@@ -1,0 +1,11 @@
+!!! XML
+!!! 
+%html
+  %head
+    %title 
+      Example
+  %body
+    #main
+      %h1 You can place text on this line
+      %p#vip.prose  
+        Or you can put more lengthy text here as content. 

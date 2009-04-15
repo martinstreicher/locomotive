@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title>The Fast and the Furious On Rails</title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+  
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+  
+  h1,h2,h3,h4, p.close {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+  
+  h2 {
+    font-size: 95%;
+    margin-top: 2em;
+  }
+  
+  h4 {
+    font-size: 85%;
+  }
+  
+  img {
+    border: none;
+  }
+  
+  li {
+    margin-bottom: 1em;
+  }
+  
+  p.image {
+    text-align: center;
+  }
+  
+  tt, pre {
+    font-family: Courier, sans-serif;
+    font-size: smaller;
+  }
+  
+  tt {
+  	font-weight: bolder;
+  }
+  
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+  
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+  
+  th, td {
+    padding: 4px 12px;
+    font-size: 80%;
+  }
+  
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+  
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>
+	The Fast and the Furious On Rails
+	</h1>
+
+<p>
+	Instant gratification is one of the real joys of developing software. Like many other crafts, coding shapes raw materials into a novel work. Tap-tap-tap and a new machine is born.
+	</p>
+	
+<p>
+	Perhaps it's no wonder that so many developers have adopted frameworks such as Ruby on Rails. Given tools such as routes, the ActiveRecord object-relational mapping (ORM), migrations, and a vast collection of open source contributions, it's easy to realize features quickly. 
+	</p>
+	
+<p>
+	But before you go all fast and furious, you must first leave the driveway. In the case of Rails, prep typically requires the installation of your essential gems and plug-ins, a modicum of configuration, the (re)creation of helpful initializers, and more. Certainly, setup occurs once, but repetition quickly becomes painful -- like driving the Audi R8 super car through Midtown traffic. 
+	</p>
+	
+<p>
+	Here's a picture of the R8 to emphasize the point. Ouch.
+	</p>
+	
+<div>
+	<p class="image">
+		<img src="images/r8.jpg" width="55%" alt="The Audi R8 super car" />
+	</p>
+</div>
+	
+<p>
+	To simplify the creation process, thus saving the sanity of many a Rails developer, a number of bootstrap kits are available. <a href="http://github.com/fudgestudios/bort/tree/master">Bort</a>, for example, 
+	</p> packages a set of plug-ins commonly used to create sites, including an asset packager (to bundle and compress JavaScript and CSS files into a single download), Rspec (to support test-driven development), and RESTful authentication (to create and activate user accounts). You can download Bort with the command <tt>git clone	git://github.com/fudgestudios/bort.git</tt>. 
+	</p>
+	
+<p>
+	The <a href="http://railskits.com/available-kits/">RailsKits</a> website also offers a number of specialized kits, some for free and some for a nominal fee. Of course, you can also download any number of open source Rails applications to base your work on. (Be mindful of the terms of the license.) 
+	</p>
+	
+<p>
+	Bort is very capable and I've employed it to launch some of my own projects. Moreover, you can easily extend Bort with additional plug-ins and other custom code to create your own kernel. 
+	</p>
+	
+<p>
+	However, Bort has two significant limitations: if your form of application differs, Bort is of little use; and Bort doesn't affect the system software. If you regularly require specific gems or other tasks to prep the system for the application, Bort is of little use. 
+	</p>
+	
+<p>
+	But hang on there, Mr. Diesel. Rails 2.3 offers another, much more flexible approach: the <i>application template</i>. 
+	</p>
+	
+
+<h2>
+	Vroom, Vroom!
+	</h2>
+	
+<p>
+	Created by <a href="http://www.jeremymcanally.com/">Jeremy McAnally</a> and  new to Rails 2.3, an application template (here, let's call it a boilerplate to avoid overloading the term template). The application boilerplate is a set of instructions to generate a new Rails application and mold the entire environment to suit. The boilerplate is a simple Ruby script, albeit with calls to a number of specialized, domain-specific methods. 
+	</p>
+	
+<p>
+	For instance, the boilerplate "language" includes the method-cum-keyword <tt>plugin</tt> to install a plugin during the generation of a new application. Thus, if you wanted to install the handy Paperclip plug-in into a new application instance, create the script <i>paperclip.rb</i> with contents &hellip;
+	</p>
+	
+<pre class="list">
+plugin( 'paperclip', :git => git://github.com/thoughtbot/paperclip.git )
+</pre>
+
+&hellip; and run the command <tt>rails album -m paperclip.rb</tt>&hellip;
+
+<pre>
+$ <b>rails --version</b>
+Rails 2.3.2
+$ <b>rails album -m paperclip.rb</b>
+    create  
+    create  app/controllers
+    ...
+  applying  template: paperclip.rb
+    plugin  paperclip
+    
+Unpacking objects: 100% (62/62), done.
+From git://github.com/thoughtbot/paperclip
+* branch            HEAD       -> FETCH_HEAD
+
+   applied  paperclip.rb
+$ <b>ls album/vendor/plugins/</b>
+paperclip
+</pre>
+	
+
+<h2>
+	A Better Bort
+	</h2>
+	
+<p>
+	Let's march through a more lengthy example to learn more about the available boilerplate methods. Specifically, let's look at Jeremy McAnally's boilerplate to replace Bort. (Jeremy offers a number of boilerplates via his <a href="http://github.com/jeremymcanally/rails-templates/tree/master">GitHub account</a>.)  Here is <i>bort.rb</i>. 
+	</p>
+	
+<pre class="list">
+# bort.rb
+# from Jeremy McAnally, Pratik Naik
+# based on bort by Jim Neath
+ 
+inside('vendor') do
+  run "ln -s ~/commit-rails/rails rails"
+end
+ 
+plugin 'rspec', 
+  :git => 'git://github.com/dchelimsky/rspec.git'
+plugin 'rspec-rails', 
+  :git => 'git://github.com/dchelimsky/rspec-rails.git'
+plugin 'exception_notifier', 
+  :git => 'git://github.com/rails/exception_notification.git'
+plugin 'open_id_authentication', 
+  :git => 'git://github.com/rails/open_id_authentication.git'
+plugin 'asset_packager', 
+  :git => 'http://synthesis.sbecker.net/pages/asset_packager'
+plugin 'role_requirement', 
+  :git => 'git://github.com/timcharper/role_requirement.git'
+plugin 'restful-authentication', 
+  :git => 'git://github.com/technoweenie/restful-authentication.git'
+ 
+gem 'mislav-will_paginate', :version => '~> 2.2.3', 
+  :lib => 'will_paginate',  :source => 'http://gems.github.com'
+gem 'rubyist-aasm'
+gem 'ruby-openid'
+ 
+rake("gems:install", :sudo => true)
+ 
+generate("authenticated", "user session")
+generate("rspec")
+</pre>
+
+<p>
+	The keywords of the boilerplate domain-specific language are largely self-explanatory, making the intent of an application template easy to comprehend. 
+	</p>
+	
+<ul>
+	<li><tt>inside()</tt> requires the path to a directory. This method changes directory to the named path and executes each command in the block within that directory. This <tt>inside()</tt> command is unique to Jeremy's environment: he links <i>vendor/rails</i> (the application's frozen Rails code) to Edge Rails found in <i>~/commit-rails/rails</i>. (You can safely remove this block or adapt it to your own environment.)</li>
+
+	<li>The next series of instructions should be familiar: Each statement installs a plug-in. In addition to <tt>:git</tt>, you can also use <tt>:svn</tt>. </li>
+	
+	<li>The next operator, <tt>gem</tt>, does not install a gem. Instead, per convention, it adds a <tt>gem.config</tt> entry to <i>environment.rb</i> to connote that the application depends on the named gem. Here, three gems are required: <tt>will_paginate</tt> to paginate results; <tt>rubyist-aasm</tt> ("acts as state machine") to track sign-up progress from new user to registered user;  and <tt>ruby-openid</tt> to support OpenID authentication. </li>
+
+	<li>The next statement, <tt>rake("gems:install", :sudo => true)</tt> is the same as the command <tt>sudo rake gems:install</tt>. It enumerates the gem prerequisities and installs the gems as <i>root</i>. </li>
+
+	<li>Finally, the boilerplate runs two generators, the equivalent of the commands&hellip;
+<pre>
+ruby script/generate authenticated user session
+ruby script/generate rspec
+</pre></li>
+	</ul>
+
+<p>
+	In addition to these operations, you can create new routes with <tt>route()</tt>, add new <i>rake</i> tasks with <tt>rakefile()</tt>, and install an initializer with <tt>initializer()</tt>. Similar to <tt>initializer()</tt>, convenience methods <tt>lib()</tt>,  <tt>vendor()</tt>, and <tt>file()</tt> add a file to the <i>lib</i> and <i>vendor</i> directories, and any directory relative to RAILS_ROOT, respectively. 
+	</p>
+	
+<p>
+	For example, you could use initializer() to create a list of date formats you commonly use. 
+	</p>
+	
+<pre class="list">
+initializer 'date_formats.rb', <<-CODE
+ActiveSupport::CoreExtensions::Time::Conversions::DATE_FORMATS.merge!(
+  :date             => '%m/%d/%Y',
+  :date_time12      => '%m/%d/%Y %I:%M%p',
+  :date_time24      => '%m/%d/%Y %H:%M',
+  :day_date         => '%a %m/%d/%Y',
+  :day_date_time12  => '%a %m/%d/%Y | %I:%M%p',   
+  :day_date_time24  => '%a %m/%d/%Y | %H:%M'
+)
+CODE
+</pre>
+	
+<p>
+	Once so defined, you can convert a date to a pretty string with simple code such as <tt>@message.sent.to_s( :day_date_time12 )</tt>. 
+	</p>
+	
+<p>	
+	You can even drop your newly-generated application into Git with keyword <tt>git</tt>. 
+	</p>	
+
+<pre class="list">
+git :init
+git :add => "."
+git :commit => "-a -m 'Initial commit'"
+</pre>
+	
+	
+<h2>
+	More Goodies
+	</h2>
+
+<p>
+	Application templates are sure to save you time and headaches when creating a new application. Happily, the same automation can be applied to an existing application, too. The new <i>rake</i> task <tt>rails:template</tt> can apply a boilerplate script to an existing body of code. 
+	</p>
+	
+<p>
+	For instance, to add the Paperclip plug-in to an existing work, just point to the script:
+	</p>
+	
+<pre>
+$ rake rails:template LOCATION=~/templates/paperclip.rb
+</pre>
+
+<p>
+	You can share boilerplate scripts as well. If the Paperclip template is located at http://example.com/templates/paperclip.rb.txt, simply point to the URL: 
+	</p>
+	
+<pre>
+$ rails album -m http://example.com/templates/paperclip.rb.txt
+</pre>
+	
+<p>
+	Until a <a href="http://guides.rubyonrails.org/">Rails Guide</a> for application templates is available, you can read about all the boilerplate   capabilities at <a href="http://m.onkey.org/2008/12/4/rails-templates">Pratik Naik's blog</a>. If you craft a helpful application template, consider sharing it with Jeremy.  
+	</p>
+	
+<p>
+	If you combine the features of application template, <tt>rake rails:freeze:edge</tt>, and <tt>config.gem</tt>, you should have little hassle  sharing a complete, stand-alone application with others. 
+	</p>
+	
+<p>
+	Until next time, happy tinkering. 
+	</p>
+	
+	
+<p class="close">
+	Martin Streicher is a freelance Ruby on Rails developer, the author of IBM developerWorks's monthly <i>Speaking Unix</i> column, and a widely-published author on open source technologies. He drives a 5.7L Hemi and can blow the doors off most minivans. You can reach Martin at martin.streicher@gmail.com.   
+	</p>	
+</body>
+</html>
