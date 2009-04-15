@@ -1,0 +1,8 @@
+This is the repository for code and prose created by Martin Streicher. 
+
+Directory       Purpose
+
+articles/       Technical articles
+  lm/             for Linux Magazine
+  amazon/         for Amazon Developer Center
+  
