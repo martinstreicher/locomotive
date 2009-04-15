@@ -1,0 +1,773 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=macintosh">
+<style type="text/css" title="text/css">
+
+body {
+    margin: 15px 40px;
+    font-size: 10pt; 
+}
+
+div.sidebar {
+    margin: 0 15px 15px 0; 
+}
+
+h1, h2, h3, h4, legend, p.caption {
+    font-family: Tahoma;
+}
+
+h1 {
+    color: #484848; 
+}
+
+h1 {
+    font-size: 1.5em;
+    margin-bottom: 0px;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin-top: 0px; 
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+h3 {
+    font-size: 1.2em;
+    margin-top: 1.5em;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+h3 + p {
+    margin-top: 0.5em;
+}
+
+h4 {
+	margin: 0;
+	font-size: 85%;
+}
+
+h4 + p {
+	margin-top: 3px;
+}
+
+p + h4 {
+	margin-top: 5px;
+}
+
+p.byline {
+  font-size: 0.80em;
+}
+
+legend {
+  border: 1px solid black;
+  padding: 2px;
+  font-size:      .9em;
+}
+
+p, li {
+    font-family:    Georgia;
+    font-size:      .9em;
+    line-height:    1.3em;
+}
+
+li {
+	margin-bottom: .5em;
+}
+
+p.quote {
+    margin-left:    3em;
+    margin-right:  5em;
+    color:              #484848;
+   font-style: italic;
+}
+
+p.caption {
+    font-size: 70%;
+    font-weight: bolder;
+    text-align: center; }
+
+    
+pre {
+    font-family:    Courier New;
+    font-size:      smaller;
+    padding: 10px;
+    border: 1px solid black;
+}
+
+pre.tty {
+	background: black;
+	color: white;
+}
+
+</style>
+</head>
+<body>
+
+<h1>
+  How to Manage Assets on Amazon CloudFront
+  </h1>
+ <p class="byline">
+ 	By Martin Streicher
+ 	</p>
+
+<br />
+<p>
+  If your Web site is flourishing, you've probably realized that success is both a blessing and a curse. On the one hand, a growing audience and increased traffic furthers your goal, be it communication, commerce, or community. On the other hand, the additional page views and the incumbent demands on bandwidth, processor cycles, and storage may seem daunting. Ironically, mushrooming traffic can torpedo a burgeoning site. 
+  </p>
+  
+<p>
+	But before you run off to lease more bandwidth or purchase additional rackmount servers, consider delegating some of the busy work your servers currently contend with to Amazon's Simple Storage Service (S3) and Amazon's CloudFront content delivery network. 
+	</p>
+	
+<p>
+ 	In particular, S3 and CloudFront can unburden your servers from the chore of serving static content. Delivering assets from a specialized network reserves compute power for computation. 
+  </p>
+  
+<p>
+  Moreover, you can serve that content more quickly. Typically, the more distant the server (as measured by network topology), the greater the latency, or the time required to establish a connection to a server.  CloudFront both reduces latency and hastens each download. CloudFront <i>edge locations</i> are located worldwide and are likely more proximate to your visitor than your own server farm. Further, CloudFront has been architected and optimized to deliver content. 
+	
+<p>
+	As you'll see, integrating your application with S3 and CloudFront is a snap. With a little bit of work, you can do more with the hardware and software you already have deployed. 
+	</p>	
+	
+ <div style="float:right; width: 40%; border: 1px solid black; margin: 10px 10px; padding: 10px 10px;">
+ <h3 style="padding: 0px; margin: 0px;">
+ 	Strategies to Boost Performance<br />and Throughput
+	 </h3>
+	 
+<p>
+	There are many strategies to respond to proliferating usage. Software drives some approaches; hardware is required for others. Here are additional avenues to pursue to increase the throughput and performance of your existing infrastructure. 
+	</p>
+	
+<h4>
+  First, Establish a Baseline
+  </h4>
+  
+<p>
+  Before you launch into any site optimization, it's vital you collect metrics to establish a baseline. After all, without a baseline, you cannot judge whether a change improves or worsens operation. Further, if you quantify "normal" usage first, aberrations and emerging trends, when they occur, stand out plainly.  
+  </p>
+  
+<h4>
+  Hit the Library
+  </h4>
+  
+<p>
+  Next, read a good book. Steve Souder's <a href="http://www.amazon.com/High-Performance-Web-Sites-Essential/dp/0596529309/ref=pd_bbs_sr_1?ie=UTF8&amp;s=books&amp;qid=1237660939&amp;sr=8-1"><i>High-Performance Web Sites</i></a> is a must-read (a sequel to the book is in the works, too.). 
+  </p>
+  
+<p>
+  You should also profile your site with Yahoo's <a href="http://developer.yahoo.com/yslow/"><i>Y!Slow</i></a> meter. Y!Slow is based on the recommendations contained in Souder's book. (Souder is an engineer at Yahoo!.) Y!Slow measures performance along multiple axes, provides a score for each characteristic, and awards a grade &mdash;an "A" for speedy sites, an "F" for laggards&mdash;for overall responsiveness. (The figure shows the performance of the White House home page.) 
+  </p>
+  
+  <div class="sidebar" style="float: right; margin: 10px 10px; width: 200px;">
+  <p class="caption">
+    <img src="images/whitehouse.jpg" width="200px" />
+    <br />
+    The White House Web site scores poorly on the Y!Slow benchmark.
+    </p>
+  </div>
+  
+ <p>
+  In general, you should at least investigate, if not implement, each recommendation provided by Y!Slow, as even a slight investment of effort can boost a grade from an "F" to "B" or "A." For example, simply placing JavaScript at the bottom of a Web page allows the page to render more quickly because code execution is deferred til the last moment. To your visitor, the page looks more complete, even if JavaScript has yet to assemble a few remaining elements. 
+  </p>
+
+<h4>
+  Inquire About Your Queries
+  </h4>
+  
+<p>
+  Most Web applications read and write content from a relational database. If data retrieval is slow, your entire application will likely appear sluggish. Thus, your next best opportunity is to tune your database queries. Most database engines provide a query analyzer for this exact purpose; it typically reveals the interpretation of each query, the (internal) optimizations made to hasten the query, and ultimately, the duration of the operation. You can take this information to add indexes, say, or denormalize data. 
+  </p>
+  
+<p>
+  Certainly, you can also profile your own code. In fact, if your queries are quick and other subcomponents (disk I/O, networking, processor) require negligible time, your application and its framework, if any, is the next usual suspect. Use a profiler suitable to your language, and install an accelerator if one is available. For example, there are several <a href="http://en.wikipedia.org/wiki/PHP_accelerator">accelerators available for PHP</a>, which is typically interpreted anew with each respect. The PHP accelerators cache the bytecode, avoiding the rework otherwise associated with each request. 
+  </p>
+      
+<h4>
+  Meanwhile, Elsewhere in the Stack...
+  </h4>
+  
+<p>
+  Everything above the "metal," or your servers, is software, so there is ample opportunity to squeeze, shape, and even swap components in the so-called stack to bolster performance. 
+  </p>
+  
+<p>
+  To reduce the memory footprint of your application, you can tweak your Apache configuration or even switch to a tiny server such as <a href="http://www.lighttpd.net/"><i>lighttpd</i></a> (nicknamed "lightee"). To minimize processor cycles, pages that change infrequently (say a minute or more) can be cached in a reverse proxy such as <a href="http://www.squid-cache.org/"><i>Squid</i></a>. Database load can be offset using caches, keeping both query results and entire objects in memory. The query cache is commonly the purview of the database engine; objects from virtually any programming language can be cached using <a href="http://www.danga.com/memcached/"><i>Memcache</i></a>. 
+  </p>
+  
+<p>
+  lighttpd, Squid, and Memcache are provided as open, free (free, as in beer, and free, as in speech) source. There is a wealth of open source to improve site performance. One increasingly popular solution is <a href="http://xph.us/software/beanstalkd/"><i>beanstalkd</i></a>, a fast, distributed, in-memory work queue service. Its reduces the latency of page views web applications by running time-consuming tasks asynchronously.
+  </p>
+
+<h4>
+  Bring Bigger Bucks
+  </h4>
+  
+<p>
+  In addition to software upgrades, your site can acquire additional bandwidth from your service provider. In turn, this may require additional networking gear. 
+  </p>
+  
+<p>
+  If your site's architecture permits, you can can scale horizontally with the addition of new hardware; depending on the application, the incremental servers could be deployed in the Web farm, the application server corp, or within the database contingent, or in combination. Your site can also add diskless but memory-rich servers to act as reverse proxies, object caches (a la Memcache), and raw processors fed by a work queue.
+  </p>
+  
+ <h4>
+ 	Keep It on the Cheap
+ 	</h4> 
+ 	
+<p>
+  Most optimization strategies are not mutually exclusive, and you should avail yourself of every possible no- or low-cost optimization before spending additional sums. With a little research, you can detect bottlenecks, diagnose problems, and implement many of the prescriptions yourself, only at the cost of your time. Of course, hardware and accessories are sold separately. 
+  </p>
+</div>
+
+<div style="float: left; width: 55%;">
+<h3>
+  Amazon-ian Compute Power
+  </h3>
+
+<p>
+  Figures One and Two depicts the difference between an entirely self-hosted application and one that delegates asset trafficking to the CloudFront content delivery network.
+  </p>
+  
+<p>
+  In the self-hosted solution, captured in Figure One, example.com hosts its site on servers in Austin, Texas. The system handles <i>all</i> requests&mdash;dynamic Web pages, static Web pages, and static assets, such as images, movies, and CSS and JavaScript files. Every site visitor, independent of location (here,   Maui, Hawaii; Los Angeles, California; Lincoln, Nebraska; New York, New York; and Miami, Florida) connects to the server in Austin. For the resident of Maui, the latency to download an image is the time required to traverse the Internet between the two endpoints. 
+  </p>
+    
+<p>
+  In the alternate solution shown in Figure Two, combining example.com's existing infrastructure with Amazon S3 and CloudFront, requests for dynamic content (shown as dash-dotted lines) are fulfilled by the Austin server. However, requests for static content (the dashed lines) are sent instead to the closest CloudFront edge location (each edge location is depicted as a star). If the edge location does not yet have the requested asset, it pulls a copy from S3, caches the asset locally, and ultimately fulfills the request. From then on and until the asset is expired from the edge location's cache, all subsequent requests for the asset can be served proximately and expeditously. 
+  </p>
+    
+<div class="sidebar" style="float: none; width: 100%;">
+	<div>
+		<img src="images/two.png" width="100%" />
+		<p class="caption">
+			Figure One: A centralized, standalone server farm must process all incoming requests. The capacity of the servers is diluted by busy work. 
+			</p>
+		</div>  
+  
+	<div>
+			<img src="images/three.png" width="100%" />
+			<p class="caption">
+				Figure Two: Amazon CloudFront, a content delivery network, delegates delivery of static content to a specialized, distributed, and proximate network of servers. (The maps shown here are illustrative only and do not necessarily represent the topology of Amazon S3 and CloudFront.)
+				</p>
+			</div>  
+</div>
+
+<p>
+  Thus, assets that are oft-requested tend to remain in the edge location cache, translating to lower latency and improved download times for those nearby.
+  </p>
+  
+<p>
+  The division of labor between the example.com server and the access points is transparent to the Web surfer. Rather than point the HTML to an image, say, on example.com, the application server points the URL to the CloudFront network. The browser rolls merrily along unperturbed.  
+  </p>
+  
+<p>
+  There is one wrinkle in this scheme: an edge location can serve stale data.  If the edge location has an asset in its cache, it need not return to the S3 bucket to fetch the asset again. Hence, if you change the asset on S3&mdash;crop a photo, for instance&mdash;what is available in the remote cache differs from the canonical source. You can mitigate this issue by setting short expiries on CloudFront, but this defeats the purpose and real advantages of a long-lived cache. 
+  </p>
+  
+<p>
+  The best solution is to uniquely name each and every version of each asset and modify your application to request a specific version. For example, instead of generating <tt>&lt;img src="logo.png" /&gt;</tt>, the application might   generate <tt>&lt;img src="logo_200903222305.png" /&gt;</tt>, where <i>logo_200903222305.png</i> is the latest version and <tt>200903222305</tt> reflects the last-modified time of the file, or March 22, 2009 at 11:05 pm. You can concoct any number of unique naming schemes, but choose one and retrofit your code and build system to suit. 
+  </p>
+
+<p>
+  The next section presents a complete example. If you want a fresh computer to develop and test this example, launch an instance on the Elastic Compute Cloud. Several images suffice, including the Rails on Ubuntu Intrepid image, AMI ID ami-e1937488. The example is constructed with Ruby on Rails, but the equivalent can be constructed in other popular programming languages and other platforms. 
+  </p>
+
+  
+<h3>
+  Getting Started with Rails
+  </h3>
+
+<p>
+  Let's create a small Ruby on Rails application and integrate it with Amazon S3 and CloudFront to serve static content from the network of edge locations. The application is a simple photo manager. You can upload and caption images; once uploaded, S3 and CloudFront serve all the images. 
+  </p>
+  
+<p>
+  To follow along, you will need Ruby 1.8.6, Ruby on Rails 2.2 or later, the SQLite database engine, the ImageMagick image processing library, and an account on CloudFront (which includes a companion account on Amazon S3.) 
+  </p>
+ 
+ <p>
+	 If you're using the recommended EC2 instance, all of the required software is already installed. If your computer does not have Ruby, Rails, SQLite, or ImageMagick, packages are widely available in binary form for many platforms. If you use Linux, all of the software is likely available via your package manager, such as <i>Aptitude</i>.  
+  
+ <p>
+  You will also need two additional Ruby gems: the RightScale Amazon Web Services gem and Paperclip. The former provides a robust, fast, and secure interface to Amazon's web services; the latter processes file uploads and associates each attachment with a Rails model. Paperclip can also store attachments directly on Amazon S3, which makes it ideal for this demonstration. 
+  </p>
+  
+<p>
+	After you install Ruby, Ruby on Rails, SQLite, and ImageMagick, install the two gems. 
+   </p>
+  
+<pre class="tty">
+$ <b>sudo gem install right_aws paperclip</b>
+Successfully installed right_aws-1.10.0
+Successfully installed paperclip-2.1.2
+2 gems installed
+Installing ri documentation for right_aws-1.10.0...
+Installing ri documentation for paperclip-2.1.2...
+Installing RDoc documentation for right_aws-1.10.0...
+Installing RDoc documentation for paperclip-2.1.2...
+</pre>
+
+<p>
+  Now, let's start writing the application. Use <tt>rails</tt> to generate the initial code. Call the application "gallery." 
+  </p>
+  
+<pre class="tty">
+$ <b>rails gallery</b>
+create  
+create  app/controllers
+create  app/helpers
+create  app/models
+...
+create  log/development.log
+create  log/test.log
+</pre>
+
+<p>
+  Next, create a Rails model named <tt>Picture</tt> wth one string field, a caption. 
+  </p>
+  
+<pre class="tty">
+$ <b>cd gallery</b>
+$ <b>ruby script/generate scaffold picture caption:string</b>
+...
+create    test/fixtures/pictures.yml
+create    db/migrate
+create    db/migrate/20090322120824_create_pictures.rb
+</pre>
+  
+<p>
+	To continue, edit the <tt>Picture</tt> model to include the features of Paperclip. The file <i>app/models/picture.rb</i> should look like this when you're finished. 
+  </p>
+  
+<pre>
+require 'paperclip'
+
+class Picture < ActiveRecord::Base
+  ACCESS_KEY_ID = 'YOUR_ACCESS_KEY_ID'
+  SECRET_ACCESS_KEY = 'YOUR_SECRET_ACCESS_KEY'
+  BUCKET = 'cloudfront-demo'
+
+  has_attached_file :photo,
+    :storage => 's3',
+    :bucket => BUCKET,
+    :path => "uploads/:attachment/:id/:styles.:extension",
+    :styles => {
+      :medium => "300x300>",
+      :thumb => "100x100>" },
+    :s3_credentials => {
+      :access_key_id => ACCESS_KEY_ID,
+      :secret_access_key => SECRET_ACCESS_KEY },
+    :s3_permissions => 'public-read'
+end
+</pre>
+  
+<p>
+	Paperclip provides <tt>has_attached_file</tt>, which peforms all the heavy lifting required to save an uploaded file and associate it with a record. The configuration for Picture also creates two thumbnail styles, <tt>thumb</tt> and <tt>medium</tt>, one small and one large, respectively. The rest of the options configure access to S3. 
+	</p>
+	
+<ul>
+	<li>
+		<tt>:storage => s3</tt> saves attachments to S3. If you omit this, Paperclip saves attachments to the local filesystem within the application's <i>public</i> folder. 
+		</li>
+		
+	<li>
+		<tt>:bucket => BUCKET</tt> selects a bucket. You should edit the constant <tt>BUCKET</tt> and replace <tt>cloudfront-demo</tt> with the name of one of your own buckets.  
+		</li>
+		
+	<li>
+		<tt>:path</tt> describes how each file should be stored within a bucket. In addition to literals, you can use placeholders that are filled when each attachment is actually saved.  <tt>:attachment</tt> is replaced with the name of your model; <tt>:id</tt> stands in for the ID of the model instance; <tt>:styles</tt> is replaced with the name of the image style (here, one of <tt>originals</tt> for the full-size attachment, and either <tt>thumbs</tt> or <tt>mediums</tt> for the thumbnail images); and <tt>:extension</tt> is the attachment's file extension.
+		</li>
+		
+	<li>
+		<tt>:s3_credentials</tt> grant access to your bucket. 	You <b><i>must</i></b> replace the placeholder credentials, <tt>YOUR_ACCESS_KEY_ID</tt> and <tt>YOUR_SECRET_ACCESS_KEY</tt> with your own access key ID and secret access key. (You can generate this pair of keys from the Amazon Web Services site.) 
+		</li>
+		
+	<li>
+		As the owner of the bucket, Paperclip grants you full access implicitly. The <tt>s3_permissions</tt> specified, <tt>public-read</tt>, grant open access to the bucket to everyone <i>else</i>. 
+		</li>
+	</ul>	
+	
+<p>
+
+	</p>
+	
+<p>
+	Figure Three shows what an Amazon S3 bucket looks like after three additions to the picture catalog. (The application shown is the <a href="http://www.s3fox.net/">Firefox S3 Organizer plug-in</a>, which can navigate and manage S3 files, access control lists, and more. It's used later in this article to configure CloudFront, as well.) Look at the path shown in the text field. Seem familiar? The path components of <tt>/cloudfront-demo/uploads/photos/4/</tt> are the bucket name, the literal "uploads," the name of the associated model, and the ID of the model instance, respectively.  
+	</p>
+
+<div>
+  <img src="images/s3organizer.jpg" width="100%" />
+  <p class="caption">
+    Figure Three: Paperclip can save attachments in your Amazon Simple Storage Service bucket.
+    </p>
+  </div>
+  	
+<p>
+  The next step is to add a Rails migration to modify the Picture model and add new columns to keep track of the attachments's filename, size, content type, and date saved. Create the migration with <tt>ruby script/generate</tt>.
+  </p>
+  
+<pre class="tty">
+$ <b>ruby script/generate migration AddPhotoColumnsToPicture</b>
+exists  db/migrate
+create  db/migrate/20090322122945_add_photo_columns_to_picture.rb
+</pre>
+  
+<p>
+	Open the new migration and edit it to match the code below.
+	</p>
+	
+<pre>
+class AddPhotoColumnsToPicture < ActiveRecord::Migration
+  def self.up
+    add_column :pictures, :photo_file_name,    :string
+    add_column :pictures, :photo_content_type, :string
+    add_column :pictures, :photo_file_size,    :integer
+    add_column :pictures, :photo_updated_at,   :datetime
+  end
+
+  def self.down
+    remove_column :pictures, :photo_file_name
+    remove_column :pictures, :photo_content_type
+    remove_column :pictures, :photo_file_size
+    remove_column :pictures, :photo_updated_at
+  end
+end
+</pre>
+
+<p>
+	You can now initialize the database with <tt>rake db:migrate</tt>. 
+	</p>
+	
+<pre class="tty">
+$ <b>rake db:migrate</b>
+==  CreatePictures: migrating =================================================
+-- create_table(:pictures)
+   -> 0.0023s
+==  CreatePictures: migrated (0.0027s) ========================================
+
+==  AddPhotoColumnsToPicture: migrating =======================================
+-- add_column(:pictures, :photo_file_name, :string)
+   -> 0.0102s
+-- add_column(:pictures, :photo_content_type, :string)
+   -> 0.0041s
+-- add_column(:pictures, :photo_file_size, :integer)
+   -> 0.0041s
+-- add_column(:pictures, :photo_updated_at, :datetime)
+   -> 0.0046s
+==  AddPhotoColumnsToPicture: migrated (0.0243s) ==============================
+</pre>
+
+<p>
+	The last step in writing the application is to create the views to create, edit, view, and delete pictures. The controllers are satisfactory unchanged. The listings below are <i>index.html.erb</i>, <i>show.html.erb</i>, <i>new.html.erb</i>, and <i>edit.html.erb</i>, respectively. 
+	</p>
+
+<pre>
+&lt;%# index.html.erb -%&gt;
+&lt;h1&gt;Listing pictures&lt;/h1&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Thumbnail&lt;/th&gt;
+    &lt;th&gt;Caption&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% for picture in @pictures %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;%= image_tag picture.cloudfront_url(:thumb) %&gt;
+    &lt;/td&gt;
+    &lt;td&gt;&lt;%=h picture.caption %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Show', picture %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Edit', 
+      edit_picture_path(picture) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to 'Destroy', picture, 
+      :confirm =&gt; 'Are you sure?', 
+      :method =&gt; :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;
+
+&lt;br /&gt;
+
+&lt;%= link_to 'New picture', new_picture_path %&gt;
+</pre>
+
+<pre>
+&lt;%# show.html.erb -%&gt;
+&lt;p&gt;
+  &lt;b&gt;Image:&lt;/b&gt;
+  &lt;%= image_tag @picture.photo.url %&gt;
+&lt;p&gt;
+  &lt;b&gt;Caption:&lt;/b&gt;
+  &lt;%=h @picture.caption %&gt;
+&lt;/p&gt;
+
+&lt;%= link_to 'Edit', edit_picture_path(@picture) %&gt; |
+&lt;%= link_to 'Back', pictures_path %&gt;
+&lt;/pre&gt;
+</pre>
+
+<pre>
+&lt;%# new.html.erb %&gt;
+&lt;h1&gt;New picture&lt;/h1&gt;
+
+&lt;% form_for(@picture, 
+    :html =&gt; { :multipart =&gt; true }) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :photo %&gt;&lt;br /&gt;
+    &lt;%= f.file_field :photo %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :caption %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :caption %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit "Update" %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;%= link_to 'Back', pictures_path %&gt;
+</pre>
+
+<pre>
+&lt;%# new.html.erb -%&gt;
+&lt;h1&gt;New picture&lt;/h1&gt;
+
+&lt;% form_for(@picture, 
+    :html =&gt; { :multipart =&gt; true }) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :photo %&gt;&lt;br /&gt;
+    &lt;%= f.file_field :photo %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :caption %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :caption %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.submit "Update" %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;%= link_to 'Back', pictures_path %&gt;
+</pre>
+
+<p>
+	Let's run the application. Type <tt>./script/server</tt> and point your browser to <tt>http://localhost:3000</tt>. Walk through the interface and upload a handful of files. Eventually, your index page should resemble Figure Four. 
+	</p>
+
+<div>
+  <img src="images/index.jpg" width="100%" />
+  <p class="caption">
+    Figure Four: A snapshot of the image manager application.
+    </p>
+  </div>
+  
+ <p>
+ 	If you examine your S3 bucket, it should resemble Figure Three. 	And if you view the HTML source of the application's index page, the URL for each image resembles  <i>https://s3.amazonaws.com/cloudfront-demo/uploads/photos/1/thumbs.png</i>. With very little work, you've already separated the work of the application from the busy work of serving assets. The next step is to serve the assets even more quickly by referencing an edge location in closer proximity to your end-user.  
+ 	</p>
+
+   
+<h3>
+	Tying Rails to CloudFront
+	</h3>
+	
+<p>
+	To disburse content from CloudFront, you create a <i>distribution</i>. A distribution connects an Amazon S3 bucket to a special domain name such as <i>http://d138nkhrob277s.cloudfront.net</i>. To serve content from the distribution, simply replace the domain name and name of the bucket with the domain name of the distribution.    
+	</p>
+	
+<p>
+	For example, if you serve an image from your Amazon S3 bucket via <i>https://s3.amazonaws.com/cloudfront-demo/uploads/photos/1/thumbs.png</i>, you can serve the very same image via CloudFront by changing the URL to <i>http://d138nkhrob277s.cloudfront.net/uploads/photos/1/thumbs.png</i>. It's that easy!
+	</p>
+	
+<p>
+	Amazon offers a number of ways to create and manage distributions. The most convenient option is the Firefox S3 Organizer plug-in. Figure Five shows the Firefox S3 Organizer plug-in and a pair of buckets created for this example. To create a distribution, choose a bucket from the list, right-click to open the option menu, and choose Manage Distributions. 
+	</p>
+	
+	
+<p>
+	Now that the distribution is ready, you can change the Rails code to use CloudFront. The changes are simple: In Picture, wrap the existing Paperclip <tt>url()</tt> method and replace the leading portion of the URL with the CloudFront URL, and update the views to use the new method. 
+	</p>
+	
+<p>
+	<tt>cloudfront_url()</tt> is the wrapper method.
+	</p>
+	
+<pre>
+DISTRIBUTION = 'http://d138nkhrob277s.cloudfront.net'
+
+def cloudfront_url( variant = nil )
+  self.photo.url(variant).gsub( "#{S3}/#{BUCKET}", DISTRIBUTION )
+end
+</pre>
+
+<p>
+	And here is the one-line to <i>index.html.erb</i> to use CloudFront. You can make similar changes to the other view templates, too. 
+	</p>
+
+<pre>
+&lt;%= image_tag picture.cloudfront_url(:thumb) %&gt;
+</pre>
+
+
+<h3>
+	Managing Versions of Files
+	</h3>
+	
+<p>
+	The last task is to ensure that CloudFront doesn't serve stale static assets, such as data files and images.  
+	</p>
+	
+<p>
+	To reiterare, CloudFront caches your assets in edge locations to accelerate delivery to nearby visitors. Assets do expire from the cache, but the expiry of a particular asset may be days or even weeks in the future, if your application has so deemed. (An expiry can be set by your application via a  <tt>Cache-Control</tt> header in a response.) In the event you want to replace the asset with a new version of the asset, you must do something to effectively obsolete the older incarnation. 
+	</p>
+	
+<p>
+	An easy approach is to simply assign the new version of the asset a new name. For example, if you change your company logo&mdash;an asset that typically changes very rarely and hence can be cached for long periods&mdash;you can update all uses of <i>logo.png</i> to <i>logo_version2.png</i>. Essentially, the older file is now obsolete and will be purged from each edge location cache in due course. However, as soon as the <i>logo_version2.png</i> is referenced by the application, the edge locations will rush to the origin to cache the new file.  
+	</p>
+	
+<p>
+	While the notion is simple&mdash;just create a new file for each new version&mdash; the mechanics of implementing the scheme are a little more complicated. If you use a version control system to manage your assets, for instance, you probably want the file name <i>intact</i> from revision to revision to be able to keep its history intact, too. And, given how many assets an application typically has, you don't want to search and replace asset references in every source code file every time you make a change. 
+	</p>
+	
+<p>
+	What to do? Automate, of course, using <i>rake</i>. 
+	</p>
+	
+<p>
+	To prepare, march through your code and replace all explicit references to an asset with a constant. For example, if you refer to <i>logo.png</i>, replace it with <tt>LOGO_PNG</tt>. Next, move all of the assets in <i>public</i> to a new directory, <i>app/assets</i>.  Ideally, app/assets, like the rest of your Rails application, is maintained by a version control system such as <i>Subversion</i> or <i>Git</i>. 
+	</p>
+	
+<p>
+	Next, create a <i>rake</i> task to amend the assets' file names with the last modified time of the file (or, if you prefer, the MD5 hash of the contents of the file). This makes each file name unique because timestamps per file are also unique. Finally, map the latest revision of the file to its constant and emit a list of constants to include in the application. 
+	</p>
+	
+<p>
+	Here is the new <i>rake</i> task, which should be installed in <i>lib/tasks/constants.rake</i> in your Rails application. 
+	</p>
+	
+<pre>
+require 'fileutils'
+
+TIMESTAMP = "%m%d%Y%H%M%S" 
+
+def move( file_name )
+  directory = File.dirname( file_name ) 
+  basename  = File.basename( file_name )
+  extension = File.extname( basename )
+  rootname  = File.basename( file_name, extension )
+  time_code = File.stat( file_name ).mtime.strftime( TIMESTAMP )
+  
+  new_name  = File.join( directory, 
+    "#{rootname}_#{time_code}#{extension}" )
+  FileUtils.mv( file_name, new_name )
+  
+  [ basename, new_name ]
+end
+
+def list( file_name, excluded = [] )
+  ( modified = Array.new ) << if File.directory?( file_name )
+    Dir.open( "#{ file_name }" ).map do | file |
+      next if file.match(/^\.+/)
+      next if excluded.include?( File.extname( file ).downcase )
+      
+      list( "#{ file_name }/#{ file }", excluded )
+    end
+  else
+    file_name 
+  end
+end  
+
+namespace :constants do
+  source = File.join( RAILS_ROOT, 'app', 'assets' )
+  destination = File.join( RAILS_ROOT, 'public' )
+  target = File.join( RAILS_ROOT, 
+    'config', 'initializers', 'constants.rb' )
+  excluded = %w( cgi html rb fcgi ico txt ).map { |ext| 
+    ".#{ext}".downcase }
+  
+  desc "Generate a list of constants, one for each static asset"
+  task :generate do 
+    FileUtils.rm_f ( target )
+    FileUtils.cp_r( source, destination )
+    target_file = File.new( target, 'w' )
+
+    list( destination, excluded ).flatten.compact.map { 
+      |file| move( file ) }.each { | c |
+        constant = c.first.to_s.gsub( '.', '_' ).upcase
+        value = c.last.gsub( "#{RAILS_ROOT}/public", '' )
+        target_file.puts "#{constant} = '#{value}'" }
+  end
+  
+  desc "Delete your public folder and the constants file"
+  task :clean do 
+    FileUtils.rm_f ( target )
+    FileUtils.rm_r( destination, { :force => true } )
+  end
+end
+</pre>
+
+<p>
+There are two new tasks, <tt>constants:clean</tt> and <tt>constants:generate</tt>. The former task removes your <i>public</i> directory and the file <i>config/initializers/constants.rb</i>. Both are regenerated by the other new task, <tt>constants:generate</tt>. 
+	</p>
+
+<p>
+	Let's try it. Open the index.html.erb template and add the Rails logo to the head of the page with the line...
+	</p>
+	
+<pre>
+&lt;%= image_tag RAILS_PNG %&gt;
+</pre>
+	
+<p>
+	Next, copy the contents of the <i>public</i> folder into <i>app/assets</i>, run the two new rake tasks, and start the server. 
+	</p>
+	
+<pre class="tty">
+$ <b>mkdir app/assets</b>
+$ <b>cp -pr public/* app/assets</b>
+$ <b>rake constants:clean constants:generate</b>
+$ <b>./script/server</b>
+</pre>
+
+<p>
+If you look at the HTML source of your index page, you should see <tt>&lt;img alt="Rails_03232009160913" src="/images/rails_03232009160913.png /&gt;. That's good. 
+	</p>
+	
+<p>
+	The last step is to move the image to your Amazon S3 bucket and point the &lt;img ...&gt; tag to point to the CloudFront domain.  
+	</p>
+	
+<p>
+	Use the Firefox S3 Organizer to create a folder named <i>images</i> in your bucket and upload the Rails PNG file. Make sure to make both the folder and the image world-readable. 
+	</p>
+	
+<p>
+	To point your image tag URLs to CloudFront, set the Rails <tt>asset_host</tt> to the domain of your distribution. <tt>asset_host</tt>, if set, prefaces URLs for images and other static assets with the domain you specify.  Open <i>environment.rb</i> and add the following line:
+	</p>
+
+<pre>
+ActionController::Base.asset_host = 
+  'http://d138nkhrob277s.cloudfront.net'
+</pre>
+
+<p>
+	Stop and restart the server and revisit your index page. The URL for the Rails logo should now point to your CloudFront distribution. 
+	</p>
+	
+	
+<h3>
+	CloudFront a Silver Lining
+	</h3>
+	
+<p>
+	With only a modicum of coding and some work to establish an initial CloudFront presence, the sample Rails application now delegates a good amount of overhead to CloudFront's edge locations. The cost? Negiligible. The potential reward? Considerable.
+	</p>
+	</body>
+</html>
