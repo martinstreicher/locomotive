@@ -1,5 +1,6 @@
 
 run "gem sources -a http://gems.github.com"
+run "rm public/index.html"
 
 inside( 'config' ) do 
   run "cp database.yml database.yml.default"  

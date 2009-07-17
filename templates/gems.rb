@@ -2,6 +2,9 @@
 # Gems
 #
 
+#/ 
+# List
+#
 gem 'aws-s3', 
   :lib      => 'aws/s3'
 
@@ -13,13 +16,24 @@ gem 'mislav-will_paginate',
   :lib      => 'will_paginate',  
   :source   => 'http://gems.github.com'
 
-gem 'mongodb-mongo'
-gem 'mongodb-mongo_ext'
-gem 'jnunemaker-mongomapper'
+gem 'ruby-openid',
+  :lib => 'openid'
+
+gem 'mongodb-mongo',
+  :lib => 'mongo'
+
+gem 'jnunemaker-mongomapper',
+  :lib => 'mongomapper'
+
 gem 'mysql'
-gem 'rubyist-aasm'
-gem 'ruby-openid'
+
+gem 'rubyist-aasm', 
+  :lib => 'aasm'
+
 gem 'tlsmail'
 
 
+#/ 
+# Install
+# 
 rake("gems:install", :sudo => true)
