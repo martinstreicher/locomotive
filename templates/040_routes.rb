@@ -1,0 +1,5 @@
+route "map.login   '/login',  :controller => 'sessions',  :action => 'new'"
+route "map.logout  '/logout', :controller => 'sessions',  :action => 'destroy'"
+route "map.signup  '/signup', :controller => 'users',    :action => 'new'"
+route "map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil"
+route "map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }"
