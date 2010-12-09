@@ -1,0 +1,584 @@
+<?xml-stylesheet type="text/xsl" href="../xsl/6.0/en_US/dw-document-html-worldwide-6.0.xsl"?>
+<dw-document xmlns:dw="http://www.ibm.com/developerWorks/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../schema/6.0/dw-document-6.0.xsd">
+
+<dw-article local-site="worldwide" skill-level="3" page-end-btt-link="yes">
+<id cma-id="12345" domino-uid="" content-id="" original="yes" />
+<keywords content="Martin Streicher, UNIX, speaking UNIX, remote server, tips"/>
+
+<meta-dctype>
+	<cma-defined-type />
+</meta-dctype>
+
+<meta-dcsubject>
+	<cma-defined-subject />
+</meta-dcsubject>
+
+<meta-last-updated day="12" month="05" year="2010" initials="ma" />
+
+<content-area-primary name="aix" />
+
+<title>Speaking UNIX 17: Managing multitudes of machines the mild-mannered way</title>
+
+<author jobtitle="Software Developer" email-cc="" email="martin.streicher@gmail.com">
+	<bio>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<i><a href="http://www.linux-mag.com">Linux Magazine</a>.</i> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</bio>
+	<img alt="Martin Streicher" src="images\Bio_mstreicher.jpg"/>
+	<author-name>
+		<GivenName>Martin</GivenName>
+		<FamilyName>Streicher</FamilyName>
+	</author-name>
+	<company-name>Pixel, Byte, and Comma</company-name>
+</author>
+
+<date-published day="13" month="05" year="2010" />
+
+<abstract></abstract>
+
+<abstract-extended>Cloud computing may currently be all the rage, but there is a silicon lining
+	to each calculating cumulus: hardware and software require very real upkeep. Learn
+	how to manage gobs of machines right from the command line.
+</abstract-extended>
+
+<docbody>
+	<p>A cloud is ultimately constituted from hardware and software<mdash />components that
+		require real and regular upkeep. Hardware failures demand repair or replacement;
+		software requires patching, updates, and upgrades; and systems must be configured
+		to keep ahead of demand and potential security threats. Application developers may
+		find compute clouds soft, fluffy, and convenient, but a cloud administrator faces the
+		grimy truth.
+	</p>
+
+	<p>But you don't have to manage a cloud to face gritty issues. A LAN, a small server farm, and a
+		compute cluster pose many of the same systems administration challenges. When the
+		number of machines climbs, workaday tools such as Secure Shell (ssh), <code type="inline">scp</code>,
+		and <code type="inline">sftp</code> become cumbersome. This installment of
+		<a href="http://www.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX:">Speaking
+		UNIX</a> looks at effective techniques to manage gobs of machines from the command
+		line, starting with just a handful of systems and scaling upward.
+	</p>
+
+	<heading refname="brute" type="major">A brute force approach</heading>
+		<p>A simple and obvious approach to running a command on a collection of machines
+			wraps the common ssh utility in a script. Assuming that you have distributed
+			your public key to each remote system you want to access (to avoid typing a
+			password each time), this script, named <em>mssh.sh,</em> runs a single command
+			on each machine specified and prints the collected results at the end (see
+			<a href="#list1">Listing 1</a>).
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list1" type="code">Listing 1. mssh.sh</heading>
+#!/bin/bash
+# Usage: mssh.sh "machine1 [machine2...]" "command"
+
+OUTPUT_LOG=/tmp/output-$$.log
+ERROR_LOG=/tmp/error-$$.log
+MACHINES=$1; shift
+COMMAND=$1; shift
+
+for machine in $MACHINES
+do
+    ssh $machine $COMMAND >>$OUTPUT_LOG.$machine 2>>$ERROR_LOG.$machine &amp;
+done
+
+wait
+
+cat $OUTPUT_LOG.*
+cat $ERROR_LOG.* >&amp;2
+rm -f $OUTPUT_LOG.* $ERROR_LOG.*
+</code>
+
+		<p>For example, the command:</p>
+
+<code type="section" width="65%">
+mssh.sh "example.com joe@sample.com" "uptime -a"&gt;
+</code>
+
+		<p>runs <code type="inline">uptime -a</code> on two hosts: example.com and sample.com.
+			The list of machine names is quoted to lump the names together into one argument,
+			and the command is quoted for exactly the same reason. Each machine name must
+			conform to the paradigms for ssh<mdash />either <code type="inline"><em>hostname</em></code>,
+			if the remote user name is the same as the local user name, or
+			<code type="inline"><em>username@hostname</em></code> if the remote user name
+			differs from the local login. Running:
+		</p>
+
+<code type="section" width="65%">
+mssh.sh "example.com joe@sample.com" "uptime -a"&gt;
+</code>
+
+		<p>produces something akin to this:</p>
+
+<code type="section" width="65%">
+$ mssh.sh "example.com joe@sample.com" "uptime"
+example.com
+08:34:35 up 66 days, 17:29,  0 users,  load average: 0.40, 0.19, 0.07
+joe@sample.com
+08:34:28 up 104 days, 10:18,  0 users,  load average: 0.15, 0.10, 0.10
+</code>
+
+		<p>This script is rudimentary but can be extended to include other features, such as
+			a tunable timeout to prevent interminable delays when a single host is down
+			(look at the <code type="inline">ssh -o</code> option) and a named directory to
+			capture output. Indeed, many packages build on the spirit of this script to simplify
+			distributed systems administration. One of those is the Distributed Shell (dsh).
+		</p>
+
+	<heading refname="better_tool" type="major">A better tool for the task</heading>
+		<p>Specifically designed to run shell commands on remote systems, dsh provides a
+			handful of conveniences to make working with groups of machines easier. The shell
+			is available in both binary and source form. For binaries, consult your Linux<reg />
+			or UNIX<reg /> distribution for the <code type="inline">libdshconfig</code> and
+			<code type="inline">dsh</code> packages. For example, Ubuntu and Debian users
+			can install dsh in one fell swoop with <code type="inline">apt-get</code>:
+		</p>
+
+<code type="section" width="65%">
+$ sudo apt-get install libdshconfig1 libdshconfig1-dev dsh
+</code>
+
+		<p>If you cannot find pre-built packages for your system, dsh is readily built from source
+			code. Find the latest version of both the library and the utility, download and
+			unpack both tarballs, and build and install both with the typical technique of
+			<code type="inline">./configure; make; sudo make install</code> (see
+			<a href="#list2">Listing 2</a>).
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list2" type="code">Listing 2. Building dsh from source</heading>
+$ # Build and install the library first
+$ wget http://www.netfort.gr.jp/~dancer/software/downloads/libdshconfig-0.20.13.tar.gz
+$ tar xzvf libdshconfig-0.20.13.tar.gz
+$ cd libshconfig-0.20.13
+$ ./configure
+$ make
+$ sudo make install
+
+$ # Then build and install the utility
+$ wget http://www.netfort.gr.jp/~dancer/software/downloads/dsh-0.25.9.tar.gz
+$ tar xzvf dsh-0.25.9.tar.gz
+$ cd dsh-0.25.9
+$ ./configure
+$ make
+$ sudo make install
+</code>
+
+		<p>The shell is a fairly small application; the <code type="inline">dsh</code> and
+			<code type="inline">dsh.conf</code> man pages provide all the details required
+			to master the utility. For instance, to run <code type="inline">uptime</code>
+			across a set of hosts, as in the first example, you simply type:
+		</p>
+
+<code type="section" width="65%">
+$ dsh --show-machine-names -m example.com -m joe@sample.com -- uptime
+example.com: 11:34:57 up 66 days, 20:29,  0 users,  load average: 0.04, 0.06, 0.01
+joe@sample.com: 11:35  up 2 days, 14:59, 8 users, load averages: 0.46 0.35 0.31
+</code>
+
+		<p>You specify a machine with <code type="inline">-m</code>, and host names follow
+			the same rules as ssh. The two dashes in the command line separate options for
+			the <code type="inline">dsh</code> command itself from the command to run.
+			Output appears in the order the machines are named. The command
+			<code type="inline">--show-machine-names</code> prepends each machine name
+			to whatever is emitted from the remote command.
+		</p>
+		<p>If you tend to work with the same set or subset of machines, you can define one or
+			more collections and specify a collection to operate on. You can create one global
+			collection and any number of groups. The file $HOME/.dsh/machines.list is the
+			global collection. If you specify <code type="inline">dsh -a</code>, the given
+			command runs on all machines listed in machines.list. Hence, if machines.list
+			contained:
+		</p>
+
+<code type="section" width="65%">
+example.com
+joe@sample.com
+</code>
+
+		<p>the command:</p>
+
+<code type="section" width="65%">
+dsh -a --show-machine-names -- uptime
+</code>
+
+		<p>would produce the same output as the previous command:</p>
+
+<code type="section" width="65%">
+$ dsh -a --show-machine-names -- uptime
+example.com:  11:57:03 up 66 days, 20:51,  0 users,  load average: 0.29, 0.18, 0.07
+joe@sample.com: 11:57  up 2 days, 15:21, 8 users, load averages: 0.52 0.31 0.26
+</code>
+
+		<p>You can create smaller or specialized collections of machines in individual files
+			named $HOME/.dsh/group/<em>groupname,</em> where <em>groupname</em> is
+			a meaningful name you assign. For example, if you create a file named
+			<em>$HOME/.dsh/group/servers</em>, the command
+			<code type="inline">dsh -g servers -- uptime</code> runs <code type="inline">uptime</code>
+			on all machines listed in the <em>servers</em> file.
+		</p>
+		<p>Feel free to mix and match <code type="inline">-m</code> with
+			<code type="inline">-a</code> and <code type="inline">-g</code> to extend the
+			global list or a group, respectively. Additionally, you can use
+			<code type="inline">--file <em>filename</em></code> to add all machines listed
+			in <code type="inline"><em>filename</em></code> to the list of hosts. By default,
+			dsh runs commands in parallel. If you would like instead to run a command
+			sequentially<mdash />one machine after another<mdash />specify
+			<code type="inline">--wait-shell</code>.
+		</p>
+		<p>While handy, dsh has one substantial detractor: It cannot copy files. If you want to
+			deploy data, say, to more than one machine, you'll have to write a new script,
+			adopt a distribution infrastructure such as <code type="inline">rsync</code>, or
+			consider a more robust tool, such as Parallel SSH (pssh).
+		</p>
+
+	<heading refname="parallel" type="major">Just like ssh, only in parallel</heading>
+		<p>Like dsh, pssh aims to streamline the administration of lots of machines. In addition to
+			all the capabilities of dsh, pssh is able to copy files to and from a central server
+			and kill processes across a bank of systems. The shell and its underlying library
+			are written in Python, and pssh is easy to install, assuming that your system
+			already has the Python interpreter and core libraries (see <a href="#list3">Listing 3</a>).
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list3" type="code">Listing 3. Installing pssh</heading>
+$ # For systems with apt-get (apt-get installs Python if necessary)
+$ sudo apt-get install pssh
+
+$ # For all others, install Python and then continue
+$ wget http://peak.telecommunity.com/dist/ez_setup.py
+$ sudo python ez_setup.py
+$ wget http://parallel-ssh.googlecode.com/files/pssh-2.1.1.tar.gz
+$ tar xzvf pssh-2.1.1.tar.gz
+$ cd pssh-2.1.1
+$ sudo python setup.py install
+</code>
+
+		<p>The pssh package installs five utilities: <code type="inline">parallel-ssh</code>,
+			<code type="inline">parallel-scp</code>, <code type="inline">parallel-slurp</code>,
+			<code type="inline">parallel-nuke</code>, and <code type="inline">parallel-rsync</code>.
+			Each utility operates on multiple hosts in parallel.
+		</p>
+			<ul>
+				<li><code type="inline">parallel-ssh</code> runs a command on multiple
+					hosts in parallel.
+				</li>
+				<li><code type="inline">parallel-scp</code>, as its name implies, copies files
+					to multiple remote hosts in parallel.
+				</li>
+				<li><code type="inline">parallel-rsync</code>, true to its moniker, efficiently
+					copies files to multiple hosts in parallel via the <code type="inline">rsync</code>
+					protocol.
+				</li>
+				<li><code type="inline">parallel-slurp</code> copies files from multiple remote
+					hosts to a central host in parallel.
+				</li>
+				<li><code type="inline">parallel-nuke</code> kills processes on multiple remote
+					hosts in parallel.
+				</li>
+			</ul>
+		<p>Unlike dsh, the hosts are always named via a <em>manifest,</em> a file in which each
+			line takes the form <code type="inline"><em>host[:port] [user]</em></code>. Here's
+			how to run <code type="inline">uptime</code> across a swath of hosts with
+			<code type="inline">parallel-ssh</code>:
+		</p>
+
+<code type="section" width="65%">
+$ parallel-ssh -h servers.txt uptime
+[1] 16:15:14 [SUCCESS] example.com 22
+16:15  up 2 days, 19:39, 9 users, load averages: 0.09 0.10 0.12
+[2] 16:15:28 [SUCCESS] sample.com 22
+16:15:28 up 67 days,  1:09,  0 users,  load average: 0.09, 0.07, 0.01
+</code>
+
+		<p>The file servers.txt has two lines:</p>
+
+<code type="section" width="65%">
+example.com
+sample.com joe
+</code>
+
+		<p>By default, output from each instance of the command appears in stdout. The
+			output is divided into sections, one section per host. However, you can name a
+			directory to capture the stdout of each instance. For example, if you run the
+			previous command and add <code type="inline">--outdir /tmp/uptime</code>,
+			a transcript of the command from each host is captured in a separate file in
+			/tmp/uptime, as <a href="#list4">Listing 4</a> shows.
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list4" type="code">Listing 4. Capturing output in a separate file</heading>
+$ parallel-ssh -h servers.txt uptime
+[1] 16:15:14 [SUCCESS] example.com 22
+[2] 16:15:28 [SUCCESS] sample.com 22
+
+$ ls -1 /tmp/uptime
+example.com
+sample.com
+
+$ cat /tmp/uptime/*
+16:22  up 2 days, 19:46, 9 users, load averages: 0.47 0.28 0.19
+16:22:32 up 67 days,  1:17,  0 users,  load average: 0.06, 0.04, 0.00
+</code>
+
+		<p>The <code type="inline">parallel-ssh</code> utility can spawn a maximum of 32
+			processes to connect to various nodes in parallel. If a remote command does
+			not complete after 60 seconds, the connection is terminated. If your command
+			requires more processing time, use <code type="inline">-t</code> to set a longer
+			expiration time. (<code type="inline">parallel-scp</code> and <code type="inline">parallel-rsync</code>
+			do not have a default expiration, but you can specify one using
+			<code type="inline">-t</code>.)
+		</p>
+		<p>You can use <code type="inline">parallel-scp</code> to copy one or more files or
+			directories to many machines in parallel. It should seem familiar if you've mastered
+			the traditional <code type="inline">scp</code>.
+		</p>
+
+<code type="section" width="65%">
+$ parallel-scp -h servers.txt /etc/hosts /tmp/hosts
+[1] 16:49:38 [SUCCESS] example.com 22
+[2] 16:49:55 [SUCCESS] sample.com 22
+</code>
+
+		<p>The previous command copies the local file /etc/hosts to /tmp/hosts on each
+			machine listed in servers.txt. <code type="inline">parallel-rsync</code> works
+			similarly, running <code type="inline">rsync</code> in parallel to manage files
+			between the local host and the remote hosts listed in the manifest.
+			<code type="inline">parallel-slurp</code> works something like
+			<code type="inline">parallel-scp</code> in reverse but with one twist: It collects
+			the named file from each remote machine but does not overwrite the local version
+			of the file. Instead, <code type="inline">parallel-slurp</code> creates a subdirectory
+			for each remote machine and copies the named file to that location.
+		</p>
+		<p>As a demonstration, imagine that you want to copy the /etc/hosts file from each remote
+			machine to the local machine. To achieve the goal, you'd execute
+			<code type="inline">parallel-slurp -h servers.txt /etc/hosts</code>, as shown in
+			<a href="#list5">Listing 5</a>.
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list5" type="code">Listing 5. Copying /etc/hosts from remote machines to
+		the local machine
+	</heading>
+$ parallel-slurp -h servers.txt -L /tmp/hosts /etc/hosts hosts_file
+1] 17:03:32 [SUCCESS] example.com 22
+[2] 17:03:50 [SUCCESS] dcauto.gotdns.com 22
+
+$ ls -R /tmp/hosts
+/tmp/hosts/example.com:
+hosts_file
+
+/tmp/hosts/sample.com:
+hosts_file
+</code>
+
+		<p>The <code type="inline">parallel-slurp</code> utility copies the named remote file
+			to the local machine and stores each copy in a specific file in an individual
+			subdirectory named after the remote host. Here, the remote file was /etc/hosts;
+			each local copy is named <em>hosts_file.</em> The <code type="inline">-L</code>
+			option specifies where to create the subdirectories. Here, the target was
+			/tmp/hosts, yielding subdirectories /tmp/hosts/example.com and
+			/tmp/hosts/sample.com.
+		</p>
+		<p>Finally, <code type="inline">parallel-nuke</code> is the equivalent of running
+			<code type="inline">ssh host killall</code>. The argument to
+			<code type="inline">parallel-nuke</code> is a pattern. Any process running on the
+			remote machine whose name matches the pattern is killed. The command is handy
+			for stopping the same daemon on a collection of servers.
+		</p>
+		<p>To use the pssh tools, you must configure public key access to each remote server you
+			want to administer. If a pssh utility yields <code type="inline">[FAILURE]</code>,
+			verify your configuration by connecting with vanilla ssh. If you are prompted for a
+			password, rectify the problem by installing your public key on the remote host and
+			try again. (For instructions, see the <code type="inline">ssh</code> and
+			<code type="inline">ssh-keygen</code> man pages.)
+		</p>
+
+	<heading refname="machinery" type="major">Machinery en masse</heading>
+		<p>For 5, 10, or tens of machines, the tools described here likely suffice, especially for
+			infrequent and ad hoc administration tasks. However, when the number of
+			machines climbs higher or you repeat the same chores often, it may be prudent to
+			consider other tools and subsystems designed to automate the maintenance of
+			many machines. Reflexively, some software intended for large networks can be
+			applied to a handful of machines, too. Finding the right tools and a balance
+			between manual intervention and automation is a perennial challenge.
+		</p>
+		<p>Here are some tools to consider:</p>
+			<ul>
+				<li><strong><code type="inline">rsync</code>.</strong> This is an excellent
+					tool for distributing files from a central server and keeping distributed
+					file systems in sync. A <a href="http://www.ibm.com/developerworks/aix/library/au-spunix_rsync/index.html">prior
+					installment of Speaking UNIX</a> covered <code type="inline">rsync</code>
+					in detail.
+				</li>
+				<li><strong>Puppet.</strong> Puppet is an increasingly popular subsystem for
+					UNIX and Linux that automates configuration maintenance. According to
+					its Web site, "[Puppet] provides a powerful framework to simplify the
+					majority of technical tasks that [systems administrators] need to perform.
+					[A chore] is written as code in Puppet’s custom language, which is shareable
+					just like any other code." Puppet can describe dependencies between
+					components, define the proper state of a file, query the state of the system,
+					and more. If you ever perform a chore more than once, chances are it's best
+					to capture it as a Puppet task.
+				</li>
+				<li><strong>Capistrano.</strong> Capistrano is another popular tool for remote
+					systems administration. Its home page describes the tool well: "Simply put,
+					Capistrano is a tool for automating tasks on one or more remote servers. It
+					executes commands in parallel on all targeted machines and provides a
+					mechanism for rolling back changes across multiple machines. It is ideal for
+					anyone doing any kind of system administration, either professionally or
+					incidentally." Like Puppet, Capistrano is scripted. Scripts are based on the
+					Ruby programming language and the Capistrano domain-specific extensions.
+					Here's an example:
+
+<code type="section" width="65%">
+task :search_libs, :hosts => "www.capify.org" do
+  run "ls -x1 /usr/lib | grep -i xml"
+end
+</code>
+
+					<p>This task is named <code type="inline">search_libs</code>. It connects to
+						www.capify.org and runs the command
+						<code type="inline">ls -x1 /usr/lib | grep -i xml</code>. Capistrano
+						supports groups of machines via <em>roles,</em> among hundreds of
+						other features. Tasks are launched via the <code type="inline">cap</code>
+						command, as in <code type="inline">cap search_libs</code>. Capistrano
+						is used widely among Ruby and Rails developers to deploy code to
+						servers, but it's an excellent choice for automating most distributed
+						systems administration tasks. Tutorials explain how to mix Capistrano
+						with the Java<trade /> language, Perl, Python, and other programming
+						languages and how to use Capistrano with application engines, such as
+						Drupal and Expression Engine. Capistrano works best when paired with a
+						source control system, but it's not required. You can distribute binaries
+						with the <code type="inline">put</code> operation.
+					</p>
+				</li>
+				<li><strong>Nagios.</strong> Maintenance is important, but so too is monitoring.
+					Outages and errors can wreak havoc on a network, especially when many
+					systems are running identical configurations. Nagios is an open source
+					monitor that watches servers, services, resources, and more. It's easy to
+					install and deploy and can be used via any Web browser.
+				</li>
+			</ul>
+		<p>You may also want to look at compute cluster tools such as Oak Ridge National Laboratories'
+			(ORNL) Cluster Command and Control (C3) and pdsh. C3 was developed to operate a
+			massive compute cluster at ORNL and offers a number of command-line tools that
+			increase systems manager productivity by reducing the time and effort required to
+			operate and manage a cluster. The pdsh shell is similar in many ways to pssh but can
+			also manage system images.
+		</p>
+
+	<heading refname="little_time" type="major">So many machines, so little time</heading>
+		<p>Using tools such as dsh and pssh save time and reduce errors. You can run the same
+			command on a large number of systems and see the combined results almost instantly.
+			Manifests lump like machines together, too, reducing the risk of omissions. Puppet and
+			Capistrano can capture oft-repeated tasks in scripts. If you manage more then a handful
+			of machines, automation is key. See, even compute clouds can have a silver lining.
+		</p>
+</docbody>
+
+<resources>
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.ibm.com/developerworks/aix/library/au-rsyncfamily/index.html">The rsync
+			family</a> (Federico Kereki, developerWorks, April 2009): Get to know
+			<code type="inline">rsync</code> and a variety of utilities based on the
+			<code type="inline">rsync</code> protocols.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://www.netfort.gr.jp/~dancer/software/downloads">dsh</a>: This shell can
+			run a shell command on many machines in parallel.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://parallel-ssh.googlecode.com">pssh</a>. Parallel ssh runs commands, copies
+			files, and manages processes on many machines in parallel.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://projects.puppetlabs.com/>Puppet">Puppet</a>. Learn more about Puppet,
+			one of the most popular distributed systems administration tools.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://www.capify.org/index.php/Capistrano">Capistrano</a>. Visit the Capistrano
+			site to learn more about scripting administration with Ruby and the Capistrano
+			domain-specific language.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://www.nagios.org/">Nagios</a>. This open source monitoring platform can
+			be combined with automated maintenance tools to improve the overall stability
+			of any size network.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://www.csm.ornl.gov/torc/C3/">ORNL Cluster Command and Control</a>. The
+			C3 tools manage hundreds of compute nodes.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://sourceforge.net/projects/pdsh/">pdsh</a>: This compute cluster management
+			tool can run a command on multiple machines in parallel.
+	</resource>
+
+	<resource resource-category="Discuss">
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	</resource>
+
+	<resource resource-category="Discuss">
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L<mdash />technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools<mdash />technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	</resource>
+</resources>
+
+	</dw-article>
+</dw-document>

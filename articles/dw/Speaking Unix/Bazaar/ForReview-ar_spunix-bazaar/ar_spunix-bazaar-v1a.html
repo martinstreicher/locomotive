@@ -1,0 +1,532 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Speaking UNIX 16: Bazaar</title><meta http-equiv="PICS-Label" content="(PICS-1.1 &#34;http://www.icra.org/ratingsv02.html&#34; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &#34;http://www.rsac.org/ratingsv01.html&#34; l gen true r (n 0 s 0 v 0 l 0) &#34;http://www.classify.org/safesurf/&#34; l gen true r (SS~~000 1))"/><link rel="schema.DC" href="http://purl.org/DC/elements/1.0/"/><link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico"/><meta name="Owner" content="dW Information/Raleigh/IBM"/><meta name="DC.Language" scheme="rfc1766" content="en-US"/><meta name="IBM.Country" content="ZZ"/><meta name="Security" content="Public"/><meta name="IBM.SpecialPurpose" content="SP001"/><meta name="IBM.PageAttributes" content="sid=1003"/><meta name="Abstract" content="Software development is characterized by refactorings, quandaries, bugs, epiphanies, and breakthroughs; managing change is essential. Bazaar is a powerful, next-generation source control system that adapts to the dynamics of any development team. Here's an introduction." /><meta name="Description" content="Software development is characterized by refactorings, quandaries, bugs, epiphanies, and breakthroughs; managing change is essential. Bazaar is a powerful, next-generation source control system that adapts to the dynamics of any development team. Here's an introduction." /><meta name="Keywords" content="Martin Streicher, UNIX, speaking UNIX, Bazaar, dddauca" /><meta name="DC.Date" scheme="iso8601" content="2010-04-20" /><meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316" /><meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="SWG10" /><meta name="DC.Rights" content="Copyright (c) 2010 by IBM Corporation" /> <meta name="Robots" content="index,follow" /><meta name="IBM.Effective" scheme="W3CDTF" content="2010-04-20" /><meta name="Last update" content="19042010ma" /><link rel="stylesheet" type="text/css" media="screen,print" href="http://www.ibm.com/common/v14/table.css"/><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwcss14.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="http://www.ibm.com/common/v14/main.css"/><link rel="stylesheet" type="text/css" media="all" href="http://www.ibm.com/common/v14/screen.css"/><link rel="stylesheet" type="text/css" media="print" href="http://www.ibm.com/common/v14/print.css"/><script language="JavaScript" src="
+../web/www.ibm.com/common/v14/detection.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dropdown.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/grabtitle.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/emailfriend2.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwplugin.js" type="text/javascript"></script><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-head1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><style type="text/css">
+pre.section {margin-top: 0; margin-bottom: 0; font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px}
+.boldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold} .rboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff0000}
+.gboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff6600}
+.bboldcode {font-family: Andale Mono, Lucida  Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #3c5f84}
+</style><style type="text/css">
+.atitle { font-family:arial,sans-serif; font-size:18px; }
+</style><script type="text/javascript" language="JavaScript">var emailAbstract = "Software development is characterized by refactorings, quandaries, bugs, epiphanies, and breakthroughs; managing change is essential. Bazaar is a powerful, next-generation source control system that adapts to the dynamics of any development team. Here's an introduction."; </script></head><body><!--MASTHEAD_BEGIN--><!--#include virtual="/developerworks/inc/s-topmast14.inc" --><!--MASTHEAD_END--><!-- CMA ID: undefined --><!-- Site ID: 1 --><table width="100%" cellspacing="0" cellpadding="0" border="0" id="v14-body-table"><tr valign="top"><!--LEFTNAV_BEGIN--><td width="150" id="navigation"><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-spacer"><a class="left-nav-overview" href="http://www.ibm.com/developerworks"> </a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-overview" colspan="2"><a class="left-nav-overview" href="http://www.ibm.com/developerworks">developerWorks</a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-highlight" colspan="2"><a class="left-nav" href="#">In this article:</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#welcome">Welcome to the Bazaar</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#concepts">Core concepts</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#tasks">Performing typical tasks</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#sharing">Sharing your work with others</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#offerings">Rich offerings from Bazaar</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#resources">Resources</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#author">About the author</a></td></tr><tr class="left-nav-last"><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/v14/t/left-nav-corner.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td colspan="2" class="related"><b class="related">Related links</b></td></tr><tr class="rlinks"><td><img src="../web/www.ibm.com/i/v14/t/rl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="rlinks" href="http://www.ibm.com/developerworks/views/aix/library.jsp">AIX and UNIX technical library</a></td></tr><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><tr><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/c.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--></td><!--LEFTNAV_END--><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0" id="content-table"><tr valign="top"><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td><a name="main"><img src="../web/www.ibm.com/i/c.gif" width="592" height="1" alt="skip to main content" border="0"/></a></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10" height="18"><img src="../web/www.ibm.com/i/c.gif" width="10" height="18" alt=""/></td><td width="100%"><img src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/><br /><a class="bctl" href="http://www.ibm.com/developerworks/">developerWorks</a><span class="bct">  &gt;  </span><a class="bctl" href="http://www.ibm.com/developerworks/aix/">AIX and UNIX</a><span class="bct">  &gt;</span><img src="../web/www.ibm.com/i/c.gif" width="1" height="1" alt=""/><br /><h1>Speaking UNIX 16: Bazaar</h1><p id="subtitle"><em>A great place to keep your code</em></p><img class="display-img" src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/></td><td width="192" class="no-print"><a href="http://www.ibm.com/developerworks/"><img src="../web/www.ibm.com/developerworks/i/dw.gif" width="192" height="18" border="0" alt="developerWorks"/></a></td></tr></table></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td width="100%"><table align="right" cellpadding="0" cellspacing="0" width="160" border="0" class="no-print"><tr><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-1-small">Document options</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><script language="JavaScript" type="text/javascript">
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img alt="Set printer orientation to landscape mode" height="16" src="../web/www.ibm.com/i/v14/icons/printer.gif" width="16" vspace="3" /></td><td width="122"><p><b><a class="smallplainlink" href="javascript:print()">Print this page</a></b></p></td></tr>');
+//-->
+</script>
+<noscript></noscript><script language="JavaScript" type="text/javascript">
+<!-- 5.6 10/24 llk: added cdata around the subdirectory path of email gif-->
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/v14/icons/em.gif" height="16" width="16" vspace="3" alt="Email this page" /></td><td width="122"><p><a class="smallplainlink" href="javascript:void newWindow()"><b>E-mail this page</b></a></p></td></tr>');
+//-->
+</script><noscript><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/c.gif" height="16" width="16" alt=""/></td><td width="122" class="small"><p><span class="ast">Document options requiring JavaScript are not displayed</span></p></td></tr></noscript></table></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-right-column1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-2-small">Rate this page</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td><img src="../web/www.ibm.com/i/v14/icons/d_bold.gif" height="16" width="16" border="0" vspace="3" alt=""/></td><td width="125"><p><a class="smallplainlink" href="#rate"><b>Help us improve this content</b></a></p></td></tr></table></td></tr></table><br /></td></tr></table><p>Level: Intermediate</p><p><a href="#author">Martin Streicher</a> (<a href="mailto:martin.streicher@gmail.com?subject=Speaking UNIX 16: Bazaar">martin.streicher@gmail.com</a>), Software Developer, Pixel, Byte, and Comma<br /></p><p> 20 Apr  2010</p><blockquote>Software development is characterized by refactorings, quandaries, bugs, 
+	epiphanies, and breakthroughs; managing change is essential. Bazaar is a powerful, 
+	next-generation source control system that adapts to the dynamics of any development 
+	team. Here's an introduction.
+</blockquote><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES-->
+	<p>Mark Twain once noted, "The time to begin writing an article is when you have finished 
+		it to your satisfaction. By that time, you begin to clearly and logically perceive what 
+		it is that you really want to say." Twain's observation is right on the mark (no pun 
+		intended), and his wisdom applies just as well to software. Invariably, the subtleties,
+		nuances, and scope of the problem at hand become clear only after the application 
+		has been written. Between typing the first line of code and packaging a release, 
+		there are any number of false starts, dead ends, rewrites, refactorings, quandaries 
+		and bugs, and epiphanies and breakthroughs.
+	</p>
+
+<table width="30%" cellpadding="0" cellspacing="0" border="0" align="right"><tr><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td><table width="100%" cellpadding="5" cellspacing="0" border="1"><tr><td bgcolor="#eeeeee">
+	<a name="fua"><b>Frequently used acronyms</b></a><br />
+		<ul>
+			<li><b>API:</b> Application programming interface</li>
+			<li><b>FTP:</b> File Transfer Protocol</li>
+			<li><b>HTTP:</b> Hypertext Transfer Protocol</li>
+			<li><b>SFTP:</b> Secure File Transfer Protocol</li>
+			<li><b>URL:</b> Uniform resource locator</li>
+		</ul>
+</td></tr></table></td></tr></table>
+
+	<p>Indeed, change is so constant during development that special software must be used to 
+		track modifications. Dubbed <i>source control</i> (or <i>version control</i>), this 
+		software records each and every revision made to the application. Source control 
+		lets you compare revisions, switch between one version of a file and another, and 
+		gather revisions into a release. Features, process, and best practices vary from one 
+		source control system to another&#8212;many proprietary and open source options 
+		are available&#8212;but the intent is universal: Audit who did what and when. 
+		Popular commercial source control systems include Perforce and AccuRev; leading 
+		open source source control systems include Subversion, Arch, Mercurial, Git, and 
+		Bazaar (see <a href="#resources">Resources</a> for links).
+	</p>
+	<p>Of the latter options, Bazaar is notable, because it's employed to produce the Ubuntu 
+		Linux&#174; distribution&#8212;an enormous software project with thousands of 
+		components. Bazaar is also special, because it can be adapted to virtually any team 
+		dynamic. For example, some development teams prefer centralization, where all 
+		changes are collected in and applied to one repository. (Subversion is a centralized 
+		system.) Other teams prefer decentralization, where each developer has an 
+		independent repository that can be shared as if it were the principal repository. In 
+		this scheme, one repository, owned collectively, can be designated as a hub for 
+		integration, but it differs only by convention. (Git is a decentralized system.) Another 
+		popular work style designates one developer as the "gatekeeper," who has sole access 
+		to a canonical repository. Changes are submitted to the gatekeeper, who assembles,
+		reviews, approves, and applies them to the master repository. Bazaar is flexible enough
+		to accommodate each of these protocols. Like Subversion, Bazaar can sync with a central
+		repository. Like Git, work can proceed locally, detached from any server.
+	</p>
+	<p>Bazaar also has many other appealing features, such as an API for integration with other 
+		software tools, plug-ins to integrate Bazaar with Git and Subversion (among other 
+		systems), and a simple numbering scheme for branches that directly reflects the 
+		genealogy of the branch. You can also pick up Bazaar in a snap, making it a great 
+		choice for versioning your shell "dot" files, documents, and system configuration files.
+		The documentation for Bazaar is outstanding&#8212;clear, concise, and practical.
+	</p>
+
+	<p><a name="welcome"><span class="atitle">Welcome to the Bazaar</span></a></p>
+		<p>Bazaar is available for all major operating systems. Source code is available, if you 
+			prefer to build from scratch, or you can download a suitable binary from the 
+			Bazaar home page. Bazaar is a collection of command-line utilities, but the 
+			Bazaar community has also crafted a number of graphical utilities. You can 
+			accelerate and facilitate adoption with the point-and-click tools and switch to 
+			the command-line tools as needed. You can even host your project on Launchpad,
+			a service built around Bazaar (and managed by Canonical, the same company that 
+			produces Bazaar and Ubuntu Linux).
+		</p>
+		<p>If you're using a UNIX&#174; or Linux system, chances are that your distribution 
+			offers a pre-built Bazaar package&#8212;typically abbreviated <i>bzr</i>; 
+			Bazaar-related packages use the same shorthand for a prefix. For instance, if you 
+			use Ubuntu or any Debian-derived Linux version, you can find and install Bazaar 
+			software quickly with the Advanced Packaging Tool (APT). Use 
+			<code>apt-cache</code> to search for <i>bzr,</i> as shown in
+			<a href="#list1">Listing 1</a>.
+		</p>
+
+<br /><a name="list1"><b>Listing 1. Find all the Bazaar-related tools in the 
+		APT repository
+	</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ apt-cache search bzr
+bzrtools - Collection of tools for bzr
+bzr-builder - construct a bzr branch from a recipe
+bzr-cvsps-import - CVS to Bazaar importer
+bzr-email - Notification email plugin for Bazaar
+bzr-fastimport - Fast-import/fast-export plugin for Bazaar
+bzr-git - Bazaar plugin providing Git integration
+bzr-gtk - provides graphical interfaces to Bazaar (bzr) version control
+bzr-loom - Focused patch plugin support for Bazaar
+bzr-pqm - bzr plugin to submit an email to a Patch Queue Manager
+bzr-rebase - Rebase plugin for Bazaar
+bzr-search - search plugin for Bazaar
+bzr-stats - statistics plugin for Bazaar
+bzr-svn - Bazaar plugin providing Subversion integration
+bzr-upload - Bazaar plugin for uploading to web servers
+...
+bzr - easy to use distributed version control system
+
+# Install the core bzr package
+$ apt-get install bzr
+</pre></td></tr></table><br />
+
+		<p>The latter shell command downloads and installs the core Bazaar components. You 
+			control Bazaar through a single utility, aptly named <code>bzr</code>.
+			For a list of the most commonly used commands, type <code>bzr help</code>,
+			as shown in <a href="#list2">Listing 2</a>.
+		</p>
+
+<br /><a name="list2"><b>Listing 2. Available Bazaar commands</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ bzr help
+Bazaar -- a free distributed version-control tool
+http://bazaar-vcs.org/
+
+Basic commands:
+  bzr init           makes this directory a versioned branch
+  bzr branch         make a copy of another branch
+
+  bzr add            make files or directories versioned
+  bzr ignore         ignore a file or pattern
+  bzr mv             move or rename a versioned file
+
+  bzr status         summarize changes in working copy
+  bzr diff           show detailed diffs
+
+  bzr merge          pull in changes from another branch
+  bzr commit         save some or all changes
+  bzr send           send changes via email
+
+  bzr log            show history of changes
+  bzr check          validate storage
+
+  bzr help init      more help on e.g. init command
+  bzr help commands  list all commands
+  bzr help topics    list all help topics
+</pre></td></tr></table><br />
+
+		<p>If you want help with a specific command, type <code>bzr help <i>command</i></code>,
+			where <code><i>command</i></code> is the name of the command,
+			such as <code>bzr help init</code>.
+		</p>
+		<p>A series of Bazaar commands is called a <i>recipe,</i> and the online help provides 
+			countless recipes to jump start usage and teach best practices. For instance, 
+			the material for <code>bzr help init</code> provides a recipe to 
+			transform any directory into a Bazaar repository, as <a href="#list3">Listing 3</a>
+			shows.
+		</p>
+
+<br /><a name="list3"><b>Listing 3. Recipe for transforming a directory into a 
+		Bazaar repository
+	</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ cd ~/project
+$ bzr init
+$ bzr add .
+$ bzr status
+$ bzr commit -m "imported project"
+</pre></td></tr></table><br />
+
+		<p>This recipe has five steps. First, change to the project directory you want to keep 
+			under source control. Next, run <code>bzr init</code>, which adds 
+			a subdirectory named <i>.bzr</i> to the current directory to contain the 
+			bookkeeping metadata for the repository. The <code>bzr add .</code> 
+			command recursively adds the contents of "dot" (the current directory) to the 
+			manifest of files the repository manages but does not create a snapshot of the 
+			current state of the files. <code>bzr commit</code> actually records 
+			the state of all files in the repository and adds a brief annotation. You can 
+			provide the annotation as an argument to <code>-m</code> (be sure 
+			to use quotation marks to keep the sentence intact) or omit the option and create 
+			a note in your favorite text editor. <code>bzr status</code> reports 
+			what's ready to add to the repository, what's been changed, what's been elided, 
+			and more.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="concepts"><span class="atitle">Core concepts</span></a></p>
+		<p>Bazaar shares much in common with other source control systems, although its 
+			implementations differ and, pleasingly, leverage facilities you already know how to 
+			use, such as Secure Shell (SSH) and URLs. Bazaar manages revisions and can diverge 
+			and merge to create and collect branches, respectively. Here are some of the key
+			concepts in Bazaar:
+		</p>
+			<ul>
+				<li>A <i>revision</i> is a collection of changes made to one or more files. 
+					You might make a revision to fix a bug or implement a new feature.
+					Each revision has a unique ID (more on IDs momentarily), a sole 
+					<i>committer,</i> and zero or more <i>authors.</i> The committer
+					is the developer who physically recorded the revision, while each 
+					author receives an attribution recognizing his or her contribution to 
+					the revision. <a href="#fig1">Figure 1</a> shows a single revision.
+
+					
+						<br /><br /><a name="fig1"><b>Figure 1. A Bazaar 
+							revision
+						</b></a><br />
+						<img alt="Bazaar revisions" src="images/revision.png" width="189" height="226"/>
+					<br /><br />
+
+				</li>
+				<li>Typically, each revision has a single predecessor, or <i>parent.</i> Thus, 
+					you can picture development as a chain of revisions, where each revision 
+					builds on the changes captured in its parent. This scheme is shown in 
+					<a href="#fig2">Figure 2</a>.
+
+					
+						<br /><br /><a name="fig2"><b>Figure 2. Some development 
+							proceeds as a series of revisions.
+						</b></a><br />
+						<img alt="Some development proceeds as a series of revisions." src="images/chain.png" width="572" height="162"/>
+					<br /><br />
+
+					<p>However, development is rarely so orderly, especially when many 
+						developers are working in parallel. A revision can have multiple
+						predecessors, too. In this case, a revision represents a merge
+						(see <a href="#fig3">Figure 3</a>).
+					</p>
+
+						
+							<br /><br /><a name="fig3"><b>Figure 3. Combining 
+								threads of development leads to a merge, a revision 
+								with multiple parents
+							</b></a><br />
+							<img alt="Combining threads of development leads to a merge, a revision with multiple parents." src="images/merge.png" width="572" height="241"/>
+						<br /><br />
+
+				</li>
+				<li>As mentioned above, a revision ID directly reflects the revision's lineage. 
+					Revisions are numbered sequentially starting from 1 and are suffixed each 
+					time a chain of development diverges, or <i>branches.</i> For example, in 
+					<a href="#fig3">Figure 3</a>, revision 2 diverges into two branches: <i>2.1</i>
+					and <i>2.2.</i> The first revision in branch 2.1 is 2.1.1; the second in the same 
+					branch is 2.1.2, and so on. When two or more branches merge, the suffixes 
+					are dropped and numbering returns to the previous scheme. Revision 3 is 
+					the result of merging two branches. <a href="#fig4">Figure 4</a> shows a 
+					graphical tool that pictures Bazaar histories in much the same way as 
+					<a href="#fig3">Figure 3</a>. Bazaar's revision numbering scheme is far 
+					more meaningful and concise than, say, Git's, which uses long, cryptic 
+					MD5 hashes as unique identifiers.
+
+					
+						<br /><br /><a name="fig4"><b>Figure 4. A graphical tool 
+							pictures Bazaar histories.
+						</b></a><br />
+						<img alt="A graphical tool pictures Bazaar histories." src="images/log.png" width="572" height="498"/>
+					<br /><br />
+
+				</li>
+				<li>A <i>branch</i> is simply a pointer to a <i>tip revision,</i> or a revision that 
+					has no successor in the same lineage. In <a href="#fig3">Figure 3</a>, 
+					revision 3 represents a branch, because it's the latest revision. In addition,
+					revisions 2.1.2 and 2.2.2 are branches, because both are the ultimate 
+					revision in the 2.1 and 2.2 lineages, respectively.
+				</li>
+			</ul>
+		<p>One of the strengths of Bazaar is its reuse of existing, familiar paradigms. A branch is simply 
+			a folder. You'll find other examples of common sense features throughout Bazaar. For 
+			example, if you use Bugzilla to track bugs, you can annotate a revision as a bug fix 
+			with the <code>--fixes</code> option.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="tasks"><span class="atitle">Performing typical tasks</span></a></p>
+		<p>In general, Bazaar manages entire directories of files. However, you can avoid doing so 
+			if you want to omit certain files from version control or operate on individual 
+			files or subdirectories. You need not use dot (<code>.</code>) to 
+			operate on the entire current directory, either initially or during the lifetime 
+			of the repository. Many Bazaar commands take a list of file and directory names 
+			and operate only on the specified entities.
+		</p>
+		<p>For example, if you changed files easy.c, medium.c, and hard.c but only want to 
+			commit the latter, simply name the file in the commit:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ bzr commit -m "Fix bug no. 99." easy.c
+</pre></td></tr></table><br />
+
+		<p>Better yet, Bazaar provides a special feature to group and isolate operations to 
+			particular files. A <i>view</i> is a collection of files and directories, and when
+			you enable a view, only the files in the collection are visible. You can create 
+			multiple views and switch among them, and you can disable and enable a 
+			view to reveal and hide files as necessary. As the Bazaar documentation summarizes,
+			"Defining a view does not delete the other files in the working tree&#8212;it 
+			merely provides a 'lens' over the working tree." Commands like 
+			<code>bzr commit</code>, <code>bzr add</code>, and 
+			<code>bzr ls</code> restrict operation to the current view. Other 
+			commands that operate on the file system are unaffected by views.
+		</p>
+		<p>To ignore types of files, such as object files created by compilation or backup files 
+			that your text editor generates, you can create an <i>ignore file</i> named 
+			<i>.bzrignore</i> at the top level of your repository. Put this file under version 
+			control, too, to help collaborators avoid adding spurious files to the repository.
+			The command <code>bzr ignore</code> adds entries to the file for you.
+			The ignore file does not omit files already under version control; it omits only those
+			not yet in the repository.
+		</p>
+		<p>Oftentimes, a bug fix or enhancement spans multiple files and various sections of code 
+			in each file. Unless a developer is very careful to make discrete commits, features 
+			can become commingled, making it difficult to connect a batch of changes to a bug 
+			report or enhancement request. Or, more frequently, a developer may find it 
+			necessary to revert a file to a particular state to isolate a bug. In both cases, the 
+			developer may want to tease individual revisions from the whole. Bazaar provides 
+			<i>shelves</i> just for this purpose. You can shelve, or set aside, revisions; make 
+			commits (if necessary); and then <i>unshelve</i>, or restore, the changes to pick 
+			up where you left off previously. Cleverly, Bazaar shelves individual diffs.
+		</p>
+		<p>Here's one possible scenario. Assume that the file dictionary.txt contains three changes
+			since it was last committed to the repository. You can compare the current state
+			of your work with the repository using <code>bzr diff</code>, as
+			shown in <a href="#list4">Listing 4</a>.
+		</p>
+
+<br /><a name="list4"><b>Listing 4. Compare current work against the repository version</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ bzr diff
+=== modified file 'dictionary.txt'
+--- dictionary.txt	2010-04-10 23:57:00 +0000
++++ dictionary.txt	2010-04-10 23:58:40 +0000
+@@ -1,2 +1,5 @@
++bonzo
+ chico
+ groucho
++harpo
++zeppo
+</pre></td></tr></table><br />
+
+		<p>As the diff shows, the first, fourth, and fifth lines are new. To set aside the changes,
+			run <code>bzr shelve</code>. The command interactively prompts you
+			to persist or shelve each diff. If you want to annotate a shelf, provide the 
+			<code>-m</code> option again, as shown in <a href="#list5">Listing 5</a>.
+		</p>
+
+<br /><a name="list5"><b>Listing 5. Annotate a shelf</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ cat dictionary.txt
+bonzo
+chico
+groucho
+harpo
+zeppo
+
+$ bzr shelve -m 'Save other brothers for later.'
+--- dictionary.txt	2010-04-10 23:57:00 +0000
++++ dictionary.txt	2010-04-11 00:15:56 +0000
+@@ -1,2 +1,5 @@
++bonzo
+ chico
+ groucho
++harpo
++zeppo
+Shelve? [yNfq?] y
+Selected changes:
+ M  dictionary.txt
+Shelve 1 change(s)? [yNfq?] y
+Changes shelved with id "1".
+</pre></td></tr></table><br />
+
+		<p>If you now examine the file, you should see just two lines. You can also use 
+			<code>bzr shelve --list</code> to see the list of shelves you have 
+			available (see <a href="#list6">Listing 6</a>).
+		</p>
+
+<br /><a name="list6"><b>Listing 6. View lists of shelves</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ cat dictionary.txt
+chico
+groucho
+
+$ bzr shelve --list
+  1: Save other brothers for later.
+</pre></td></tr></table><br />
+
+		<p>The inverse of <code>shelve</code> is <code>unshelve</code>.
+			This command restores the file to its previous state, as shown in <a href="#list7">Listing 7</a>.
+		</p>
+
+<br /><a name="list7"><b>Listing 7. Restore a file to its previous state</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ bzr unshelve
+Using changes with id "1".
+Message: Save other brothers for later.
+ M  dictionary.txt
+All changes applied successfully.
+Deleted changes with id "1".
+
+$ cat dictionary.txt
+bonzo
+chico
+groucho
+harpo
+zeppo
+</pre></td></tr></table><br />
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="sharing"><span class="atitle">Sharing your work with others</span></a></p>
+		<p>Although Bazaar can realize a centralized version control scheme, it is perfectly 
+			capable of powering large-scale, distributed software development. Sharing is 
+			surprisingly simple and uses any number of existing UNIX sharing technologies.
+		</p>
+		<p>The simplest technology&#8212;and the default unless you specify another 
+			choice&#8212;is the local file system. You can share your branch with another 
+			developer using the handle <code>file://<i>path/to/your/branch</i></code>,
+			where <code><i>path/to/your/branch</i></code> is the absolute 
+			path name to your branch, such as /Users/martin/code/emailer. Given the handle,
+			another developer can create a branch based on your work with a single command:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+ $ bzr branch file://Users/martin/code/emailer
+</pre></td></tr></table><br />
+
+		<p>The <code>branch</code> command copies the complete history of this 
+			branch so you have everything you need to merge, branch, scan history, and more.
+			Because a branch is just a folder, you need not use <code>bzr branch</code>.
+			You can also copy a branch via <code>cp -pr</code>, expanding a 
+			tarball, or through a remote copy using something like rsync. You can also share a
+			branch via SFTP, HTTP, FTP, and a special protocol built for Bazaar, prefaced with
+			<code>bzr:://</code>. (For a complete list of supported protocols, 
+			type <code>bzr help urlspec</code> at the command line.) Once you 
+			have a branch, you can update it to match the state of the original using the 
+			command <code>bzr pull</code>.
+		</p>
+		<p>Publishing a branch is as simple as sharing the branch's URL. You don’t need a special 
+			server to publish a Bazaar branch: Just make the branch's files and the .bzr directory
+			available via any of the methods already mentioned. You can also push a branch 
+			(or the changes for a branch) with a special Bazaar command:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ bzr push sftp://servername.com/path/to/directory
+</pre></td></tr></table><br />
+
+		<p>Each of the commands that work with branches accept a URL.</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="offerings"><span class="atitle">Rich offerings from Bazaar</span></a></p>
+		<p>Bazaar has too many features to list here. For a complete introduction and a large 
+			catalog of compatible software, see the Bazaar home page. Bazaar also provides 
+			a "smart server" that tunnels a special Bazaar protocol via SSH. You or your systems
+			administrator can establish a smart server to host your projects on your own source
+			code server. The administration documentation also explains how to combine 
+			Bazaar with plug-ins that amend core features. Moreover, the software provides 
+			<i>hooks</i> where you can inject your own scripts and code to perform other 
+			actions, such as deploying code or running continuous integration tests.
+		</p>
+<br /><br /><p><a name="resources"><span class="atitle">Resources</span></a></p><b>Learn</b><br /><ul><li>
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	<br /><br /></li><li>
+		<a href="http://doc.bazaar.canonical.com/bzr.2.1/en/">Bazaar online documentation</a>: Read 
+			the excellent  to learn how to use Bazaar.
+	<br /><br /></li><li>
+		<a href="https://launchpad.net/">Launchpad</a>: This free source code hosting platform is
+			intended to share open source code. It offers integrated bug tracking, source code 
+			reviews, mailing lists to coordinate teams, and more.
+	<br /><br /></li><li>
+		<a href="http://www.canonical.com/">Canonical</a>: Bazaar and Launchpad are sponsored 
+			by Canonical, the purveyors of <a href="http://www.ubuntu.com/">Ubuntu Linux</a>.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	<br /><br /></li></ul><br /><b>Get products and technologies</b><br /><ul><li>
+		<a href="http://bazaar.canonical.com/en/">Bazaar</a>: Download the Bazaar software from 
+			the project home page.
+	<br /><br /></li><li>
+		<a href="http://git-scm.com/">Git</a>: Git is a popular version control system and is used 
+			to coordinate development on the Linux kernel, among other substantial projects. 
+			Git was created by Linux founder Linus Torvalds.
+	<br /><br /></li><li>
+		<a href="http://subversion.tigris.org/">Subversion</a>: This longstanding open source 
+			version control system is available for nearly every operating system. Its 
+			repositories are centralized. A number of graphical Subversion clients are available.
+	<br /><br /></li><li>
+		<a href="http://mercurial.selenic.com/">Mercurial</a>: Mercurial is another recent entrant 
+			in open source version control. It runs on all major operating systems.
+	<br /><br /></li></ul><br /><b>Discuss</b><br /><ul><li>
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	<br /><br /></li><li>
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L&#8212;technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools&#8212;technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	<br /></li></ul><br /><br /><p><a name="author"><span class="atitle">About the author</span></a></p><table border="0" cellspacing="0" cellpadding="0" width="100%"><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" height="5" width="100%" alt=""/></td></tr><tr valign="top" align="left"><td><p><img alt="Martin Streicher" src="images\Bio_mstreicher.jpg" align="left"/></p></td><td><img src="../web/www.ibm.com/i/c.gif" height="5" width="4" alt=""/></td><td width="100%"><p>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<i><a href="http://www.linux-mag.com">Linux Magazine</a>.</i> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</p></td></tr></table><br /><br /><br /><p class="no-print"><span class="atitle"><a name="rate">Rate this page</a></span></p><span class="no-print"/><br /><p><!--#include virtual="/developerworks/inc/s-reserved-social-tagging.inc" --></p><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><span class="no-print"><table align="right" cellpadding="0" cellspacing="0"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /></span></td><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td></tr></table></td></tr></table><!--FOOTER_BEGIN--><!--#include virtual="/developerworks/inc/s-footer14.inc" --><!--FOOTER_END--><!--XSLT stylesheet used to transform this file:  dw-document-html-5.12.xsl--></body></html>

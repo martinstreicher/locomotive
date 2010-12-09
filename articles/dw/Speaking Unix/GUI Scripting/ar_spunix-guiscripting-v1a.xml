@@ -1,0 +1,583 @@
+<?xml-stylesheet type="text/xsl" href="../xsl/6.0/en_US/dw-document-html-worldwide-6.0.xsl"?>
+<dw-document xmlns:dw="http://www.ibm.com/developerWorks/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../schema/6.0/dw-document-6.0.xsd">
+
+<dw-article local-site="worldwide" skill-level="3" page-end-btt-link="yes">
+<id cma-id="12345" domino-uid="" content-id="" original="yes" />
+<keywords content="Martin Streicher, UNIX, speaking UNIX, GUI, shell scripting"/>
+
+<meta-dctype>
+	<cma-defined-type />
+</meta-dctype>
+
+<meta-dcsubject>
+	<cma-defined-subject />
+</meta-dcsubject>
+
+<meta-last-updated day="23" month="09" year="2010" initials="ma" />
+
+<content-area-primary name="aix" />
+
+<title>Speaking UNIX: Creating great graphical applications with shell scripts</title>
+
+<author jobtitle="Software Developer" email-cc="" email="martin.streicher@gmail.com">
+	<bio>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</bio>
+	<img alt="Martin Streicher" src="images\Bio_mstreicher.jpg"/>
+	<author-name>
+		<GivenName>Martin</GivenName>
+		<FamilyName>Streicher</FamilyName>
+	</author-name>
+	<company-name>Pixel, Byte, and Comma</company-name>
+</author>
+
+<date-published day="23" month="09" year="2010" />
+
+<abstract></abstract>
+
+<abstract-extended>The command line isn't suitable for every user. Indeed, some users may 
+	only feel comfortable when armed with a mouse. To accommodate those users or build 
+	custom desktop applications using only the shell, add GUIs to your scripts. Here's how.
+</abstract-extended>
+
+<docbody>
+	<p>If you walk into any crowded machine room, chances are, you'll catch chit-chat about 
+		"shebangs," slashes, dot-dots, root, pipes, ports, and dash-dash this and that. If you 
+		speak UNIX<reg />, you'll no doubt grok the local lingo<mdash />acronyms, command 
+		names, shortcuts, options, file names, and colloquialisms about UNIX<mdash />and 
+		feel right at home. Like practitioners of other art, UNIX users have an extensive 
+		vernacular for describing the specifics of their work.
+	</p>
+
+<sidebar width="35%">
+	<heading refname="fua" type="sidebar">Frequently used acronyms</heading>
+		<ul>
+			<li><strong>GUI:</strong> Graphical user interface</li>
+			<li><strong>HTML:</strong> Hypertext Markup Language</li>
+		</ul>
+</sidebar>
+
+	<p>But not everyone speaks UNIX; in fact, some may find the command line daunting or 
+		perplexing. Further, you simply may not want to entrust the entirety of the 
+		command line to an occasional or inexperienced user. To assist those unaccustomed 
+		to the command line or to build custom solutions around the shell, you can build 
+		GUIs for your scripts. With such tools<mdash /><code type="inline">dialog</code> and 
+		Zenity are two worthy of mention (see <a href="#resources">Resources</a>)<mdash />you
+		can use dialog boxes, file browsers, and other common "windowing" controls and 
+		techniques to interact with your users. Indeed, dialog boxes provide for more natural 
+		conversations: You present information, ask for a response, and react accordingly.
+	</p>
+	<p>This installment of "Speaking UNIX" looks at <code type="inline">dialog</code> and Zenity 
+		and shows how you can turn any script into a convincing GUI application. You use 
+		<code type="inline">dialog</code> with traditional, text-based interfaces; Zenity proffers 
+		the style of the modern, windowed desktop.
+	</p>
+
+	<heading refname="add_dialog_box" type="major">Add dialog boxes to any shell script</heading>
+		<p>A command-line utility typically offers sufficient options to completely control 
+			each invocation. Some switches may enable or disable a feature, while other 
+			switches may process arguments, such as a list of names. On the command line, 
+			you present (nearly) all the information up front and let the job go. Graphical 
+			applications are very different. Choices are made through menus, check boxes, 
+			and file browsers. A graphical application takes in a little information, processes
+			it, and then usually asks for more information. It's said that GUI applications 
+			are <em>event driven.</em>
+		</p>
+		<p>The <code type="inline">dialog</code> utility spans the two worlds. You invoke the 
+			utility whenever you need input from the user, and then return to your script
+			to continue processing whatever data was provided. In other words, if you write 
+			a script to use <code type="inline">dialog</code>, you'll likely ignore 
+			command-line arguments and instead use <code type="inline">dialog</code> to 
+			prompt for information when necessary.
+		</p>
+		<p>If your system lacks the <code type="inline">dialog</code> utility, you can easily 
+			install it with your distribution's own package manager, or you can build it 
+			directly from source. For example, if your system uses Aptitude, you can install
+			<code type="inline">dialog</code> with the command:
+		</p>
+
+<code type="section" width="65%">
+sudo apt-get install dialog
+</code>
+
+		<p>Otherwise, to build from source, download the code from maintainer Thomas Dickey's 
+			Web site (see <a href="#resources">Resources</a>) and run the typical trio of 
+			commands: <code type="inline">./configure &amp;&amp; make &amp;&amp; 
+			make install</code>:
+		</p>
+
+<code type="section" width="65%">
+$ wget http://invisible-island.net/datafiles/release/dialog.tar.gz
+$ tar xzf dialog.tar.gz
+$ cd dialog-1.1-20100428
+$ ./configure
+$ make
+$ sudo make install
+</code>
+
+		<p>After the installation, you should have a new utility named <code type="inline">dialog</code>
+			in your path. Type <code type="inline">man dialog</code> to see the bundled 
+			documentation.
+		</p>
+		<p>Using <code type="inline">dialog</code> is simple: It's just another UNIX command.
+			You display a dialog box of your choice using the command's options, then capture 
+			the result and perform some logic based on that value. Some variations of 
+			<code type="inline">dialog</code> place the result of the command directly in the 
+			special shell status variable, <code type="inline">$?</code>, which you should save
+			or interrogate immediately after the <code type="inline">dialog</code> command 
+			exits (because a subsequent command will immediately change its value). Other,
+			typically more complicated variations of the <code type="inline">dialog</code>
+			command both set the shell status variable and generate other results. To make 
+			things simple, <code type="inline">dialog</code> provides the <code type="inline">--stdout</code>
+			option to always emit its result to standard output, making it easy to capture data
+			with command evaluation (a combination of a command in backquotes and an 
+			assignment statement).
+		</p>
+		<p>For example, the command <code type="inline">dialog --yesno</code> is one of the 
+			simplest variants. It presents a question, prompts for either a yes or no response,
+			and returns either <code type="inline">0</code> or <code type="inline">1</code> in 
+			<code type="inline">$?</code> depending on whether the user selected "Yes" or 
+			"No," respectively. You can test the value of <code type="inline">$?</code> and 
+			execute some conditional code. Here's is a working snippet you can add to a shell
+			script:
+		</p>
+
+<code type="section" width="65%">
+dialog --yesno "Do you want to continue?" 0 0
+rc=$?
+if [ "${rc}" == "0" ]; then
+  echo Yes
+else
+  echo No
+fi
+</code>
+
+		<p>The <code type="inline">--yesno</code> option requires at least three arguments: text 
+			for the question and the height and width of the dialog box itself, measured in rows
+			and columns. If you don't require specific dimensions, you can always use 
+			<code type="inline">0</code> for either height or width to size the dialog box 
+			automatically. (There are also options for placing the window relative to the top 
+			left corner of the window.) <a href="#fig1">Figure 1</a> shows 
+			<code type="inline">--yesno</code> in operation.
+		</p>
+
+			<figure>
+				<heading refname="fig1" type="figure">Figure 1. The --yesno operation</heading>
+				<img alt="The --yesno operation" src="images/figure1.png"/>
+			</figure>
+
+		<p>The <code type="inline">dialog</code> option <code type="inline">--calendar</code>
+			presents a calendar to allow the user to choose a specific date. If the user 
+			chooses a date, and then clicks <strong>OK</strong>, the command returns 
+			<code type="inline">0</code>. If, however, the user clicks <strong>Cancel</strong>,
+			the command returns <code type="inline">1</code>. Moreover, if the user clicks
+			<strong>OK</strong>, the command emits the date selected to standard output. 
+			Here's an example using command evaluation to yield a date:
+		</p>
+
+<code type="section" width="65%">
+RESULT=`dialog --stdout --title "CALENDAR" 
+    --calendar "Please choose a date..." 0 0 9 1 2010`
+retval=$?
+</code>
+
+		<p>The <code type="inline">--title</code> option uses the next argument to add a title 
+			to the dialog box and can be used with any <code type="inline">dialog</code>
+			command. Much like <code type="inline">--yesno</code>, you provide some text 
+			to prompt the user. Next, the options <code type="inline">0 0</code> again specify
+			automatic height and width, and the options <code type="inline">9 1 2010</code>
+			dictate the initial day, month, and year, respectively, shown in the calendar. The 
+			Tab and arrow keys alter the calendar and choose a date. After the dialog box is 
+			dismissed, if <code type="inline">retval</code> is <code type="inline">0</code>,
+			the value of <code type="inline">RESULT</code> is the date selected. 
+			<a href="#fig2">Figure 2</a> shows the calendar dialog box.
+		</p>
+
+			<figure>
+				<heading refname="fig2" type="figure">Figure 2. The calendar dialog box</heading>
+				<img alt="The calendar dialog box" src="images/figure2.png"/>
+			</figure>
+
+		<p>The <code type="inline">dialog</code> command offers most of the controls typically 
+			found in a graphical application:
+		</p>
+			<ul>
+				<li><code type="inline">--infobox</code> simply presents information: It 
+					does not expect any input. The information box remains on screen 
+					only briefly. To prolong its display, place a <code type="inline">sleep</code>
+					command between it and the next command.
+				</li>
+				<li><code type="inline">--input</code> collects a single, typed response. You 
+					might use this command to collect your user's name or zip code.
+				</li>
+				<li><code type="inline">--textbox</code> displays the contents of a text file.
+					If the file exceeds the vertical height of the dialog box, a control allows 
+					for simple scrolling up and down.
+				</li>
+				<li><code type="inline">--menu</code> and <code type="inline">--radiolist</code>
+					present a list of choices and allow the user to select one. The two 
+					kinds of dialog box are functionally equivalent but have slightly different 
+					visual styles to better simulate what a GUI might present. Specifically, 
+					the <code type="inline">--radiolist</code> command renders 
+					<code type="inline">(&amp;nbsp;)</code> to mimic radio buttons.
+				</li>
+				<li><code type="inline">--checklist</code> displays a list of items that the user can
+					enabled or disabled individually.
+				</li>
+			</ul>
+		<p>The output of each <code type="inline">dialog</code> variant differs but is either a 
+			single value or a list of quoted values separated by white space. For instance,
+			<code type="inline">--checklist</code>, which is great for choosing one or more 
+			options, emits a list of quoted values, where each value is associated with an 
+			enabled option. An example demonstrates the operation:
+		</p>
+
+<code type="section" width="65%">
+RESULT=`dialog --stdout 
+   --checklist "Enable the account options you want:" 10 40 3 \
+  1 "Home directory" on \
+  2 "Signature file" off \
+  3 "Simple password" off`
+</code>
+
+		<p>The backslash (<code type="inline">\</code>) at the end of lines 1, 2, and 3 are 
+			continuations; everything from <code type="inline">RESULT</code> to 
+			<code type="inline">off`</code> is one command. If the user enabled
+			<strong>Home directory</strong> and <strong>Simple password</strong>,
+			<code type="inline">$RESULT</code> would be <code type="inline">"1" "3"</code>.
+			The arguments to <code type="inline">--checklist</code> are the height and width,
+			the number of list elements at any time (you can scroll to see additional items if
+			some are occluded), and the checklist options, where each option is a value, a 
+			description, and whether the option is initially enabled or disabled.
+		</p>
+		<p>You can type <code type="inline">dialog --help</code> at any time to see the list of 
+			general and <code type="inline">dialog</code>-specific options. There are tons 
+			of uses for <code type="inline">dialog</code>.
+		</p>
+
+	<heading refname="pixels" type="major">Got pixels? Use Zenity.</heading>
+		<p>Zenity is to the UNIX desktop what <code type="inline">dialog</code> is to simple 
+			terminal windows. You can use Zenity to open GTK+ dialog boxes from any shell
+			script. In fact, Zenity shares many of the same features as 
+			<code type="inline">dialog</code>; the only difference is that Zenity works in 
+			an X Window System environment. Zenity comes bundled with GNOME. If you don't 
+			run GNOME, you can install Zenity separately (however, expect a large number of 
+			GTK+ libraries to be installed, too). You can also download the source of Zenity 
+			from the GNOME project pages (see <a href="#resources">Resources</a> for a link).
+		</p>
+		<p>Here's a quick example. The command:</p>
+
+<code type="section" width="65%">
+zenity --question --text "Do you want to continue?"
+</code>
+
+		<p>produces something like <a href="#fig3">Figure 3</a>. (The machine used for 
+			demonstration is running Ubuntu 10.) If you click <strong>OK</strong>, the 
+			command returns <code type="inline">0</code>. Otherwise, it returns 
+			<code type="inline">1</code>.
+		</p>
+
+			<figure>
+				<heading refname="fig3" type="figure">Figure 3. A simple question</heading>
+				<img alt="A simple question" src="images/figure3.png"/>
+			</figure>
+
+		<p>Like <code type="inline">dialog</code>, Zenity has a good number of options<mdash />perhaps
+			even more than <code type="inline">dialog</code><mdash />but the options are 
+			well named and thus self-explanatory. You'll likely find Zenity more advantageous 
+			than <code type="inline">dialog</code>, especially as most computer users have 
+			an X desktop of some sort.
+		</p>
+		<p>Zenity offers many of the same controls as <code type="inline">dialog</code>. Here 
+			is a snippet to collect a name:
+		</p>
+
+<code type="section" width="65%">
+ENTRY=`zenity --entry --text "Please enter your name" 
+   --entry-text "Your name" --title "Enter your name"
+if [ $? == 0 ]; then
+  zenity --info --text "Hello $ENTRY\!"
+fi
+</code>
+
+		<p>Again, if the exit code of <code type="inline">zenity</code> is <code type="inline">0</code>,
+			then <code type="inline">ENTRY</code> has the person's name. Here is the 
+			calendar example from above rewritten to use Zenity:
+		</p>
+
+<code type="section" width="65%">
+DATE=`zenity --calendar --day "9" --month "1" --year "2010" --format "%Y-%m-%d"
+if [ $? == 0 ]; then
+  echo $DATE
+fi
+</code>
+
+		<p>Although Zenity is a little more verbose<mdash />there are separate options for day,
+			month, and year, for example<mdash />the additional switches free you from 
+			remembering the precise usage sequence of arguments. Zenity's calendar also 
+			allows you to specify the format for output, using standard 
+			<code type="inline">strftime()</code> codes. The result of this command would be 
+			something like <code type="inline">2010-1-9</code> for 9 January 2010.
+		</p>
+		<p>Zenity also provides a progress meter to show the state of an operation. It reads data 
+			from standard input line by line. If a line is prefixed with the octothorpe, or pound
+			sign (<code type="inline">#</code>), the text is updated with the text on that line.
+			If a line contains only a number, the percentage is updated with that number.
+			<a href="#list1">Listing 1</a> shows is an example from the Zenity documentation.
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list1" type="code">Listing 1. The Zenity progress meter</heading>
+#!/bin/sh
+(
+  echo "10" ; sleep 1
+  echo "# Updating mail logs" ; sleep 1
+  echo "20" ; sleep 1
+  echo "# Resetting cron jobs" ; sleep 1
+  echo "50" ; sleep 1
+  echo "This line will just be ignored" ; sleep 1
+  echo "75" ; sleep 1
+  echo "# Rebooting system" ; sleep 1
+  echo "100" ; sleep 1
+) |
+zenity --progress \
+  --title="Update System Logs" \
+  --text="Scanning mail logs..." \
+  --percentage=0
+
+if [ "$?" = -1 ] ; then
+  zenity --error \
+    --text="Update canceled."
+fi
+</code>
+
+		<p>The sub-shell (wrapped in parentheses) performs a series of tasks<mdash />albeit 
+			sleep delays in this contrived example<mdash />and emits output to a Zenity progress 
+			meter via a pipe. Before each step, the sub-shell emits a number to advance the 
+			progress meter, which starts at <code type="inline">0</code> per 
+			<code type="inline">--percentage 0</code>, and then emits a string prefaced with 
+			<code type="inline">#</code> to change the status message. Thus, the progress 
+			meter steps along to mark the work of the script. If Zenity exits with code 
+			<code type="inline">-1</code>, the <strong>Cancel</strong> button was clicked.
+		</p>
+		<p>Again, to use <code type="inline">dialog</code> or Zenity, replace code where you 
+			previously referenced a command-line argument with a dialog box. With a little 
+			creativity, you can turn your shell scripts into first-class desktop citizens.
+		</p>
+
+	<heading refname="tools" type="major">Additional advanced tools</heading>
+		<p>At some point, you may find that your requirements exceed the capabilities of both 
+			shell scripting and the <code type="inline">dialog</code> and Zenity tools. In 
+			those instances, you may turn to <code type="inline">C/C++</code> and build 
+			native applications for the desktop, but you can also turn to advanced scripting 
+			languages and language bindings for any number of robust GUI frameworks.
+		</p>
+		<p>One combination is the Ruby scripting language and the Ruby bindings for the wxWidgets
+			framework. Ruby is object oriented, expressive, concise, and runs on most operating
+			systems. The wxWidgets framework is also available on every major platform, 
+			including Mac OS X, Windows<reg />, Linux<reg />, and UNIX. Because both are 
+			portable, you can write an application once in Ruby and run it everywhere. Another,
+			simpler option is Shoes. Although not as rich as wxWidgets, Shoes is fairly quick to 
+			learn and use. The code in <a href="#list2">Listing 2</a> realizes a calculator in 70 
+			lines of code.
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list2" type="code">Listing 2. A calculator in Shoes</heading>
+class Calc
+  def initialize
+    @number = 0
+    @previous = nil
+    @op = nil
+  end
+
+  def to_s
+    @number.to_s
+  end
+
+  (0..9).each do |n|
+    define_method "press_#{n}" do
+      @number = @number.to_i * 10 + n
+    end
+  end
+
+  def press_clear
+    @number = 0
+  end
+
+  {'add' =&gt; '+', 'sub' =&gt; '-', 'times' =&gt; '*', 'div' =&gt; '/'}.each do |meth, op|
+    define_method "press_#{meth}" do
+      if @op
+        press_equals
+      end
+      @op = op
+      @previous, @number = @number, nil
+    end
+  end
+
+  def press_equals
+    @number = @previous.send(@op, @number.to_i)
+    @op = nil
+  end
+end
+
+number_field = nil
+number = Calc.new
+Shoes.app :height =&gt; 250, :width =&gt; 200, :resizable =&gt; false do
+  background "#EEC".."#996", :curve =&gt; 5, :margin =&gt; 2
+
+  stack :margin =&gt; 2 do
+
+    stack :margin =&gt; 8 do
+      number_field = para strong(number)
+    end
+
+    flow :width =&gt; 218, :margin =&gt; 4 do
+      %w(7 8 9 / 4 5 6 * 1 2 3 - 0 Clr = +).each do |btn|
+        button btn, :width =&gt; 46, :height =&gt; 46 do
+          method = case btn
+            when /[0-9]/; 'press_'+btn
+            when 'Clr'; 'press_clear'
+            when '='; 'press_equals'
+            when '+'; 'press_add'
+            when '-'; 'press_sub'
+            when '*'; 'press_times'
+            when '/'; 'press_div'
+          end
+
+          number.send(method)
+          number_field.replace strong(number)
+        end
+      end
+    end
+  end
+end
+</code>
+
+		<p>An introduction to Ruby and Shoes is beyond the scope of this article, but here are
+			some of the most important constructs:
+		</p>
+			<ul>
+				<li>The bulk of the Ruby class <code type="inline">Calc</code> uses Ruby's 
+					metaprogramming features to define functions at run time for all the 
+					digit keys and for the math operation keys.
+				</li>
+				<li>The code beginning <code type="inline">Shoes.app...</code> creates the 
+					GUI for the calculator, rendering the layout and the buttons for it. 
+					Shoes provides two containers to assemble layouts: the <code type="inline">stack</code>
+					and the <code type="inline">flow</code>. A <em>stack</em> is a vertical 
+					stack of elements, with each element placed directly beneath the element
+					preceding it. A <em>flow</em> packs elements in as tightly as it can until 
+					it reaches the limits of its bounding box, and then wraps the remaining 
+					elements. (You can think of a stack as an HTML <code type="inline">&lt;div&gt;</code>
+					and a flow as an HTML <code type="inline">&lt;p&gt;</code>.) You create 
+					a stack or flow using a Ruby block.
+				</li>
+				<li>The innermost <code type="inline">flow</code> block loops, creating all the 
+					buttons in the application and effectively binding each button to its 
+					method. (The <code type="inline">case</code> statement returns a 
+					method name; the line <code type="inline">number.send(method)</code>
+					calls that method on the instantiated calculator.)
+				</li>
+				<li>The line <code type="inline">number_field.replace strong(number)</code>
+					updates the calculator display with the result of the most recent calculation.
+					Emitting <code type="inline">number</code> causes the class to call its 
+					own <code type="inline">to_s</code> ("to string") method.
+				</li>
+			</ul>
+		<p>Other scripting languages have similar libraries, and there are many more choices for Ruby 
+			itself, including Ruby Cocoa to develop Cocoa applications on Mac OS X with Ruby. 
+			Pick your favorite open source scripting language, find a lightweight GUI toolkit, 
+			and start coding.
+		</p>
+
+	<heading refname="compiler" type="major">We don't need no stinkin' compiler!</heading>
+		<p>If you've already mastered shell scripting, combine your work with <code type="inline">dialog</code>
+			or Zenity to add interactivity. And once you need more programming power than what 
+			the shell provides, consider a language such as Ruby or Python and any one of 
+			several windowing toolkits. You don't need a compiler to write great desktop 
+			applications.
+		</p>
+</docbody>
+
+<resources>
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.wxwidgets.org/">wxWidgets</a>: Read more about wxWidgets,
+			the cross-platform GUI framework.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://invisible-island.net/dialog/dialog.html"><code type="inline">dialog</code>
+			project page</a>: Download the source code for <code type="inline">dialog</code>.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://ftp.gnome.org/pub/gnome/sources/zenity/2.30/zenity-2.30.0.tar.bz2">Zenity</a>:
+			Get the source code for Zenity from the GNOME project pages.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://github.com/shoes/shoes">Shoes</a>: Learn how to script applications with
+			Shoes, a GUI library for <a href="http://www.ruby-lang.org/en/">Ruby</a>.
+	</resource>
+
+	<resource resource-category="Discuss">
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	</resource>
+
+	<resource resource-category="Discuss">
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L<mdash />technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools<mdash />technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	</resource>
+</resources>
+
+	</dw-article>
+</dw-document>

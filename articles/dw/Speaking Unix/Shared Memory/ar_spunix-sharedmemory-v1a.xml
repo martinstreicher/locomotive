@@ -1,0 +1,488 @@
+<?xml-stylesheet type="text/xsl" href="../xsl/6.0/en_US/dw-document-html-worldwide-6.0.xsl"?>
+<dw-document xmlns:dw="http://www.ibm.com/developerWorks/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../schema/6.0/dw-document-6.0.xsd">
+
+<dw-article local-site="worldwide" skill-level="3" page-end-btt-link="yes">
+<id cma-id="12345" domino-uid="" content-id="" original="yes" />
+<keywords content="Martin Streicher, UNIX, speaking UNIX, shared memory"/>
+
+<meta-dctype>
+	<cma-defined-type />
+</meta-dctype>
+
+<meta-dcsubject>
+	<cma-defined-subject />
+</meta-dcsubject>
+
+<meta-last-updated day="25" month="05" year="2010" initials="ma" />
+
+<content-area-primary name="aix" />
+
+<title>Speaking UNIX 18: Interprocess communication with shared memory</title>
+
+<author jobtitle="Software Developer" email-cc="" email="martin.streicher@gmail.com">
+	<bio>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</bio>
+	<img alt="Martin Streicher" src="images\Bio_mstreicher.jpg"/>
+	<author-name>
+		<GivenName>Martin</GivenName>
+		<FamilyName>Streicher</FamilyName>
+	</author-name>
+	<company-name>Pixel, Byte, and Comma</company-name>
+</author>
+
+<date-published day="26" month="05" year="2010" />
+
+<abstract></abstract>
+
+<abstract-extended>UNIX provides a number of technologies for <em>interprocess communication,</em>
+	or cooperative computing between two or more applications. Shared memory is the fastest and
+	most flexible of the techniques and is surprisingly easy to implement.
+</abstract-extended>
+
+<docbody>
+	<p>Based on appearance, a UNIX<reg /> application has sole command of the underlying host.
+		It has ready and free access to the processor, its memory is sacrosanct, and attached
+		devices serve the application's every whim. But true to the maxim "Appearances can
+		be deceiving," such sovereignty is a clever illusion. A UNIX system runs any number of
+		applications simultaneously, sharing its finite physical resources judiciously among all.
+		Processor capacity is doled out in slices, application images are constantly shuffled
+		in and out of real memory, and device access is driven by demand and policed by
+		access rights. Although your shell prompt blinks attentively, a UNIX machine teems
+		with activity.
+	</p>
+
+<sidebar width="35%">
+	<heading refname="fua" type="sidebar">Frequently used acronyms</heading>
+		<ul>
+			<li><strong>API:</strong> Application programming interface</li>
+			<li><strong>IPv4:</strong> Internet Protocol version 4</li>
+			<li><strong>IPv6:</strong> Internet Protocol version 6</li>
+			<li><strong>POSIX:</strong> Portable Operating System Interface for UNIX</li>
+		</ul>
+</sidebar>
+
+	<p>Complexity notwithstanding, most applications are happily oblivious to shared tenancy.
+		However, you can write applications to interact with each other. For example, one
+		application could collect or generate data, while another monitors progress and
+		analyzes the information on the fly. Chat, an instant exchange of messages, is
+		another instance of cooperating code, where the application both transmits and
+		receives data from a peer. Secure Shell (ssh) is another tandem, potentially
+		coordinating between two entirely different hosts. In each instance, code connects
+		to other, independent code to swap information, often using a protocol to negotiate
+		and control the interchange.
+	</p>
+	<p>UNIX provides a number of technologies for such <em>interprocess communication.</em>
+		Some techniques provide for communication on the same host, while others facilitate
+		host-to-host exchanges. Speed varies among the techniques, too, so you must choose
+		the option that best suits your requirements. Coordination<mdash />enforcing timing
+		and exclusivity<mdash />is invariably required, too. For example, if one application
+		produces data and another consumes it, the consumer must pause and wait for the
+		producer whenever it exhausts the shared pool. Reflexively, the producer may slow
+		or stall if the consumer cannot deplete the pool quickly enough.
+	</p>
+	<p><a href="#table1">Table 1</a> summarizes the forms of interprocess communication
+		available on a typical UNIX system.
+	</p>
+
+<heading refname="table1" type="table">Table 1. Interprocess communication in UNIX</heading>
+	<table border="0" cellpadding="0" cellspacing="0" class="ibm-data-table"
+		summary="Interprocess communication in UNIX">
+		<tr>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Scope</th>
+			<th>Use</th>
+		</tr>
+		<tr>
+			<td>File</td>
+			<td>Data is written to and read from a typical UNIX file. Any number of processes
+				can interoperate.
+			</td>
+			<td>Local</td>
+			<td>Sharing large data sets</td>
+		</tr>
+		<tr>
+			<td>Pipe</td>
+			<td>Data is transferred between two processes using dedicated file descriptors.
+				Communication occurs only between a parent and child process.
+			</td>
+<!-- MARTIN: IN THE ABOVE LINE, WHAT IS DATA READ FROM AND WRITTEN TO? -MA -->
+<!-- MICHELLE: CLARIFIED -MS -->
+			<td>Local</td>
+			<td>Simple data sharing, such as producer and consumer</td>
+		</tr>
+		<tr>
+			<td>Named pipe</td>
+			<td>Data is exchanged between processes via dedicated file descriptors.
+				Communication can occur between any two peer processes on the
+				same host.
+			</td>
+<!-- MARTIN: IN THE ABOVE LINE, WHAT IS DATA READ FROM AND WRITTEN TO? -MA -->
+<!-- MICHELLE: CLARIFIED -MS -->
+			<td>Local</td>
+			<td>Producer and consumer, or command-and-control, as demonstrated
+				with the MySQL server and its command-line query utility
+			</td>
+		</tr>
+		<tr>
+			<td>Signal</td>
+			<td>An interrupt alerts the application to a specific condition.</td>
+			<td>Local</td>
+			<td>Cannot transfer data in a signal, so mostly useful for process management</td>
+		</tr>
+		<tr>
+			<td>Shared memory</td>
+			<td>Information is shared by reading and writing from a common segment of memory.</td>
+			<td>Local</td>
+			<td>Cooperative work of any kind, especially if security is required</td>
+		</tr>
+		<tr>
+			<td>Socket</td>
+			<td>After special setup, data is transferred using common input/output operations.</td>
+			<td>Local or remote</td>
+			<td>Network services such as FTP, ssh, and the Apache Web Server</td>
+		</tr>
+	</table>
+
+	<p>As mentioned above, each technique suits a particular need. Assuming that coordination
+		between multiple processes is roughly equally intricate, each approach has advantages
+		and disadvantages:
+	</p>
+		<ul>
+			<li>Sharing data via a common UNIX file is simple, because it uses familiar file
+				operations. However, sharing data via the file system is inherently slow,
+				because disk input and output operations cannot match the expediency of
+				memory. Further, it is difficult to coordinate reads and writes via a file only,
+				and ultimately, saving sensitive data in a file is not secure, because root and
+				other privileged users can access the information. In a sense, files are best
+				used when viewed as read-only or write-only.
+			</li>
+			<li>The pipe and named pipe are also simple mechanisms to use, using two standard
+				file descriptors on each end of the connection<mdash />one exclusive to read
+				and another exclusive to write operations. A pipe, though, can only be used
+				between a parent and child process, not between two arbitrary processes.
+				The named pipe addresses the latter shortcoming and is an excellent choice
+				for data exchange on the same system. However, neither a pipe nor a named
+				pipe provides random access, because each operates as a first-in, first-out
+				(FIFO) device.
+			</li>
+			<li>A signal cannot transfer data from one process to another. In general, signals should
+				only be used to communicate exceptional conditions between one process
+				and another.
+			</li>
+			<li>Shared memory is well suited to larger collections of data and, because it uses
+				memory, grants fast, random access. Shared memory is slightly more
+				complicated to implement but is otherwise an excellent choice for
+				<em>intra</em>host collaboration between multiple processes.
+			</li>
+			<li>A socket functions much like a named pipe but can span hosts. <em>Local
+				sockets</em> (also called <em>UNIX sockets</em>) are restricted to
+				local (same host) connectivity. <em>Inet</em> and <em>Inet6</em>
+				sockets, which use the IPv4 and IPv6 protocols, respectively, accept
+				remote connections (and local connections via the local machine's
+				Internet addressing). The socket is the obvious choice for any networking
+				application, such as distributed processing or a Web browser. Coding is
+				a little more complicated than with named pipes, but the pattern is
+				well established and well documented in any UNIX network programming
+				book.
+			</li>
+		</ul>
+	<p>Ignoring <em>inter</em>host applications, let's look at shared memory for interprocess
+		communication on the same host.
+	</p>
+
+	<heading refname="works" type="major">How shared memory works</heading>
+		<p>As its name implies, shared memory makes a segment of memory accessible to more
+			than one process. Special system calls, or requests to the UNIX kernel, allocate
+			and free the memory and set permissions; common Read and Write operations
+			put and get data from the region.
+		</p>
+		<p>Shared memory is not drawn from a process's own memory: That memory is always
+			private. Instead, shared memory is allocated from the system's free memory pool
+			and is annexed by each process that wants access. Annexation is called <em>mapping,</em>
+			where the shared segment of memory is assigned local addresses in each process'
+			own address space. <a href="#fig1">Figure 1</a>, <a href="#fig2">Figure 2</a>,
+			<a href="#fig3">Figure 3</a>, and <a href="#fig4">Figure 4</a> depict the process:
+		</p>
+			<ol>
+				<li>Assume two processes, A and B, are running on the same system, as
+					shown in <a href="#fig1">Figure 1</a>, and have been specifically
+					coded to coordinate and share information via shared memory. A
+					and B have disproportionate sizes in the figure to emphasize that
+					the applications need not be identical.
+
+					<figure>
+						<heading refname="fig1" type="figure">Figure 1. xxx</heading>
+						<img alt="xxx" src="images/fig1.png" width="326" height="251"/>
+					</figure>
+<!-- MARTIN: PLEASE PROVIDE A CAPTION FOR THIS FIGURE. -MA -->
+				</li>
+				<li>In <a href="#fig2">Figure 2</a>, process A requests a segment of shared
+					memory. Process A initializes the memory segment, preparing it for
+					use. The process also names the segment so that other processes can
+					find it. Typically, a segment name is not dynamically assigned; instead,
+					it is well known, such as a constant in a header file, and easily referenced
+					from other code.
+
+					<figure>
+						<heading refname="fig2" type="figure">Figure 2. xxx</heading>
+						<img alt="xxx" src="images/fig2.png" width="326" height="251"/>
+					</figure>
+<!-- MARTIN: PLEASE PROVIDE A CAPTION FOR THIS FIGURE. -MA -->
+				</li>
+				<li>Process A annexes, or maps, the shared memory segment into its own
+					address space. Process B finds the segment via its named pipe and also
+					maps the segment into its address space. This is shown in
+					<a href="#fig3">Figure 3</a>. Both processes are enlarged by the size of
+					the shared memory segment.
+
+					<figure>
+						<heading refname="fig3" type="figure">Figure 3. xxx</heading>
+						<img alt="xxx" src="images/fig3.png" width="326" height="251"/>
+					</figure>
+<!-- MARTIN: PLEASE PROVIDE A CAPTION FOR THIS FIGURE. -MA -->
+				</li>
+				<li>Finally, in <a href="#fig4">Figure 4</a>, processes A and B can read and written
+					from the shared memory segment freely. The shared memory is treated
+					the same as local process memory. <code type="inline">read()</code>
+					and <code type="inline">write()</code> operate as normal.
+
+					<figure>
+						<heading refname="fig4" type="figure">Figure 4. xxx</heading>
+						<img alt="xxx" src="images/fig4.png" width="326" height="251"/>
+					</figure>
+<!-- MARTIN: PLEASE PROVIDE A CAPTION FOR THIS FIGURE. -MA -->
+				</li>
+			</ol>
+		<p>Much of the work shown in these figures is captured in the UNIX shared memory
+			API. In fact, there are two variants of the shared memory API: the POSIX API and the
+			older but no less effective System V API. Because POSIX is the ratified standard and
+			likely found on UNIX and Linux<reg /> and derivations of those systems, let's use that
+			version. Additionally, the POSIX API uses simple file descriptors for read and write and
+			so should seem much more familiar.
+		</p>
+		<p>POSIX provides five entry points to create, map, synchronize, and undo shared memory
+			segments:
+		</p>
+			<ul>
+				<li><strong><code type="inline">shm_open()</code>.</strong> Creates a
+					shared memory region or attaches to an existing, named region.
+					This system call returns a file descriptor.
+				</li>
+				<li><strong><code type="inline">shm_unlink()</code>.</strong> Deletes a
+					shared memory region given a file descriptor (returned from
+					<code type="inline">shm_open()</code>. The region is not actually
+					removed until all processes accessing the region exit, much like any
+					file in UNIX. However, once <code type="inline">shm_unlink()</code>
+					is called (typically by the originating process), no other processes can
+					access the region.
+				</li>
+				<li><strong><code type="inline">mmap()</code>.</strong> Maps a shared
+					memory region into the process's memory. This system call requires
+					the file descriptor from <code type="inline">shm_open()</code> and
+					returns a pointer to memory. (In some cases, you can also map a file
+					descriptor to a plain file or another device into memory. A discussion
+					of those options is beyond the scope of this introduction; consult the
+					<code type="inline">mmap()</code> documentation for your operating
+					system for specifics.)
+				</li>
+				<li><strong><code type="inline">munmap()</code>.</strong> The inverse of
+					<code type="inline">mmap()</code>.
+				</li>
+				<li><strong><code type="inline">msync()</code>.</strong> Used to synchronize
+					a shared memory segment with the file system<mdash />a technique
+					useful when mapping a file into memory.
+				</li>
+			</ul>
+		<p>The pattern for shared memory is to create a segment with <code type="inline">shm_open()</code>,
+			size it with <code type="inline">write()</code> or <code type="inline">ftruncate()</code>,
+			map it into process memory with <code type="inline">mmap()</code>, and do the
+			work required with one or more additional participants. To finish, the originating
+			process calls <code type="inline">munmap()</code> and <code type="inline">shm_unlink()</code>,
+			and then exits.
+		</p>
+
+	<heading refname="sample" type="major">A sample application</heading>
+		<p><a href="#list1">Listing 1</a> shows a small shared memory example. (The code is
+			derived from John Fusco's book, <em>The Linux Programmer's Toolbox,</em> and
+			used with the permission of the author.) The code implements a parent and child
+			process that communicates via a shared memory segment.
+		</p>
+
+<code type="section" width="65%">
+	<heading refname="list1" type="code">Listing 1. Shared memory example</heading>
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/file.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;sys/wait.h&gt;
+
+void error_and_die(const char *msg) {
+  perror(msg);
+  exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[]) {
+  int r;
+
+  const char *memname = "sample";
+  const size_t region_size = sysconf(_SC_PAGE_SIZE);
+
+  int fd = shm_open(memname, O_CREAT | O_TRUNC | O_RDWR, 0666);
+  if (fd == -1)
+    error_and_die("shm_open");
+
+  r = ftruncate(fd, region_size);
+  if (r != 0)
+    error_and_die("ftruncate");
+
+  void *ptr = mmap(0, region_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (ptr == MAP_FAILED)
+    error_and_die("mmap");
+  close(fd);
+
+  pid_t pid = fork();
+
+  if (pid == 0) {
+    u_long *d = (u_long *) ptr;
+    *d = 0xdbeebee;
+    exit(0);
+  }
+  else {
+    int status;
+    waitpid(pid, &amp;status, 0);
+    printf("child wrote %#lx\n", *(u_long *) ptr);
+  }
+
+  r = munmap(ptr, region_size);
+  if (r != 0)
+    error_and_die("munmap");
+
+  r = shm_unlink(memname);
+  if (r != 0)
+    error_and_die("shm_unlink");
+
+  return 0;
+}
+</code>
+
+		<p>Here are some highlights from the code:</p>
+			<ul>
+				<li>The call to <code type="inline">shm_open()</code> should look familiar: It
+					is much like the <code type="inline">open()</code> function, including
+					how to initialize the segment and permissions. Here, the segment is
+					world-readable and world-writable. The next unused file descriptor is
+					returned if the call is successful; otherwise, <code type="inline">-1</code>
+					is returned and <code type="inline">errno</code> is set accordingly.
+				</li>
+				<li><code type="inline">ftruncate()</code> sizes the file to
+					<code type="inline">region_size</code> bytes, which was previously set
+					to the system's standard page size. <code type="inline">sysconf()</code>
+					is provided as part of libc. (You can use the shell utility <code type="inline">getconf</code>
+					to explore your system's configuration settings, too.)
+				</li>
+				<li><code type="inline">mmap()</code> annexes the shared memory segment
+					and returns a pointer suitable for reading and writing bytes directly from
+					the segment. <code type="inline">PROT_READ</code> and
+					<code type="inline">PROT_WRITE</code> indicate that the pages in the
+					segment can be read from and written to, respectively. <code type="inline">MAP_SHARED</code>
+					specifies that any changes to the memory segment should be "public" to
+					all cooperating processes.
+				</li>
+				<li>The computation part of the code should seem familiar if you've worked at
+					all with <code type="inline">fork()</code>: After the fork, the parent
+					and child have copies of all open file descriptors and data values, so
+					the pointer works for both. <code type="inline">pid</code>, however,
+					differs. The child gets 0, the parent gets the process ID of the child,
+					and the value of the variable determines which of the
+					<code type="inline">if</code>/<code type="inline">then</code>/<code type="inline">else</code>
+					branches to take. The child writes some bytes to the pointer, and then
+					exits. The parent waits for the child to exit, and then reads what was
+					written.
+				</li>
+				<li>Before the parent can exit, however, it must free the shared memory.
+					<code type="inline">munmap()</code> and <code type="inline">shm_unlink()</code>
+					do the trick.
+				</li>
+			</ul>
+		<p>This example is very elementary. A real application would use semaphores or other
+			techniques to control reading and writing to the shared segment. Such control is
+			typically application specific, and you can find many examples in the Berkeley
+			Software Distribution (BSD) and Linux source, if your UNIX flavor is not open
+			source.
+		</p>
+
+	<heading refname="all" type="major">All for one</heading>
+		<p>Because UNIX runs many applications seemingly at the same time, it's an ideal platform
+			for monitoring, data collection, cooperative and distributed computing, and
+			client-server applications. Shared memory is the fastest of the interprocess
+			communications options available and is quite flexible. You can map files into
+			memory, as well<mdash />an ideal solution for accelerating data access.
+		</p>
+</docbody>
+
+<resources>
+<!-- MARTIN: PLEASE PROVIDE SOME SPECIFIC RESOURCE ENTRIES FOR THIS ARTICLE. -MA -->
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	</resource>
+
+	<resource resource-category="Discuss">
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	</resource>
+
+	<resource resource-category="Discuss">
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L<mdash />technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools<mdash />technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	</resource>
+</resources>
+
+	</dw-article>
+</dw-document>

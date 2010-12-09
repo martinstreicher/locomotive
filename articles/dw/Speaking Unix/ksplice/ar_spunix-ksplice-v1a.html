@@ -1,0 +1,372 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Speaking UNIX 15: Get to know Ksplice</title><meta http-equiv="PICS-Label" content="(PICS-1.1 &#34;http://www.icra.org/ratingsv02.html&#34; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &#34;http://www.rsac.org/ratingsv01.html&#34; l gen true r (n 0 s 0 v 0 l 0) &#34;http://www.classify.org/safesurf/&#34; l gen true r (SS~~000 1))"/><link rel="schema.DC" href="http://purl.org/DC/elements/1.0/"/><link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico"/><meta name="Owner" content="dW Information/Raleigh/IBM"/><meta name="DC.Language" scheme="rfc1766" content="en-US"/><meta name="IBM.Country" content="ZZ"/><meta name="Security" content="Public"/><meta name="IBM.SpecialPurpose" content="SP001"/><meta name="IBM.PageAttributes" content="sid=1003"/><meta name="Abstract" content="Ksplice applies kernel patches on-the-flyno reboot requiredin a fraction of a second. Here's a hands-on guide to performing painless system updates." /><meta name="Description" content="Ksplice applies kernel patches on-the-flyno reboot requiredin a fraction of a second. Here's a hands-on guide to performing painless system updates." /><meta name="Keywords" content="Martin Streicher, UNIX, speaking UNIX, Ksplice, dddauca" /><meta name="DC.Date" scheme="iso8601" content="2010-03-22" /><meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316" /><meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="SWG10" /><meta name="DC.Rights" content="Copyright (c) 2010 by IBM Corporation" /> <meta name="Robots" content="index,follow" /><meta name="IBM.Effective" scheme="W3CDTF" content="2010-03-22" /><meta name="Last update" content="19032010ma" /><link rel="stylesheet" type="text/css" media="screen,print" href="http://www.ibm.com/common/v14/table.css"/><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwcss14.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="http://www.ibm.com/common/v14/main.css"/><link rel="stylesheet" type="text/css" media="all" href="http://www.ibm.com/common/v14/screen.css"/><link rel="stylesheet" type="text/css" media="print" href="http://www.ibm.com/common/v14/print.css"/><script language="JavaScript" src="
+../web/www.ibm.com/common/v14/detection.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dropdown.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/grabtitle.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/emailfriend2.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwplugin.js" type="text/javascript"></script><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-head1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><style type="text/css">
+pre.section {margin-top: 0; margin-bottom: 0; font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px}
+.boldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold} .rboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff0000}
+.gboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff6600}
+.bboldcode {font-family: Andale Mono, Lucida  Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #3c5f84}
+</style><style type="text/css">
+.atitle { font-family:arial,sans-serif; font-size:18px; }
+</style><script type="text/javascript" language="JavaScript">var emailAbstract = "Ksplice applies kernel patches on-the-flyno reboot requiredin a fraction of a second. Here's a hands-on guide to performing painless system updates."; </script></head><body><!--MASTHEAD_BEGIN--><!--#include virtual="/developerworks/inc/s-topmast14.inc" --><!--MASTHEAD_END--><!-- CMA ID: 12345 --> <!-- Site ID: 1 --><table width="100%" cellspacing="0" cellpadding="0" border="0" id="v14-body-table"><tr valign="top"><!--LEFTNAV_BEGIN--><td width="150" id="navigation"><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-spacer"><a class="left-nav-overview" href="http://www.ibm.com/developerworks"> </a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-overview" colspan="2"><a class="left-nav-overview" href="http://www.ibm.com/developerworks">developerWorks</a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-highlight" colspan="2"><a class="left-nav" href="#">In this article:</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#live_kernel">Patching a live kernel</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#easy">Kernel patching was never this easy</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#custom_kernels">Updating custom kernels</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#24">Twenty-four, Seven, Three Hundred Sixty-five</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#resources">Resources</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#author">About the author</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#rate">Rate this page</a></td></tr><tr class="left-nav-last"><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/v14/t/left-nav-corner.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td colspan="2" class="related"><b class="related">Related links</b></td></tr><tr class="rlinks"><td><img src="../web/www.ibm.com/i/v14/t/rl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="rlinks" href="http://www.ibm.com/developerworks/views/aix/library.jsp">AIX and UNIX technical library</a></td></tr><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><tr><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/c.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--></td><!--LEFTNAV_END--><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0" id="content-table"><tr valign="top"><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td><a name="main"><img src="../web/www.ibm.com/i/c.gif" width="592" height="1" alt="skip to main content" border="0"/></a></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10" height="18"><img src="../web/www.ibm.com/i/c.gif" width="10" height="18" alt=""/></td><td width="100%"><img src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/><br /><a class="bctl" href="http://www.ibm.com/developerworks/">developerWorks</a><span class="bct">  &gt;  </span><a class="bctl" href="http://www.ibm.com/developerworks/aix/">AIX and UNIX</a><span class="bct">  &gt;</span><img src="../web/www.ibm.com/i/c.gif" width="1" height="1" alt=""/><br /><h1>Speaking UNIX 15: Get to know Ksplice</h1><p id="subtitle"><em>Give reboots the boot</em></p><img class="display-img" src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/></td><td width="192" class="no-print"><a href="http://www.ibm.com/developerworks/"><img src="../web/www.ibm.com/developerworks/i/dw.gif" width="192" height="18" border="0" alt="developerWorks"/></a></td></tr></table></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td width="100%"><table align="right" cellpadding="0" cellspacing="0" width="160" border="0" class="no-print"><tr><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-1-small">Document options</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><script language="JavaScript" type="text/javascript">
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img alt="Set printer orientation to landscape mode" height="16" src="../web/www.ibm.com/i/v14/icons/printer.gif" width="16" vspace="3" /></td><td width="122"><p><b><a class="smallplainlink" href="javascript:print()">Print this page</a></b></p></td></tr>');
+//-->
+</script>
+<noscript></noscript><script language="JavaScript" type="text/javascript">
+<!-- 5.6 10/24 llk: added cdata around the subdirectory path of email gif-->
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/v14/icons/em.gif" height="16" width="16" vspace="3" alt="Email this page" /></td><td width="122"><p><a class="smallplainlink" href="javascript:void newWindow()"><b>E-mail this page</b></a></p></td></tr>');
+//-->
+</script><noscript><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/c.gif" height="16" width="16" alt=""/></td><td width="122" class="small"><p><span class="ast">Document options requiring JavaScript are not displayed</span></p></td></tr></noscript></table></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-right-column1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-2-small">Rate this page</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td><img src="../web/www.ibm.com/i/v14/icons/d_bold.gif" height="16" width="16" border="0" vspace="3" alt=""/></td><td width="125"><p><a class="smallplainlink" href="#rate"><b>Help us improve this content</b></a></p></td></tr></table></td></tr></table><br /></td></tr></table><p>Level: Intermediate</p><p><a href="#author">Martin Streicher</a> (<a href="mailto:martin.streicher@gmail.com?subject=Speaking UNIX 15: Get to know Ksplice">martin.streicher@gmail.com</a>), Software Developer, Pixel, Byte, and Comma<br /></p><p> 22 Mar  2010</p><blockquote>Ksplice applies kernel patches on-the-fly&#8212;no reboot required&#8212;in
+	a fraction of a second. Here's a hands-on guide to performing painless system updates.
+</blockquote><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES-->
+	<p>UNIX&#174; machines run and run (and run). A desktop or portable system can be left on for
+		weeks, even months, and server uptime can stretch to a year or more. Indeed, if you 
+		could preclude hardware failures and Mother Nature, a UNIX system might run perennially.
+		Alas, hardware is imperfect, Mother Nature has a mind of her own, and software suffers
+		from bugs. Gear requires replacement. Storms happen. And systems require patches and 
+		restarts. Much like death and taxes, downtime is a certainty.
+	</p>
+
+<table width="30%" cellpadding="0" cellspacing="0" border="0" align="right"><tr><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td><table width="100%" cellpadding="5" cellspacing="0" border="1"><tr><td bgcolor="#eeeeee">
+	<a name="fua"><b>Frequently used acronyms</b></a><br />
+		<ul>
+			<li><b>GUI:</b> Graphical user interface</li>
+		</ul>
+</td></tr></table></td></tr></table>
+
+	<p>However, unlike death and taxes, you can <i>minimize</i> downtime. Proactive and regular
+		system maintenance and hot spares boost availability, as does a robust data center 
+		replete with backup power and redundant connections to the Internet. Thankfully, too,
+		most applications and libraries can be updated seamlessly and on demand using tools
+		such as rpm, Aptitude, and yum.
+	</p>
+	<p>Unfortunately, kernel updates&#8212;modifications to address vulnerabilities and flaws 
+		in the core system software&#8212;aren't so painless. A kernel update is very disruptive,
+		requiring scheduled downtime to temporarily halt all services on each and every machine
+		affected and reboot each one. Although such upkeep is necessary and vital, keeping pace
+		with kernel updates can nonetheless make operations something akin to a yo-yo. To wit,
+		the time lines in <a href="#fig1">Figure 1</a> show the frequency of critical kernel updates
+		for a number of popular operating systems between January 2009 and February 2010. Each
+		cycle icon represents a mandatory restart (image courtesy of Ksplice, Inc.).
+	</p>
+
+		
+			<br /><a name="fig1"><b>Figure 1. Frequency of kernel updates 
+				by operating system
+			</b></a><br />
+			<img alt="Frequency of kernel updates by operating system" src="images/reboots-required.png" width="572" height="337"/>
+		<br />
+
+	<p>But now, you can patch your kernel as it runs, eliminating the otherwise wholesale interruption
+		caused by a restart. In other words, scheduled upgrades no longer need a schedule. Ksplice
+		is a set of tools to patch the kernel <i>in situ,</i> as it's running&#8212;no reboot 
+		required. Given an existing kernel, its source code, and one or more unified diff files (a 
+		unified diff is the canonical form for kernel patches), Ksplice replaces existing, errant object 
+		code in the kernel with new object code. Ksplice can replace both program code and data 
+		structures. Better yet, a kernel <i>splice</i> interrupts normal system operation for a mere 
+		fraction of a millisecond, leaving daemons, processes, and connections intact.
+	</p>
+	<p>Let's look briefly at how Ksplice works and learn to use its tools to keep a kernel up to date.
+		There are three ways to use Ksplice: through a GUI; through equivalent, high-level 
+		command-line utilities; and, if you have the source to your kernel, through the raw Ksplice
+		tools. A Ubuntu version 9.04 or version 9.10 user, for example, can download and install
+		a point-and-click application to choose and apply kernel modifications. All three variants 
+		of Ksplice are introduced here.
+	</p>
+
+	<p><a name="live_kernel"><span class="atitle">Patching a live kernel</span></a></p>
+		<p>Put succinctly and simply, Ksplice patches a running kernel by replacing one or more 
+			vulnerable or faulty functions with newer, correct implementations. To effect the 
+			substitution (again, oversimplifying for the moment,) the tool amends a running 
+			kernel image with the new functions' object code and injects a jump at the head 
+			of each existing function to call its new counterpart. Virtually the entire kernel 
+			remains unchanged, save for the new object code and a few instructions to redirect 
+			the function calls.
+		</p>
+		<p>Additionally, Ksplice can affect data structures, albeit with a little extra programming.
+			Ksplice can run code during an update to facilitate such a change. It also provides 
+			a pair of hooks to run setup and tear-down code immediately before and immediately 
+			after the kernel is updated. You can also add new functions to augment the kernel: 
+			New functions simply have no counterparts in the original kernel.
+		</p>
+		<p>You can apply Ksplice to virtually any kernel, even those that shipped before Ksplice was
+			developed. To splice a kernel, you must have its source code, the set of patches 
+			you want to apply, and a compiler capable of isolating each function and data structure 
+			in the kernel in its own section in the object code. For example, the GNU Compiler 
+			Collection (GCC) provides the flags <code>-ffunction-sections</code> 
+			and <code>-fdata-sections</code>, respectively, for those exact 
+			purposes. (Other compilers, such as the Intel&#174; <code>C</code> 
+			Compiler, have similar capabilities.) Such "modular" object code is more easily 
+			manipulated by Ksplice. The running kernel to be patched need not have been 
+			compiled with the same special options.
+		</p>
+		<p>Ksplice refers to the kernel compiled from the original source as the <i>pre</i> kernel.
+			The new kernel built from the patched source is the <i>post</i> kernel. And the
+			running kernel is nicknamed the <i>run</i> kernel. Ksplice fails if pre is not the 
+			same as run&#8212;a clear indication that the source code does not match the 
+			running kernel. Apart from that special condition, Ksplice compares pre to post, and
+			each difference becomes a splice. All splices are bundled into a single object file
+			ready to be injected into the kernel.
+		</p>
+		<p>Ksplice uses the <code>stop_machine</code> feature (or its equivalent,
+			depending on your flavor of UNIX) to prepare to splice new code. Think of 
+			<code>stop_machine</code> as a traffic signal: It allows a sole CPU
+			to proceed while idling all others. After executing <code>stop_machine</code>,
+			Ksplice analyzes each function marked for replacement to determine whether it is
+			active. If even a single thread's instruction pointer refers to a function's code in 
+			memory or a single thread's kernel stack refers to a return address within the 
+			function, the function is considered active and cannot be replaced. Otherwise,
+			the function is deemed inactive and is replaced. Ksplice tries repeatedly to 
+			make a replacement but may ultimately abandon the effort. If so, it reports an 
+			error and stops.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="easy"><span class="atitle">Kernel patching was never this easy</span></a></p>
+		<p>If you run one of the more popular UNIX distributions, Ksplice couldn't be easier to 
+			use. The authors of Ksplice provide a client application customized for your 
+			distro. You can keep your kernel up to date for a nominal fee of less than US$5 per 
+			system per month. You can find a list of supported operating systems on the Ksplice 
+			Web site (see <a href="#resources">Resources</a>). The Ksplice software is available 
+			free of charge for Ubuntu 9.04 (Jaunty Jackalope) and Ubuntu 9.10.
+		</p>
+		<p>For demonstration purposes, this article uses Ubuntu and splices its kernel. To use 
+			Ksplice on Ubuntu, you must download and install the Ksplice Uptrack client (see
+			<a href="#resources">Resources</a> for a link). Uptrack manages the rebootless 
+			kernel updates available for your system. You can view and install Ksplice updates,
+			and you can review alerts when new kernel updates are available. The software is 
+			provided as a Debian package. (You can also download the software from the 
+			command line using a tool such as <code>wget</code> or cURL.)
+		</p>
+		<p>Next, use <code>gdebi</code> to install the package. If you do not yet
+			have <code>gdebi</code>, you can install it with the command:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+sudo apt-get install gdebi
+</pre></td></tr></table><br />
+
+		<p>If you prefer a graphical client, you can install Ksplice with the command:</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+sudo gdebi-gtk ksplice-uptrack.deb
+</pre></td></tr></table><br />
+
+		<p><code>gdebi</code> installs Uptrack and its dependencies, which include
+			<code>kerneloops</code>, the YAML library, Python, and the cURL
+			library (see <a href="#list1">Listing 1</a>).
+		</p>
+
+<br /><a name="list1"><b>Listing 1. Installing Uptrack and its dependencies</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ wget http://www.ksplice.com/uptrack/dist/karmic/ksplice-uptrack.deb
+$ sudo gdebi ksplice-uptrack.deb
+Reading package lists: Done
+Reading state information: Done
+Reading state information: Done
+Reading state information: Done
+Reading state information: Done
+
+Requires the installation of the following packages:
+kerneloops  curl  libcurl3  python-yaml  libyaml-0-1
+Client for the Ksplice Uptrack service
+ The Ksplice Uptrack service enables you to keep your system
+ up to date and secure without rebooting it.
+This package contains the command-line and graphical Uptrack clients.
+Do you want to install the software package? [y/N]:y
+...
+</pre></td></tr></table><br />
+
+		<p>After you accept the terms of service and the installation finishes, Uptrack launches
+			automatically. The installer also places a Ksplice icon&#8212;a large letter K in
+			the task bar&#8212;for easy access. <a href="#fig2">Figure 2</a> shows the Uptrack
+			Manager launching for the first time on a clean installation of Ubuntu 9.10. To 
+			patch the kernel, click <b>Install all updates</b>.
+		</p>
+
+			
+				<br /><a name="fig2"><b>Figure 2. Launching the Uptrack Manager</b></a><br />
+				<img alt="Launching the Uptrack Manager" src="images/ksplice.jpg" width="572" height="442"/>
+			<br />
+
+		<p>A progress bar, shown in <a href="#fig3">Figure 3</a>, echoes each patch as it is installed.
+			Patching the kernel takes less than a few seconds, even when a good number of 
+			patches are outstanding. And, of course, no reboot is required.
+		</p>
+
+			
+				<br /><a name="fig3"><b>Figure 3. The Ksplice progress bar</b></a><br />
+				<img alt="Ksplice progress bar" src="images/progress.jpg" width="572" height="445"/>
+			<br />
+
+		<p>When finished, the Uptrack Manager refreshes to show you the new state of your system,
+			as shown in <a href="#fig4">Figure 4</a>. A green check mark indicates that the named
+			patch was applied successfully and is now live in your running kernel. Click <b>Check</b>
+			to look for additional kernel patches available for your system. Click <b>Close</b> to 
+			dismiss the window. It is not necessary to run <code>uptrack-manager</code>
+			as root; the software prompts for an administrator's password before any modifications 
+			are applied.
+		</p>
+
+			
+				<br /><a name="fig4"><b>Figure 4. The current system state in Uptrack Manager</b></a><br />
+				<img alt="Current system state" src="images/after.jpg" width="572" height="442"/>
+			<br />
+
+		<p>You can open Uptrack any time later with the command <code>uptrack-manager</code>,
+			or click on the <b>K</b> icon on the taskbar. Ksplice runs continuously once launched.
+			If you prefer, you can configure Ksplice to apply patches to the running kernel 
+			automatically or just alert you when updates become available. For example, to
+			choose the former, edit the file  /etc/uptrack/uptrack.conf and change the 
+			<code>autoinstall</code> line to read:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+autoinstall = yes
+</pre></td></tr></table><br />
+
+		<p>In addition to <code>update-manager</code>, Uptrack includes three other 
+			command-line utilities for convenience. (These utilities are different than the tools 
+			used to work with kernel source directly, which are demonstrated in the next 
+			section). <code>uptrack-upgrade</code> installs the latest available 
+			kernel updates. <code>uptrack-remove <i>id</i></code> removes the 
+			kernel update tagged with ID <i><code>id</code></i>. If you type
+			<code>uptrack-remove --all</code>, <code>uptrack-remove</code>
+			purges all installed updates. <code>uptrack-show</code> shows a 
+			manifest of updates that are currently installed.
+		</p>
+		<p>It is essential to remember that Uptrack does not usurp the role of your distribution's
+			standard package manager. All changes that Ksplice makes are applied to the running
+			kernel and exist in memory only. Therefore, all Ksplice patches are lost upon 
+			shutdown. Continue to update your kernel on disk with a traditional software 
+			maintenance procedure, such as running:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+apt-get update; apt-get upgrade
+</pre></td></tr></table><br />
+
+		<p>as root on a regular basis or when your distribution informs you of new system updates.
+			Keeping the kernel on disk up to date ensures that your system boots the best 
+			kernel available when your system eventually requires a restart.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="custom_kernels"><span class="atitle">Updating custom kernels</span></a></p>
+		<p>Uptrack Manager is a convenient option for desktop and server computers based on
+			kernels built and distributed by a vendor or a community project. It won't work,
+			though, if your kernel is customized and built locally, because Uptrack cannot
+			compare your kernel to a known, published operating system to generate splices.
+			However, you can use Ksplice's "primitive" utilities to analyze public patches and
+			create your own splices.
+		</p>
+		<p>Describing how to build a kernel is beyond the scope of this article. If you're unfamiliar
+			with the process, there are excellent instructions and a good number of 
+			satisfactory tutorials scattered across the Internet. Instead, let's focus on the 
+			tools Ksplice provides and how to proceed once you are able to build any kernel.
+		</p>
+		<p>Ksplice provides a utility named <code>ksplice-create</code> to create
+			kernel splices. The command requires two inputs: a patch file and the entire source
+			tree for the running kernel, including any previous patches that have already been
+			applied. Given the current source code and the patches, Ksplice generates two 
+			kernels, as mentioned above, and compares the revision to its original. The output
+			of <code>ksplice-create</code> is a splice that can be applied with
+			<code>ksplice-apply</code>. You can redact a splice from the kernel 
+			with <code>ksplice-remove</code>.
+		</p>
+		<p>Here is an example (taken from the authors' academic paper and used with express 
+			permission) that creates an update for the "prctl vulnerability," CVE-2006-2451,
+			using a patch file called <i>prctl</i> and a kernel source directory ~/src:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ ksplice-create --patch=prctl ~/src
+Ksplice update tarball written to ksplice-8c4o6u.tar.gz
+$ sudo ksplice-apply ./ksplice-8c4o6u.tar.gz
+Done!
+</pre></td></tr></table><br />
+
+		<p>The former command generates a tarball of object code, ksplice-8c4o6u.tar.gz, to be
+			patched into the kernel. The second command reads the tarball, calculates the
+			renovations required, and applies the splice.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="24"><span class="atitle">Twenty-four, Seven, Three Hundred Sixty-five</span></a></p>
+		<p>Ksplice is a proven technology. According to the authors' original paper and technical
+			study, Ksplice was able to dynamically patch the Linux&#174; kernel with all 
+			security and functional patches issued between 2006 and 2008. Of those, more than 
+			two-thirds required no special code to update the kernel. Of the remaining patches,
+			special programming amounted to an average of 17 lines of code per patch.
+		</p>
+		<p>Linux was chosen to prove the Ksplice approach. The Linux source is widely and frequently
+			vetted for flaws and is patched often to quickly address shortcomings. However,
+			Ksplice can readily be adapted to any kernel for which source code is available,
+			including BSD and Sun Solaris. Ksplice supports x86, x86_64, and ARM processors,
+			too.
+		</p>
+<br /><br /><p><a name="resources"><span class="atitle">Resources</span></a></p><b>Learn</b><br /><ul><li>
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	<br /><br /></li><li>
+		<a href="http://www.ksplice.com/">Ksplice</a>: Learn more about Ksplice from the tool's
+			site.
+	<br /><br /></li><li>
+		<a href="http://www.ksplice.com/doc/ksplice.pdf">Ksplice technical paper</a>: Read the
+			technical paper to learn more about how Ksplice works.
+	<br /><br /></li><li>
+		<a href="http://kernel.org/">kernel.org</a>: Find information about the Linux kernel and
+			the kernel source code archive.
+	<br /><br /></li><li>
+		<a href="http://cve.mitre.org/">Common Vulnerabilities and Exposures</a>: An exhaustive list
+			of computer vulnerabilities is available from the CVE site. Each entry in the database
+			includes a brief description of the security vulnerability or exposure and any 
+			pertinent references.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	<br /><br /></li></ul><br /><b>Get products and technologies</b><br /><ul><li>
+		<a href="http://www.ksplice.com/uptrack/download?now=y">Ksplice Uptrack</a>: Download the 
+			Uptrack software suitable for your system.
+	<br /><br /></li><li>
+		<a href="http://www.github.com">Github</a>: Github houses thousands of Git repositories,
+			including the personal dot files of many expert users. Search for "dot files" to find
+			examples. (You can learn more about Git online and in the
+			<a href="http://github.com/guides/home">Github Guides</a>.)
+	<br /><br /></li></ul><br /><b>Discuss</b><br /><ul><li>
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	<br /><br /></li><li>
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L&#8212;technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools&#8212;technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	<br /></li></ul><br /><br /><p><a name="author"><span class="atitle">About the author</span></a></p><table border="0" cellspacing="0" cellpadding="0" width="100%"><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" height="5" width="100%" alt=""/></td></tr><tr valign="top" align="left"><td><p><img alt="Martin Streicher" src="images\Bio_mstreicher.jpg" align="left"/></p></td><td><img src="../web/www.ibm.com/i/c.gif" height="5" width="4" alt=""/></td><td width="100%"><p>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<i><a href="http://www.linux-mag.com">Linux Magazine</a>.</i> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</p></td></tr></table><br /><br /><br /><p class="no-print"><span class="atitle"><a name="rate">Rate this page</a></span></p><span class="no-print"><form method="post" action="http://www-128.ibm.com/developerworks/utils/RatingsHandler"><input type="hidden" name="SITE_ID" value="1"/><input type="hidden" name="ArticleTitle" value="Speaking UNIX 15: Get to know Ksplice"/><input type="hidden" name="Zone" value="AIX and UNIX"/><input type="hidden" name="RedirectURL" value="http://www.ibm.com/developerworks/thankyou/feedback-thankyou.html"/><input type="hidden" name="ArticleID" value="12345"/><input type="hidden" name="publish-date" value="03222010"/><input type="hidden" name="author1-email" value="martin.streicher@gmail.com" /><input type="hidden" name="author1-email-cc" value="" /><script language="javascript" type="text/javascript">document.write('<input type="hidden" name="url" value="'+location.href+'" />');</script><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/gray_rule.gif" width="100%"/><br /><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border" width="100%"><tr><td width="100%"><table cellspacing="0" cellpadding="0" border="0" width="100%"><tr><td colspan="3"><p>Please take a moment to complete this form to help us better serve you.</p></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Goal">Did the information help you to achieve your goal?</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td><input type="radio" name="goal" id="goal-yes" value="Yes"/><label for="goal-yes">Yes</label></td><td><input type="radio" name="goal" id="goal-no" value="No"/><label for="goal-no">No</label></td><td><input type="radio" name="goal" id="goal-undecided" value="Don't know"/><label for="goal-undecided">Don't know</label></td></tr></table></td><td width="100%"> </td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="12" alt=""/></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Comments">Please provide us with comments to help improve this page:</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td><textarea name="Comments" id="Comments" wrap="virtual" rows="5" cols="35" class="iform"> </textarea></td></tr></table></td><td width="100%"> </td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="12" alt=""/></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Rating">How useful is the information?</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="58" align="left"><input type="radio" name="Rating" id="Rating1" value="1"/><label for="Rating1">1</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating2" value="2"/><label for="Rating2">2</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating3" value="3"/><label for="Rating3">3</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating4" value="4"/><label for="Rating4">4</label></td><td width="61" align="left"><input type="radio" name="Rating" id="Rating5" value="5"/><label for="Rating5">5</label></td></tr><tr><td width="60" align="left"><span class="greytext">Not</span><br /><span class="greytext">useful</span></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="63" align="left"><span class="greytext">Extremely<br />useful</span></td></tr></table></td><td width="100%"> </td></tr></table></td></tr></table><table cellspacing="0" cellpadding="0" border="0" width="100%" class="v14-gray-table-border"><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="8" alt=""/></td></tr><tr><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td colspan="3"><input type="image" src="../web/www.ibm.com/i/v14/buttons/submit.gif" border="0" width="120" height="21" alt="Submit"/></td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="8" alt=""/></td></tr></table></form><br /></span><br /><p><!--#include virtual="/developerworks/inc/s-reserved-social-tagging.inc" --></p><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><span class="no-print"><table align="right" cellpadding="0" cellspacing="0"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /></span></td><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td></tr></table></td></tr></table><!--FOOTER_BEGIN--><!--#include virtual="/developerworks/inc/s-footer14.inc" --><!--FOOTER_END--><!--XSLT stylesheet used to transform this file:  dw-document-html-5.12.xsl--></body></html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2, p.subhead {
+    font-size: 95%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    display: block;
+    border: 1px solid black;
+    padding: 5px;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  th, td {
+    padding: 4px 12px;
+    font-size: 80%;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<p>
+  <em>
+    Abstract: You don't have to break into a Watergate office to uncover the secrets of the Unix power users. There's an informant and this month he's spilling the beans.
+  </em>
+</p>
+
+<h1>
+  The Best Kept Secrets of Unix Power Users
+  </h1>
+
+<p>
+  If you're wondering why I'm wearing dark sunglasses, a fake moustache, and a baseball cap (featuring the logo of  professional curling team The Floating Stones), I'm on the lam. I'm dodging black remote-control helicopters, pasty-white system administrators, and the combined forces of many daemons to bring you some of the best-kept secrets of Unix power users. Don your aluminum foil hat and read on.</p>
+
+
+<h2>
+  Save the Environment Variables
+  </h2>
+
+<p>
+  Most Unix users amass settings in shell startup files, such as <em>.bashrc</em> (for the Bash shell) and <em>.zshrc</em> (for the Z Shell), to recreate a preferred shell environment time and again. Startup files can create aliases, set shell options, and set environment variables. Essential environment variables include <tt>HOME</tt> (points to your home directory), <tt>PATH</tt> (enumerates directories to search for applications), and <tt>MANPATH</tt> (which lists directories to search for man pages). To see what environment variables are set in your shell, type <tt>printenv</tt>.</p>
+
+<p>
+  Like the shell, many Unix applications can be customized via environment variables. For example, the Java subsystem requires you to define <tt>JAVA_HOME</tt> to point to the root of a Java runtime. Similarly, the suite of Amazon Web Services utilities mandates the use of <tt>AWS_CREDENTIAL_FILE</tt> to point to valid private key credentials. Individual applications provide environment variables, too. The trick, though, is discovering the variables. Luckily, the work need not involve breaking and entering; instead, simply consult the <em>man</em> page of the utility at-hand and look for a section titled "Environment Variables."</p>
+
+<p>
+  For example, the pager utility <em>less</em> defines a number of useful environment variables.</p>
+
+<ul>
+  <li>The environment variable <tt>LESS</tt> records command-line options, reducing what you type each time you invoke the pager. For instance, if you read a good number of log files, put <tt>export LESS='--RAW-CONTROL-CHARACTERS --squeeze-lines --ignore-case'</tt> in a shell startup file to interpret control characters (usually syntax coloring), reduce runs of blank lines to a single line, and ignore case in string matches, respectively. If you work with code, <tt>export LESS='--LINE-NUMBERS --quit-if-one-screen --quit-on-intr'</tt>.</li>
+
+  <li>The environment setting named <tt>LESSKEY</tt> points to a file of key bindings. You can use key bindings to customize the behavior of <em>less</em>, say, to match the behavior of another pager or editor.</li>
+
+  <li>Like the shell, <em>less</em> can also maintain history between uses. Set <tt>LESSHISTFILE</tt> and <tt>LESSHISTSIZE</tt> to point to a file to persist commands and to set the maximum number of commands to record, respectively.</li>
+  </ul>
+
+<p>
+  Another good application of environment variable can be found in <em>gcc</em>, the GNU Compiler Collection. <em>gcc</em> defines a variety of environment variables to customize its operation. <tt>LIBRARY_PATH</tt>, as its name implies, is a list of directories to search for libraries to link to; <tt>COMPILER_PATH</tt> works much like the shell's <tt>PATH</tt>, but is used internally by <em>gcc</em> to find subprograms used during the compilation process.</p>
+
+<p>
+  If you author code and build binaries for a single platform, you may never use these environment variables, However, if you cross-compile the same code for a number of platforms, such variables are essential to access the varied headers and libraries for each platform. You might set variables to one collection of values for one kind of machine and set the values to another collection for a system of an alternate flavor.</p>
+
+<p>
+  In fact, you can take a cue from <em>gcc</em>: maintain many sets of environment variables per application and switch from one pool to another depending on your assignment. One approach is to keep an environment initialization file in each project directory and <tt>source</tt> it as needed. For instance, many Ruby developers use such a solution to switch between Ruby versions, changing environment variables <tt>PATH</tt>, <tt>GEM_HOME</tt>, and <tt>GEM_PATH</tt> as needed to hop from one version to another.</p>
+
+
+<h2>
+  Dotting the Landscape
+  </h2>
+
+<p>
+  Much like environment variables, a good number of Unix applications provide a <em>dot file</em>, or a small file whose name begins with a period, for customizations. However, unlike environment variables that capture a handful of flags or a relatively tiny amount of information, a dot file can be much more extensive, even complex, with its own peculiar syntax rules and programming language.  A dot file is a convenient place to keep options and settings, because (per Unix heritage) file names that begin with a dot do not appear in a standard directory listing. (Use <tt>ls -a</tt> to see these so-called "hidden files.") Except its special name, a dot file is a plain, text file.</p>
+
+<p>
+  A dot file is usually found in your home directory, but some utilities look for a dot file in the present working directory, too. If more than one dot file is supported by an application, the program typically has precedence rules to favor one file over another. In general, a "local" dot file -- one found in the current working directory -- has highest precedent, followed by one in your home directory, and then by a system-wide configuration. None, one, or all of these files can exist, and its up to the application to treat the files as mutually exclusive or incremental. In the former, the first dot file found in the precedent chain is definitive. In the latter, the configuration might cascade or be merged into a final result.</p>
+
+<p>
+  An example of a simple dot file is <em>less</em>'s key bindings file, located in <em><tt>$HOME</tt>/.lesskey</em>. Each line in the file is a pair: a keystroke and a command, resembling something like this snippet:</p>
+
+<pre>
+\r        forw-line
+\n        forw-line
+e         forw-line
+j         forw-line
+^E        forw-line
+^N        forw-line
+k         back-line
+y         back-line
+^Y        back-line
+</pre>
+
+<p>
+  At the other extreme, consider <em>fetchmail</em>. The utility picks up email from multiple remote sources and delivers the messages locally. The operation of the utility is controlled solely via <em><tt>$HOME</tt>/.fetchmailrc</em>. (See the man page for its many options.) <em>cron</em>, <em>git</em>, <em>vi</em> and many other commands recognize dot files, too. Again, read the man page for the application to learn what you configure in a dot file. Some dot files are rich enough to warrant a separate man page, such as crontab.</p>
+
+
+
+<h2>
+  Shhh... Secrets about SSH
+  </h2>
+
+<p>
+  SSH is a rich subsystem, used to login to remote systems, copy files, and tunnel through firewalls -- securely. And since SSH is a subsystem, it offers plenty of options to customize and streamline its operation. In fact, SSH provides a "dot directory" named <em><tt>$HOME</tt>/.ssh</em> to contain all its data. (Your .ssh directory must be mode 600 to preclude access by others.) Specifically, the file <em><tt>$HOME</tt>/.ssh/config</em> can define lots of shortcuts, including aliases for machine names, per-host access controls, and more.</p>
+
+<p>
+  Here is a typical block to customize SSH for a specific host.</p>
+
+<pre>
+Host worker
+HostName worker.example.com
+IdentityFile ~/.ssh/id_rsa_worker
+User joeuser
+</pre>
+
+<p>
+  Each block in <em>~/.ssh/config</em> configures one or more hosts. Separate individual blocks by a blank line. This block uses four options: <tt>Host</tt>, <tt>HostName</tt>, <tt>IdentityFile</tt>, and <tt>User</tt>.  <tt>Host</tt> establishes a nickname for the machine specified by <tt>HostName</tt>. A nickname allows you to type <tt>ssh worker</tt> instead of <tt>ssh worker.example.com</tt>. Moreover, the <tt>IdentityFile</tt> and <tt>User</tt> options dictate how to login to <tt>worker</tt>.  The former option points to a private key to use with the host; the latter option provides the login ID. Thus, this block is the equivalent of the command <tt>ssh joeuser@worker.example.com -i ~/.ssh/id_rsa_worker</tt>.</p>
+
+<p>
+  A powerful but little known option is <tt>ControlMaster</tt>. If set, multiple SSH sessions to the same host share a single connection. Once the first connection is established, credentials are not required for subsequent commands. This eliminates the drudgery of typing a password each and every time you connect to the same machine. <tt>ControlMaster</tt> is so handy, you'll likely want to enable it for every machine. That's accomplished easily enough with the host wildcard, <tt>*</tt>.</p>
+
+<pre>
+Host *
+ControlMaster auto
+ControlPath ~/.ssh/master-%r@%h:%p
+</pre>
+
+<p>
+  As you might guess, a block tagged <tt>Host *</tt> applies to every host, even those not named in the <em>config</em> file. <tt>ControlMaster auto</tt> tries to reuse an existing connection but will create a new connection if a shared connection cannot be found. <tt>ControlPath</tt> points to a file to persist a control socket for sharing. <tt>%r</tt> is replaced by the remote login username; <tt>%h</tt> is replaced by the target host name; and <tt>%p</tt> stands in for the port used for the connection. (<tt>%l</tt> can also be used. It is replaced with the local hostname.) The specification above creates control sockets with file names akin to <tt>master-joeuser@worker.example.com:22</tt>. Each control socket is removed when all connections to the remote host are severed. If you want to know what machines you are connected to at any time, simply type <tt>ls ~/.ssh</tt> and look at the hostname portion of the control socket (<tt>%h</tt>).
+
+<p>
+  The SSH configuration file is so expansive, it too has its own man page. Type man ssh_config</tt> to see all possible options. And here's a clever SSH trick. You may know you can tunnel from a local system to a remote one via SSH. The (albeit bizarre) command-line to use looks something like this:</p>
+
+<pre>
+$ ssh example.com -L 5000:localhost:3306
+</pre>
+
+<p>
+  This command says, "Connect via example.com and establish a tunnel between port 5000 on the local machine and port 3306 [the MySQL server port] on the machine named 'localhost'". Since <tt>localhost</tt> is interpreted on <tt>example.com</tt> as the tunnel is established, <tt>localhost</tt> is example.com. With the outbound tunnel -- formally called a local forward -- established, local clients can connect to port 5000 and talk to the MySQL server running on example.com.</p>
+
+<p>
+  This is the general form of tunneling:
+  </p>
+
+<pre>
+$ ssh <tt><em>proxyhost</em></tt> <tt><em>localport</em></tt>:<tt><em>targethost</em></tt>:<tt><em>targetport</em></tt>
+</pre>
+
+<p>
+  Here, <tt><em>proxyhost</em></tt> is a machine you can access via SSH and one that has a network connection (not via SSH) to <tt><em>targethost</em></tt>. <tt><em>localport</em></tt> is a non-privileged port (any unused port above 1024) on your local system, and <tt><em>targetport</em></tt> is the port of the service you want to connect to.</p>
+
+<p>
+  The previous command tunnels <em>out</em>, from your machine to the outside world. You can also use SSH to tunnel <em>in</em>, or connect to your local system from the outside world. This is the general form of an inbound tunnel:</p>
+
+<pre>
+$ ssh <tt><em>user</em></tt>@<tt><em>proxyhost</em></tt> -R <tt><em>proxyport</em></tt>:<tt><em>targethost</em></tt><tt><em>targetport</em></tt>
+</pre>
+
+<p>
+  When establishing an inbound tunnel -- formally called a <em>remote forward</em> -- the roles of <tt><em>proxyhost</em></tt> and <tt><em>targethost</em></tt> are reversed: the target is your local machine and the proxy is the remote machine. <tt><em>user</em></tt> is your login on the proxy. This command provides a concrete example.
+  </p>
+
+<pre>
+$ ssh joe@example.com -R 8080:localhost:80
+</pre>
+
+<p>
+  The command reads, "Connect to example.com as joe and connect the remote port 8080 to local port 80." This command gives users on example.com a tunnel to Joe's machine. A remote user can connect to 8080 to hit the Web server on Joe's machine.</p>
+
+
+
+<h2>
+  Rewriting With History
+  </h2>
+
+ <p>
+  If you spend a lot of time at the shell prompt, recording shell history can save time and typing. But there are a few annoyances with history, if left unmodified: history records duplicate commands and multiple shell instances can clobber each other's history. Both complications are easily overcome. Add two lines to your <em>.bashrc</em>.</p>
+
+<pre>
+export HISTCONTROL=ignoreboth
+shopt -s histappend
+</pre>
+
+<p>
+  The first line removes consecutive duplicate commands from your shell history. If you want to remove all duplicates independent of sequence, change <tt>ignoreboth</tt> to <tt>erasedups</tt>. The second line appends a shell's history to your history file when the shell exits. By default, the Bash history file is named (yes, a dot file) <tt>~/~/.bash_history</tt>. You can change its location by setting (yes, an environment variable) <tt>HISTFILE</tt>. If you want to save a shell's most recent 10,000 commands in a history file with 100,000 entries, add <tt>export HISTSIZE=10000 HISTFILESIZE=100000</tt> to your shell startup file. To see a shell's history, type <tt>history</tt> at any prompt.</p>
+
+<p>
+  Saving a history of commands is of little use if you cannot recall it. That's the purpose of the shell <tt>!</tt>, or bang, operator.</p>
+
+<ul>
+  <li><tt>!!</tt> ("bang bang") repeats the last command in its entirety.</li>
+
+  <li><tt>!:0</tt> is the name of the previous command. </li>
+
+  <li><tt>!^</tt> is the first argument of the previous command. <tt>!:2</tt>, <tt>!:3</tt>, and so on, ending with <tt>!$</tt> are the second, third, and eventually the last argument of the previous command.</li>
+
+  <li><tt>!*</tt> is all the arguments of the last command, except the command name=.</li>
+
+  <li><tt>!<em>n</em></tt> repeats the command numbered <tt><em>n</em></tt> in history.
+
+  <li><tt>!<em>handle</em></tt> repeats the last command that begins with the string of characters in <tt><em>handle</em></tt>. For example, <tt>!ca</tt> would repeat the last command that begins with the characters <tt>ca</tt>, such as <tt>cat README</tt>.</li>
+
+  <li><tt>!?<em>handle</em></tt> repeats the last command that <em>contains</em> the string of characters in <tt><em>handle</em></tt>. For example, <tt>!?READ</tt> would also match <tt>cat README</tt>.</li>
+
+  <li><tt>^<em>original</em>^<em>substitution</em></tt> replaces the <em>first</em> occurrence of <tt><em>original</em></tt> with <tt><em>substitution</em></tt>. For example, if the previous command was <tt>cat README</tt>, the command <tt>^README^license.txt</tt> would yield a new command <tt>cat license.txt</tt>.</li>
+
+  <li><tt>!:gs/<em>original</em>/<em>substitution</em></tt> replaces <em>all</em> occurrences of <tt><em>original</em></tt> with <tt><em>substitution</em></tt>. (<tt>!:gs</tt> means "global substitution.")</li>
+
+  <li><tt>!-2</tt> is the penultimate command. <tt>!-3</tt> is third most recent command. And so on.</li>
+  </ul>
+
+<p>
+  You can even combine history expressions together to yield sigil soup such as <tt>!-2:0 -R !^ !-3:2</tt>, which would expand to the command name of the penultimate command, followed by <tt>-R</tt>, the first argument of the previous command, and the second argument of the third most recent command. To make such cryptic commands more readable, you can expand history references as you type. Type the command <tt>bind Space:magic-space</tt> at any prompt or add it to a startup file to bind the Space key to the function magic-space, which expands history substitutions inline.</p>
+
+
+<h2>
+  Expand-o-Matic
+  </h2>
+
+<p>
+  With so much code available on the Internet, you likely download tens of files every day. And chances are all those files are packaged differently -- a ZIP file here, a RAR file there, and tarballs galore, albeit each one compressed with a different utility. Remembering how to decompress and expand each package format can be taxing. So, why not capture all those tasks in a single command. This function is widely available in many sample dot files.</p>
+
+<pre>
+ex () {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1        ;;
+      *.tar.gz)    tar xzf $1     ;;
+      *.bz2)       bunzip2 $1       ;;
+      *.rar)       rar x $1     ;;
+      *.gz)        gunzip $1     ;;
+      *.tar)       tar xf $1        ;;
+      *.tbz2)      tar xjf $1      ;;
+      *.tgz)       tar xzf $1       ;;
+      *.zip)       unzip $1     ;;
+      *.Z)         uncompress $1  ;;
+      *.7z)        7z x $1    ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+</pre>
+
+<p>
+  This function, <tt>ex</tt> expands eleven file formats and can be extended if you deal with some other package type. Once defined, say in a shell startup file, you can simply type <tt>ex <em>somefile</em></tt>, where <tt><em>somefile</em></tt> ends with one of the named extensions.</pp>
+
+<pre>
+$ ls
+source
+$ tar czf source.tgz source
+$ ls -1
+source
+source.tgz
+$ rm -rf source
+$ ex source.tgz
+$ ls -1
+source
+source.tgz
+</pre>
+
+<p>
+  By the way, if you ever misplace something you downloaded today, run <em>find</em> to discover it.</p>
+
+<pre>
+$ find ~ -type f -mtime 0
+</pre>
+
+<p>
+  <tt>-type f</tt> looks for plain files and <tt>-mtime 0</tt> looks for files created since midnight of the current day.</p>
+
+
+<h2>
+  Many More Secrets
+  </h2>
+
+<p>
+  There are a lot more expert secrets to be discovered. Search the Web for "shell auto-complete" to learn more about automatic completion, a feature that provides context-sensitive expansions as you type a command. Also search for "shell prompts" to learn how to customize your shell prompt. You can make it colorful; you can show your current working directory or Git branch; you can also show the history number, a convenient reference if you recall history a good deal. For working examples, search Github for "dot files". Many experts post their shell configurations on Github. </p>
+
+<p>
+  Now, if you'll excuse me, I have to find my wig and bronzer. It's not easy to hide when you resemble Groucho Marx.</p>
+
+
+<h2>
+  Resources
+  </h2>
+
+<ul>
+  <li>You can find a large collection of dot files online at <a href="http://dotfiles.org/">dotfiles.org</a>.</li>
+
+  <li><a href="http://www.github.com">Github</a> houses thousands of Git repositories, including the personal dot files of many expert users. Search for "dot files" to find examples. (You can learn more about Git online and in the <a href="http://github.com/guides/home">Github Guides</a>.</li>
+
+  <li>You can find documentation and source for the GNU Bash Shell on its <a href="http://www.gnu.org/software/bash/">project page</a>.</li>
+  </ul>
+
+
+</body>
+</html>

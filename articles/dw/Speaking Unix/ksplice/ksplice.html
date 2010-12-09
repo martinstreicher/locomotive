@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2, p.subhead {
+    font-size: 95%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    display: block;
+    border: 1px solid black;
+    padding: 5px;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  th, td {
+    padding: 4px 12px;
+    font-size: 80%;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<p>
+  <em>
+    Abstract: Ksplice applies kernel patches on-the-fly -- no reboot required -- in a fraction of a second. Here's a hands-on guide to performing painless system updates.
+  </em>
+</p>
+
+
+<h1>
+  Give Reboots the Boot
+  </h1>
+
+<p>
+  Unix machines run and run (and run). A desktop or portable system can be left on for weeks, even months, and server uptime can stretch to a year or more. Indeed, if you could preclude hardware failures and Mother Nature, a Unix system might run perennially. Alas, hardware is imperfect; Mother Nature has a mind of her own; and software suffers from bugs, too. Gear requires replacement. Storms happen. And systems require patches and restarts. Much like death and taxes, downtime is a certainty.</p>
+
+<p>
+  However, unlike death and taxes, you can <em>minimize</em> downtime. Proactive and regular system maintenance and hot spares boost availability, as does a robust data center replete with backup power and redundant connections to the Internet. Thankfully, too, most applications and libraries can be updated seamlessly and on-demand using tools such as <em>rpm</em>, <em>Aptitude</em> and <em>yum</em>.</p>
+
+<p>
+  Unfortunately, kernel updates -- modifications to address vulnerabilities and flaws in the core system software -- aren't so painless. A kernel update is very disruptive, requiring scheduled downtime to temporarily halt all services on each and evert machine affected and reboot each one. While such upkeep is necessary and vital, keeping pace with kernel updates can nonetheless make operations something akin to a yo-yo. To wit, the timelines in Figure 1 shows the frequency of critical kernel updates for a number of popular operating systems between January 2009 and February 2010. Each cycle icon represents a mandatory restart. (Figure 1 provided courtesy of Ksplice, Inc.)</p>
+
+<p class="image">
+  <img src="images/reboots-required.png" />
+</p>
+
+<p>
+  But now, you can patch your kernel as it runs, eliminating the otherwise wholesale interruption caused by a restart. In other words, scheduled upgrades no longer need a schedule. <em>Ksplice</em> is a set of tools to patch the kernel <em>in situ</em>, as it's running -- no reboot required. Given an existing kernel, its source code, and one or more unified diffs (a unified diff is the canonical form for kernel patches), Ksplice replaces existing, errant <em>object code</em>in the kernel with new object code. Ksplice can replace both program code and data structures. Better yet, a kernel <em>splice</em> interrupts normal system operation for a mere fraction of a millisecond, leaving daemons, processes, and connections intact.</p>
+
+<p>
+  Let's look briefly at how Ksplice works and learn to use its tools to keep a kernel up-to-date. There are three ways to use Ksplice: via a graphical user interface; via equivalent, high-level command-line utilities; and, if you have the source to your kernel, via the raw Ksplice tools. An <em>Ubuntu 9.04</em> or <em>Ubuntu 9.10</em> user, for example, can download and install a point-and-click application to choose and apply kernel modifications. All three variants of Ksplice are introduced here.</p>
+
+
+<h2>
+  Patching a Live Kernel
+  </h2>
+
+ <p>
+  Put succinctly and simply, Ksplice patches a running kernel by replacing one or more vulnerable or faulty functions with newer, correct implementations. To effectuate the substitution (again, oversimplifying for the moment,) the tool amends a running kernel image with the new functions' object code and injects a jump at the head of each existing function to call its new counterpart. Virtually the entire kernel remains unchanged, save for the new object code and a few instructions to redirect the function calls.</p>
+
+<p>
+  Additionally, Ksplice can affect data structures, albeit with a little extra programming. Ksplice can run code during an update to facilitate such a change. Ksplice also provides a pair of hooks to run setup and teardown code immediately before and immediately after the kernel is updated. You can also add new functions to augment the kernel. New functions simply have no counterparts in the original kernel.</p>
+
+<p>
+  Ksplice can be applied to virtually any kernel, even those that shipped before Ksplice was developed. To splice a kernel, you must have  its source code, the set of patches you want to apply, and a compiler capable of isolating each function and data structure in the kernel in its own section in the object code. For example, the <em>GNU Compiler Collection</em> (<em>gcc</em>) provides flags <tt>-ffunction-sections</tt> and <tt>-fdata-sections</tt>, respectively, for those exact purposes. (Other compilers, such as the Intel C Compiler, also have similar capabilities.) Such "modular" object code is more easily manipulated by Ksplice. The running kernel to be patched need not have been compiled with the same special options.</p>
+
+<p>
+  Ksplice refers to the kernel compiled from the original source as the <em>pre</em> kernel. The new kernel built from the patched source is the <em>post</em> kernel. And the running kernel is nicknamed the <em>run</em> kernel. Ksplice fails if pre is not the same as run, a clear indication the source code does not match the running kernel. Apart from that special condition, Ksplice compares pre to post and each difference becomes a splice. All splices are bundled into a single object file ready to be injected into the kernel.</p>
+
+<p>
+  Ksplice uses the <tt>stop_machine</tt> feature (or its equivalent, depending on your flavor of Unix) to prepare to splice new code. Think of <tt>stop_machine</tt> as a traffic signal: it allows a sole CPU to proceed while idling all others. After executing <tt>stop_machine</tt>, Ksplice analyzes each function marked for replacement to determine if it is active or not. If even a single thread's instruction pointer refers to a function's code in memory or a single thread's kernel stack refers to a return address within the function, the function is considered active and cannot be replaced. Otherwise, the function is deemed inactive and is replaced. Ksplice tries repeatedly to make a replacement but may ultimately abandon the effort. If so, it reports an error and stops.</p>
+
+
+<h2>
+  Kernel Patching Was Never This Easy
+  </h2>
+
+<p>
+  If you run one of the more popular Unix distributions, Ksplice couldn't be easier to use. The authors of Ksplice provide a client application customized for your distro. You can keep your kernel up-to-date for a nominal fee of less than five dollars per system per month. You can find a list of supported operating systems on the Ksplice Web site. The Ksplice software is available free of charge for Ubuntu 9.04 ("Jaunty Jackalope") and Ubuntu 9.10.</p>
+
+<p>
+  For demonstration purposes, let's use Ubuntu and splice its kernel. To use Ksplice on Ubuntu, you must download and install the Ksplice "Uptrack" client. Uptrack manages the rebootless kernel updates available for your system. You can view and install Ksplice updates and you can review alerts when new kernel updates are available. Point your browser to <a href="http://www.ksplice.com/uptrack/download">http://www.ksplice.com/uptrack/download</a> and download the Uptrack software suitable for your system. The software is provided as a Debian package. (You can also download the software from the command-line using a tool such as <em>wget</em> or <em>curl</em>.)</p>
+
+<p>
+  Next, use <em>gdebi</em> to install the package. If you do not yet have <em>gdebi</em>, you can install it with the command <tt>sudo apt-get install gdebi</tt>. (If you prefer a graphical client, you can install Ksplice with the command <tt>sudo gdebi-gtk ksplice-uptrack.deb</tt>.) gdebi installs Uptrack and its dependencies, which include kerneloops, the YAML library, Python, and the CURL library.</p>
+
+<pre>
+$ wget http://www.ksplice.com/uptrack/dist/karmic/ksplice-uptrack.deb
+$ sudo gdebi ksplice-uptrack.deb
+Reading package lists: Done
+Reading state information: Done
+Reading state information: Done
+Reading state information: Done
+Reading state information: Done
+
+Requires the installation of the following packages:
+kerneloops  curl  libcurl3  python-yaml  libyaml-0-1
+Client for the Ksplice Uptrack service
+ The Ksplice Uptrack service enables you to keep your system
+ up to date and secure without rebooting it.
+This package contains the command-line and graphical Uptrack clients.
+Do you want to install the software package? [y/N]:y
+...
+</pre>
+
+<p>
+  After you accept the terms of service and the install finishes, Uptrack launches automatically. The installer also places a Ksplice icon -- a large letter "K" in the task bar -- for easy access. Figure 2 shows the Uptrack Manager launching for the first time on a clean install of Ubuntu 9.10. To patch the kernel, click Install All Updates. </p>
+
+<p class="image">
+  <img src="images/ksplice.jpg" />
+  </p>
+
+<p>
+  A progress bar, shown in Figure 3, echoes each patch as it is installed. Patching the kernel takes less than a few seconds, even when a good number of patches are outstanding. And, of course, no reboot is required.</p>
+
+<p class="image">
+  <img src="images/progress.jpg" />
+  </p>
+
+
+<p>
+  When finished, the Uptrack Manager refreshes to show you the new state of your system, as shown in Figure 4. A green check mark indicates the named patch was applied successfully and is now live in your running kernel. Click on the button labeled Check to look for additional kernel patches available for your system. Click Close to dismiss the window. It is not necessary to run <em>uptrack-manager</em> as root; the software prompts for an administrator's password before any modifications are applied.</p>
+
+<p class="image">
+  <img src="images/after.jpg" />
+  </p>
+
+<p>
+  You can open Uptrack any time later with the command <tt>uptrack-manager</tt> or click on the "K" icon in the taskbar. Ksplice runs continuously once launched. If you prefer, you can configure Ksplice to apply patches to the running kernel automatically or just alert you when updates become available. For example, to choose the former, edit the file  <em>/etc/uptrack/uptrack.conf</em> and change the <tt>autoinstall</tt> line to read:</p>
+
+<pre>
+autoinstall = yes
+</pre>
+
+<p>
+  In addition to <em>update-manager</em>, Uptrack includes three other command-line utilities for convenience (these utilities are different than the tools used to work with kernel source directly, which are demonstrated in the next section). <em>uptrack-upgrade</em> installs the latest available kernel updates. <em>uptrack-remove <tt>id</tt></em> removes the kernel update tagged with ID <em><tt>id</tt></em>. If you type <tt>uptrack-remove --all</tt>, <em>uptrack-remove</em> purges all installed updates. <em>uptrack-show</em> shows a manifest of updates that are currently installed.</p>
+
+<p>
+  It is essential to remember that Uptrack does not usurp the role of your distribution's standard package manager. All changes made by Ksplice are applied to the running kernel and exist in memory only. Therefore, all Ksplice patches are lost upon shutdown. Continue to update your kernel on disk with a traditional software maintenance procedure, such as running <tt>apt-get update; apt-get upgrade</tt> as root on a regular basis or when your distribution informs you of new system updates. Keeping the kernel on disk up-to-date ensures that your system boots the best kernel available when your system eventually requires a restart.</p>
+
+
+<h2>
+  Updating Custom Kernels
+  </h2>
+
+<p>
+  Uptrack Manager is a convenient option for desktop and server computers based on kernels built and distributed by a vendor or a community project. It won't work, though, if your kernel is customized and built locally, because Uptrack cannot compare your kernel to a known, published operating system to generate splices. However, you can use Ksplice's "primitive" utilities to analyze public patches and create your own splices.</p>
+
+<p>
+  Describing how to build a kernel is beyond the scope of this article. If you're unfamiliar with the process, there are excellent instructions and a good number of satisfactory tutorials scattered across the Internet. Instead, let's focus on the tools Ksplice provides and how to proceed once you are able to build any kernel.</p>
+
+<p>
+  Ksplice provides a utility named <em>ksplice-create</em> to create kernel splices. The command requires two inputs: a patch file and the entire source tree for the running kernel, including any previous patches that have already been applied. Given the current source code and the patches, Ksplice generates two kernels, as mentioned above, and compares the revision to its original. The output of <em>ksplice-create</em> is a splice that can be applied with <em>ksplice-apply</em>. You can redact a splice from the kernel with <em>ksplice-remove</em>.
+
+ <p>
+  Here is an example (taken from the authors' academic paper and used with express permission) that creates an update for the "prctl vulnerability", CVE-2006-2451, using a patch file called <em>prctl</em> and a kernel source directory <em>~/src</em>:</p>
+
+<pre>
+$ ksplice-create --patch=prctl ~/src
+Ksplice update tarball written to ksplice-8c4o6u.tar.gz
+$ sudo ksplice-apply ./ksplice-8c4o6u.tar.gz
+Done!
+</pre>
+
+<p>
+  The former command generates a tarball of object code, <em>ksplice-8c4o6u.tar.gz</em>, to be patched into the kernel. The second command reads the tarball, calculates the renovations required, and applies the splice.</p>
+
+
+<h2>
+  Twenty-Four, Seven, Three Hundred Sixty Five
+  </h2>
+
+<p>
+  Ksplice is a proven technology. According to the authors' original paper and technical study, Ksplice was able to dynamically patch the Linux kernel with all security and functional patches issued between 2006 and 2008. Of those, more than two-thirds required no special code to update the kernel. Of the remaining patches, special programming amounted to an average of 17 lines of code per patch.</p>
+
+ <p>
+  Linux was chosen to prove the Ksplice approach. The Linux source is widely and frequently vetted for flaws, and is patched often to quickly address shortcomings. However, Ksplice can readily be adapted to any kernel where source code is available, including BSD and  Solaris. Ksplice supports x86, x86_64, and ARM processors, too.</p>
+</body>
+
+
+<h2>
+  Resources
+  </h2>
+
+<ul>
+  <li>Ksplice can be found online at <a href="http://www.ksplice.com/" >www.ksplice.com</a>.</li>
+
+  <li>You can download the Ksplice Uptrack software for Ubuntu 9.04 and Ubuntu 9.10 from the vendor's <a href="http://www.ksplice.com/uptrack/download?now=y">download page</a>.</li>
+
+  <li>
+    Information about the Linux kernel and the kernel source code archive can be found at <a href="http://kernel.org/">kernel.org</a>.</li>
+
+  <li>
+    An exhaustive list of computer vulnerabilities is available from the <a href="http://cve.mitre.org/">Common Vulnerabilities and Exposures</a> (CVE) site. Each entry in the database includes a brief description of the security vulnerability or exposure and any pertinent references.</li>
+
+  <li>
+    Read the <a href="http://www.ksplice.com/doc/ksplice.pdf">Ksplice technical paper</a> to learn more about how Ksplice works.</li>
+    </ul>
+
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Speaking UNIX 14: The best-kept secrets of UNIX power users</title><meta http-equiv="PICS-Label" content="(PICS-1.1 &#34;http://www.icra.org/ratingsv02.html&#34; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &#34;http://www.rsac.org/ratingsv01.html&#34; l gen true r (n 0 s 0 v 0 l 0) &#34;http://www.classify.org/safesurf/&#34; l gen true r (SS~~000 1))"/><link rel="schema.DC" href="http://purl.org/DC/elements/1.0/"/><link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico"/><meta name="Owner" content="dW Information/Raleigh/IBM"/><meta name="DC.Language" scheme="rfc1766" content="en-US"/><meta name="IBM.Country" content="ZZ"/><meta name="Security" content="Public"/><meta name="IBM.SpecialPurpose" content="SP001"/><meta name="IBM.PageAttributes" content="sid=1003"/><meta name="Abstract" content="You don't have to break into a Watergate office to uncover the secrets of UNIX power users. There's an informant, and this month he's spilling the beans." /><meta name="Description" content="You don't have to break into a Watergate office to uncover the secrets of UNIX power users. There's an informant, and this month he's spilling the beans." /><meta name="Keywords" content="Martin Streicher, UNIX, speaking UNIX, power user, dddauca" /><meta name="DC.Date" scheme="iso8601" content="2010-03-05" /><meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316" /><meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="SWG10" /><meta name="DC.Rights" content="Copyright (c) 2010 by IBM Corporation" /> <meta name="Robots" content="index,follow" /><meta name="IBM.Effective" scheme="W3CDTF" content="2010-03-05" /><meta name="Last update" content="04032010ma" /><link rel="stylesheet" type="text/css" media="screen,print" href="http://www.ibm.com/common/v14/table.css"/><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwcss14.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="http://www.ibm.com/common/v14/main.css"/><link rel="stylesheet" type="text/css" media="all" href="http://www.ibm.com/common/v14/screen.css"/><link rel="stylesheet" type="text/css" media="print" href="http://www.ibm.com/common/v14/print.css"/><script language="JavaScript" src="
+../web/www.ibm.com/common/v14/detection.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dropdown.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/grabtitle.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/emailfriend2.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwplugin.js" type="text/javascript"></script><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-head1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><style type="text/css">
+pre.section {margin-top: 0; margin-bottom: 0; font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px}
+.boldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold} .rboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff0000}
+.gboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff6600}
+.bboldcode {font-family: Andale Mono, Lucida  Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #3c5f84}
+</style><style type="text/css">
+.atitle { font-family:arial,sans-serif; font-size:18px; }
+</style><script type="text/javascript" language="JavaScript">var emailAbstract = "You don't have to break into a Watergate office to uncover the secrets of UNIX power users. There's an informant, and this month he's spilling the beans."; </script></head><body><!--MASTHEAD_BEGIN--><!--#include virtual="/developerworks/inc/s-topmast14.inc" --><!--MASTHEAD_END--><!-- CMA ID: 12345 --> <!-- Site ID: 1 --><table width="100%" cellspacing="0" cellpadding="0" border="0" id="v14-body-table"><tr valign="top"><!--LEFTNAV_BEGIN--><td width="150" id="navigation"><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-spacer"><a class="left-nav-overview" href="http://www.ibm.com/developerworks"> </a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-overview" colspan="2"><a class="left-nav-overview" href="http://www.ibm.com/developerworks">developerWorks</a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-highlight" colspan="2"><a class="left-nav" href="#">In this article:</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#environment_variables">Save the environment variables</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#landscape">Dotting the landscape</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#secrets">Shhh . . . secrets about SSH</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#history">Rewriting with history</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#expand">Expand-o-Matic</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#secrets">Many more secrets</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#resources">Resources</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#author">About the author</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#rate">Rate this page</a></td></tr><tr class="left-nav-last"><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/v14/t/left-nav-corner.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td colspan="2" class="related"><b class="related">Related links</b></td></tr><tr class="rlinks"><td><img src="../web/www.ibm.com/i/v14/t/rl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="rlinks" href="http://www.ibm.com/developerworks/views/aix/library.jsp">AIX and UNIX technical library</a></td></tr><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><tr><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/c.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--></td><!--LEFTNAV_END--><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0" id="content-table"><tr valign="top"><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td><a name="main"><img src="../web/www.ibm.com/i/c.gif" width="592" height="1" alt="skip to main content" border="0"/></a></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10" height="18"><img src="../web/www.ibm.com/i/c.gif" width="10" height="18" alt=""/></td><td width="100%"><img src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/><br /><a class="bctl" href="http://www.ibm.com/developerworks/">developerWorks</a><span class="bct">  &gt;  </span><a class="bctl" href="http://www.ibm.com/developerworks/aix/">AIX and UNIX</a><span class="bct">  &gt;</span><img src="../web/www.ibm.com/i/c.gif" width="1" height="1" alt=""/><br /><h1>Speaking UNIX 14: The best-kept secrets of UNIX power users</h1><img class="display-img" src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/></td><td width="192" class="no-print"><a href="http://www.ibm.com/developerworks/"><img src="../web/www.ibm.com/developerworks/i/dw.gif" width="192" height="18" border="0" alt="developerWorks"/></a></td></tr></table></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td width="100%"><table align="right" cellpadding="0" cellspacing="0" width="160" border="0" class="no-print"><tr><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-1-small">Document options</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><script language="JavaScript" type="text/javascript">
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img alt="Set printer orientation to landscape mode" height="16" src="../web/www.ibm.com/i/v14/icons/printer.gif" width="16" vspace="3" /></td><td width="122"><p><b><a class="smallplainlink" href="javascript:print()">Print this page</a></b></p></td></tr>');
+//-->
+</script>
+<noscript></noscript><script language="JavaScript" type="text/javascript">
+<!-- 5.6 10/24 llk: added cdata around the subdirectory path of email gif-->
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/v14/icons/em.gif" height="16" width="16" vspace="3" alt="Email this page" /></td><td width="122"><p><a class="smallplainlink" href="javascript:void newWindow()"><b>E-mail this page</b></a></p></td></tr>');
+//-->
+</script><noscript><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/c.gif" height="16" width="16" alt=""/></td><td width="122" class="small"><p><span class="ast">Document options requiring JavaScript are not displayed</span></p></td></tr></noscript></table></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-right-column1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-2-small">Rate this page</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td><img src="../web/www.ibm.com/i/v14/icons/d_bold.gif" height="16" width="16" border="0" vspace="3" alt=""/></td><td width="125"><p><a class="smallplainlink" href="#rate"><b>Help us improve this content</b></a></p></td></tr></table></td></tr></table><br /></td></tr></table><p>Level: Intermediate</p><p><a href="#author">Martin Streicher</a> (<a href="mailto:martin.streicher@gmail.com?subject=Speaking UNIX 14: The best-kept secrets of UNIX power users">martin.streicher@gmail.com</a>), Software Developer, Pixel, Byte, and Comma<br /></p><p> 05 Mar  2010</p><blockquote>You don't have to break into a Watergate office to uncover the secrets of UNIX power
+	users. There's an informant, and this month he's spilling the beans.
+</blockquote><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES-->
+	<p>If you're wondering why I'm wearing dark sunglasses, a fake moustache, and a baseball 
+		cap (featuring the logo of professional curling team The Floating Stones), I'm on the 
+		lam. I'm dodging black remote-controlled helicopters, pasty-white systems 
+		administrators, and the combined forces of many daemons to bring you some of the 
+		best-kept secrets of UNIX&#174; power users. Don your aluminum foil hat, and read on.
+	</p>
+
+	<p><a name="environment_variables"><span class="atitle">Save the environment variables</span></a></p>
+		<p>Most UNIX users amass settings in shell startup files, such as .bashrc (for the 
+			Bash shell) and .zshrc (for the Z shell), to recreate a preferred shell environment 
+			time and again. Startup files can create aliases, set shell options, and set 
+			environment variables. Essential environment variables include HOME (which 
+			points to your home directory), PATH (which enumerates directories in which to 
+			search for applications), and MANPATH (which lists directories in which to search 
+			for man pages). To see which environment variables are set in your shell, type
+			<code>printenv</code>.
+		</p>
+		<p>Like the shell, you can customize many Linux&#174; and UNIX applications through
+			environment variables. For example, the Java&#8482; subsystem requires that you 
+			define JAVA_HOME to point to the root of a Java run time. Similarly, the suite of 
+			Amazon Web Services (AWS) utilities mandates the use of AWS_CREDENTIAL_FILE
+			to point to valid private key credentials. Individual applications provide environment 
+			variables, too. The trick is discovering the variables. Luckily, the work need not 
+			involve breaking and entering; instead, simply consult the man page of the utility
+			at hand, and look for a section titled "Environment Variables."
+		</p>
+		<p>For example, the pager utility <code>less</code> defines a number of 
+			useful environment variables:
+		</p>
+			<ul>
+				<li>The environment variable LESS records command-line options, reducing
+					what you type each time you invoke the pager. For instance, if you
+					read a good number of log files, put:
+
+<table border="0" cellspacing="0" cellpadding="0" width="50%"><tr><td class="code-outline"><pre class="displaycode">
+export LESS='--RAW-CONTROL-CHARACTERS --squeeze-lines --ignore-case'
+</pre></td></tr></table><br />
+
+					<p>in a shell startup file to interpret control characters (usually syntax 
+						coloring), reduce runs of blank lines to a single line, and ignore 
+						case in string matches, respectively. If you work with code:
+					</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="50%"><tr><td class="code-outline"><pre class="displaycode">
+export LESS='--LINE-NUMBERS --quit-if-one-screen --quit-on-intr'
+</pre></td></tr></table><br />
+
+				</li>
+				<li>The environment setting named LESSKEY points to a file of key bindings.
+					You can use key bindings to customize the behavior of
+					<code>less</code>, say, to match the behavior of another 
+					pager or editor.
+				</li>
+				<li>Like the shell, <code>less</code> can also maintain history 
+					between uses. Set LESSHISTFILE and LESSHISTSIZE to point to a file of 
+					persist commands and to set the maximum number of commands to 
+					record, respectively.
+				</li>
+			</ul>
+		<p>Another good application of environment variable can be found in the GNU Compiler 
+			Collection (GCC). GCC defines a variety of environment variables to customize its 
+			operation. LIBRARY_PATH, as its name implies, is a list of directories to search for 
+			libraries to link to; COMPILER_PATH works much like the shell's PATH but is used 
+			internally by GCC to find subprograms used during the compilation process.
+		</p>
+		<p>If you write code and build binaries for a single platform, you may never use these 
+			environment variables, However, if you cross-compile the same code for a number 
+			of platforms, such variables are essential for accessing the varied headers and 
+			libraries for each platform. You might set variables to one collection of values for 
+			one kind of machine and set the values to another collection for a system of an 
+			alternate flavor.
+		</p>
+		<p>In fact, you can take a cue from GCC: Maintain many sets of environment variables per 
+			application, and switch from one pool to another depending on your assignment.
+			One approach is to keep an environment initialization file in each project directory
+			and <code>source</code> it as needed. For instance, many Ruby 
+			developers use such a solution to switch between Ruby versions, changing 
+			environment variables PATH, GEM_HOME, and GEM_PATH as needed to hop from 
+			one version to another.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="landscape"><span class="atitle">Dotting the landscape</span></a></p>
+		<p>Much like environment variables, many Linux and UNIX applications provide a <i>dot</i>
+			file&#8212;a small file whose name begins with a period&#8212;for 
+			customizations. However, unlike environment variables that capture a handful of 
+			flags or a relatively tiny amount of information, a dot file can be much more 
+			extensive, even complex, with its own peculiar syntax rules and programming 
+			language. A dot file is a convenient place to keep options and settings, because 
+			(per UNIX and Linux heritage) file names that begin with a dot do not appear in 
+			a standard directory listing. (Use <code>ls -a</code> to see these 
+			so-called <i>hidden files.</i>) Except for its special name, a dot file is a plain text
+			file.
+		</p>
+		<p>A dot file is usually found in your home directory, but some utilities look for a dot file 
+			in the present working directory, too. If an application supports more than one dot 
+			file, the program typically has precedence rules to favor one file over another. In 
+			general, a "local" dot file&#8212;one found in the current working directory&#8212;has
+			highest precedent, followed by one in your home directory, and then by a system-wide
+			configuration. None, one, or all of these files can exist, and it's up to the application
+			to treat the files as mutually exclusive or incremental. In the former case, the first
+			dot file found in the precedent chain is definitive. In the latter case, the 
+			configuration might cascade or be merged into a final result.
+		</p>
+		<p>An example of a simple dot file is <code>less</code>'s key bindings file,
+			located in $HOME/.lesskey. Each line in the file is a pair: a keystroke and a command,
+			resembling something like this snippet:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+\r        forw-line
+\n        forw-line
+e         forw-line
+j         forw-line
+^E        forw-line
+^N        forw-line
+k         back-line
+y         back-line
+^Y        back-line
+</pre></td></tr></table><br />
+
+		<p>At the other extreme, consider <code>fetchmail</code>. The utility 
+			picks up e-mail from multiple remote sources and delivers the messages locally. 
+			The operation of the utility is controlled solely through $HOME/.fetchmailrc. (See
+			the man page for its many options.) <code>cron</code>,
+			<code>git</code>, <code>vi</code>, and many other 
+			commands recognize dot files, too. Again, read the man page for the application
+			to learn what you configure in a dot file. Some dot files are rich enough to warrant
+			a separate man page, such as <code>crontab</code>.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="secrets"><span class="atitle">Shhh . . . secrets about SSH</span></a></p>
+		<p>Secure Shell (SSH) is a rich subsystem used to log in to remote systems, copy files, 
+			and tunnel through firewalls&#8212;securely. And because SSH is a subsystem,
+			it offers plenty of options for customizing and streamlining its operation. In fact,
+			SSH provides a "dot directory" named $HOME/.ssh to contain all its data. (Your .ssh
+			directory must be mode 600 to preclude access by others.) Specifically, the file
+			$HOME/.ssh/config can define lots of shortcuts, including aliases for machine names,
+			per-host access controls, and more.
+		</p>
+		<p>Here is a typical block f customize SSH for a specific host:</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+Host worker
+HostName worker.example.com
+IdentityFile ~/.ssh/id_rsa_worker
+User joeuser
+</pre></td></tr></table><br />
+
+		<p>Each block in ~/.ssh/config configures one or more hosts. Separate individual blocks 
+			with a blank line. This block uses four options: <code>Host</code>,
+			<code>HostName</code>, <code>IdentityFile</code>,
+			and <code>User</code>. <code>Host</code> establishes
+			a nickname for the machine specified by <code>HostName</code>.
+			A nickname allows you to type <code>ssh worker</code> instead of
+			<code>ssh worker.example.com</code>. Moreover, the
+			<code>IdentityFile</code> and <code>User</code> options
+			dictate how to log in to <code>worker</code>. The former option 
+			points to a private key to use with the host; the latter option provides the login ID.
+			Thus, this block is the equivalent of the command:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+ssh joeuser@worker.example.com -i ~/.ssh/id_rsa_worker
+</pre></td></tr></table><br />
+
+		<p>A powerful but little-known option is <code>ControlMaster</code>. If set,
+			multiple SSH sessions to the same host share a single connection. Once the first
+			connection is established, credentials are not required for subsequent commands.
+			This ability eliminates the drudgery of typing a password each and every time you 
+			connect to the same machine. <code>ControlMaster</code> is so 
+			handy, you'll likely want to enable it for every machine. That's accomplished easily
+			enough with the host wildcard, <code>*</code>:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+Host *
+ControlMaster auto
+ControlPath ~/.ssh/master-%r@%h:%p
+</pre></td></tr></table><br />
+
+		<p>As you might guess, a block tagged <code>Host *</code> applies to every 
+			host, even those not named in the config file. <code>ControlMaster auto</code>
+			tries to reuse an existing connection but will create a new connection if a shared
+			connection cannot be found. <code>ControlPath</code> points to a 
+			file to persist a control socket for sharing. <code>%r</code> is 
+			replaced by the remote login user name, <code>%h</code> is 
+			replaced by the target host name, and <code>%p</code> stands in for 
+			the port used for the connection. (You can also use <code>%l</code>:
+			It is replaced with the local host name.) The specification above creates control 
+			sockets with file names akin to:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+master-joeuser@worker.example.com:22
+</pre></td></tr></table><br />
+
+		<p>Each control socket is removed when all connections to the remote host are severed.
+			If you want to know which machines you are connected to at any time, simply type
+			<code>ls ~/.ssh</code> and look at the host name portion of the 
+			control socket (<code>%h</code>).
+		</p>
+		<p>The SSH configuration file is so expansive, it too has its own man page. Type
+			<code>man ssh_config</code> to see all possible options. And here's a
+			clever SSH trick: You may know you can tunnel from a local system to a remote one
+			via SSH. The (albeit bizarre) command line to use looks something like this:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ ssh example.com -L 5000:localhost:3306
+</pre></td></tr></table><br />
+
+		<p>This command says, "Connect via example.com and establish a tunnel between port
+			5000 on the local machine and port 3306 [the MySQL server port] on the machine
+			named 'localhost.'" Because <code>localhost</code> is interpreted on 
+			example.com as the tunnel is established, <code>localhost</code> is
+			example.com. With the outbound tunnel&#8212;formally called a <i>local
+			forward</i>&#8212;established, local clients can connect to port 5000 and talk 
+			to the MySQL server running on example.com.
+		</p>
+		<p>This is the general form of tunneling:</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ ssh <i>proxyhost</i> <i>localport</i>:<i>targethost</i>:<i>targetport</i>
+</pre></td></tr></table><br />
+
+		<p>Here, <code><i>proxyhost</i></code> is a machine you can access via SSH
+			and one that has a network connection (not via SSH) to 
+			<code><i>targethost</i></code>. <code><i>localport</i></code>
+			is a non-privileged port (any unused port above 1024) on your local system, and
+			<code><i>targetport</i></code> is the port of the service you want 
+			to connect to.
+		</p>
+		<p>The previous command tunnels <i>out</i> from your machine to the outside world.
+			You can also use SSH to tunnel <i>in,</i> or connect to your local system from
+			the outside world. This is the general form of an inbound tunnel:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ ssh <i>user</i>@<i>proxyhost</i> -R <i>proxyport</i>:<i>targethost</i><i>targetport</i>
+</pre></td></tr></table><br />
+
+		<p>When establishing an inbound tunnel&#8212;formally called a <i>remote forward</i>&#8212;the
+			roles of <code><i>proxyhost</i></code> and
+			<code><i>targethost</i></code> are reversed: The target is your 
+			local machine, and the proxy is the remote machine. <code><i>user</i></code>
+			is your login on the proxy. This command provides a concrete example:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ ssh joe@example.com -R 8080:localhost:80
+</pre></td></tr></table><br />
+
+		<p>The command reads, "Connect to example.com as joe and connect the remote port 
+			8080 to local port 80." This command gives users on example.com a tunnel to Joe's
+			machine. A remote user can connect to 8080 to hit the Web server on Joe's 
+			machine.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="history"><span class="atitle">Rewriting with history</span></a></p>
+		<p>If you spend a lot of time at the shell prompt, recording shell history can save time
+			and typing. But there are a few annoyances with history, if left unmodified: History
+			records duplicate commands, and multiple shell instances can clobber each other's
+			history. Both complications are easily overcome. Add two lines to your .bashrc:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+export HISTCONTROL=ignoreboth
+shopt -s histappend
+</pre></td></tr></table><br />
+
+		<p>The first line removes consecutive duplicate commands from your shell history. If 
+			you want to remove all duplicates independent of sequence, change
+			<code>ignoreboth</code> to <code>erasedups</code>.
+			The second line appends a shell's history to your history file when the shell exits.
+			By default, the Bash history file is named (yes, a dot file) <i>~/~/.bash_history.</i>
+			You can change its location by setting (yes, an environment variable) HISTFILE. If
+			you want to save a shell's most recent 10,000 commands in a history file with 
+			100,000 entries, add <code>export HISTSIZE=10000 HISTFILESIZE=100000</code>
+			to your shell startup file. To see a shell's history, type <code>history</code>
+			at any prompt.
+		</p>
+		<p>Saving a history of commands is of little use if you cannot recall it. That's the purpose
+			of the shell <code>!</code>, or bang, operator:
+		</p>
+			<ul>
+				<li><code>!!</code> ("bang bang") repeats the last command
+					in its entirety.
+				</li>
+				<li><code>!:0</code> is the name of the previous command.</li>
+				<li><code>!^</code> is the first argument of the previous 
+					command. <code>!:2</code>, <code>!:3</code>,
+					and so on, ending with <code>!$</code> are the second,
+					third, and eventually the last argument of the previous command.
+				</li>
+				<li><code>!*</code> is all the arguments of the last command,
+					except the command name.
+				</li>
+				<li><code>!<i>n</i></code> repeats the command numbered
+					<code><i>n</i></code> in history.
+				</li>
+				<li><code>!<i>handle</i></code> repeats the last command that
+					begins with the string of characters in <code><i>handle</i></code>.
+					For example, <code>!ca</code> would repeat the last
+					command that began with the characters <code>ca</code>,
+					such as <code>cat README</code>.
+				</li>
+				<li><code>!?<i>handle</i></code> repeats the last command that
+					<i>contains</i> the string of characters in <code><i>handle</i></code>.
+					For example, <code>!?READ</code> would also match
+					<code>cat README</code>.
+				</li>
+				<li><code>^<i>original</i>^<i>substitution</i></code> replaces
+					the <i>first</i> occurrence of <code><i>original</i></code>
+					with <code><i>substitution</i></code>. For example, if
+					the previous command was <code>cat README</code>,
+					the command <code>^README^license.txt</code> would
+					yield a new command <code>cat license.txt</code>.
+				</li>
+				<li><code>!:gs/<i>original</i>/<i>substitution</i></code> replaces
+					<i>all</i> occurrences of <code><i>original</i></code> with
+					<code><i>substitution</i></code>. (<code>!:gs</code>
+					means "global substitution.")
+				</li>
+				<li><code>!-2</code> is the penultimate command,
+					<code>!-3</code> is third most recent command, and so 
+					on.
+				</li>
+			</ul>
+		<p>You can even combine history expressions to yield sigil soup such as 
+			<code>!-2:0 -R !^ !-3:2</code>, which would expand to the command 
+			name of the penultimate command, followed by <code>-R</code>, the
+			first argument of the previous command, and the second argument of the third most
+			recent command. To make such cryptic commands more readable, you can expand 
+			history references as you type. Type the command <code>bind Space:magic-space</code>
+			at any prompt, or add it to a startup file to bind the Space key to the function
+			magic-space, which expands history substitutions inline.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="expand"><span class="atitle">Expand-o-Matic</span></a></p>
+		<p>With so much code available on the Internet, you likely download tens of files every day.
+			And chances are, all those files are packaged differently&#8212;a ZIP file here, a RAR
+			file there, and tarballs galore, albeit each one compressed with a different utility.
+			Remembering how to decompress and expand each package format can be taxing. So,
+			why not capture all those tasks in a single command? This function is widely available
+			in many sample dot files:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+ex () {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1        ;;
+      *.tar.gz)    tar xzf $1     ;;
+      *.bz2)       bunzip2 $1       ;;
+      *.rar)       rar x $1     ;;
+      *.gz)        gunzip $1     ;;
+      *.tar)       tar xf $1        ;;
+      *.tbz2)      tar xjf $1      ;;
+      *.tgz)       tar xzf $1       ;;
+      *.zip)       unzip $1     ;;
+      *.Z)         uncompress $1  ;;
+      *.7z)        7z x $1    ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+</pre></td></tr></table><br />
+
+		<p>This function, <code>ex</code>, expands 11 file formats and can be extended
+			if you deal with some other package type. Once defined&#8212;say, in a shell startup
+			file&#8212;you can simply type <code>ex <i>somefile</i></code>, where
+			<code><i>somefile</i></code> ends with one of the named extensions:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ ls
+source
+$ tar czf source.tgz source
+$ ls -1
+source
+source.tgz
+$ rm -rf source
+$ ex source.tgz
+$ ls -1
+source
+source.tgz
+</pre></td></tr></table><br />
+
+		<p>By the way, if you ever misplace something you downloaded today, run
+			<code>find</code> to discover it:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ find ~ -type f -mtime 0
+</pre></td></tr></table><br />
+
+		<p>The command <code>-type f</code> looks for plain files, and
+			<code>-mtime 0</code> looks for files created since midnight
+			of the current day.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="secrets"><span class="atitle">Many more secrets</span></a></p>
+		<p>There are a lot more expert secrets to be discovered. Search the Web for "shell
+			auto-complete" to learn more about automatic completion, a feature that 
+			provides context-sensitive expansions as you type a command. Also search for
+			"shell prompts" to learn how to customize your shell prompt. You can make it
+			colorful; you can show your current working directory or Git branch; you can also
+			show the history number&#8212;a convenient reference if you recall history a
+			good deal. For working examples, search Github for "dot files." Many experts post
+			their shell configurations on Github.
+		</p>
+		<p>Now, if you'll excuse me, I have to find my wig and bronzer. It's not easy to hide when
+			you resemble Groucho Marx.
+		</p>
+<br /><br /><p><a name="resources"><span class="atitle">Resources</span></a></p><b>Learn</b><br /><ul><li>
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	<br /><br /></li><li>
+		<a href="http://dotfiles.org/">dotfiles.org</a>: You can find a large collection of dot 
+			files online.
+	<br /><br /></li><li>
+		<a href="http://en.wikipedia.org/wiki/Unix_shell">UNIX shells</a>: Learn more about
+			UNIX shells.
+	<br /><br /></li><li>
+		<a href="http://www.gnu.org/software/bash/">GNU Bash shell</a>: Find documentation 
+			and source for the GNU Bash Shell on its project page.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	<br /><br /></li></ul><br /><b>Get products and technologies</b><br /><ul><li>
+		<a href="http://www.github.com">Github</a>: Github houses thousands of Git repositories,
+			including the personal dot files of many expert users. Search for "dot files" to find 
+			examples. (You can learn more about Git online and in the
+			<a href="http://github.com/guides/home">Github Guides</a>.)
+	<br /><br /></li></ul><br /><b>Discuss</b><br /><ul><li>
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	<br /><br /></li><li>
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L&#8212;technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools&#8212;technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=748amp;&amp;amp;cat=72">Virtualization&#8212;technical</a></li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	<br /></li></ul><br /><br /><p><a name="author"><span class="atitle">About the author</span></a></p><table border="0" cellspacing="0" cellpadding="0" width="100%"><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" height="5" width="100%" alt=""/></td></tr><tr valign="top" align="left"><td><p><img alt="Martin Streicher" src="images\Bio_mstreicher.jpg" align="left"/></p></td><td><img src="../web/www.ibm.com/i/c.gif" height="5" width="4" alt=""/></td><td width="100%"><p>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<i><a href="http://www.linux-mag.com">Linux Magazine</a>.</i> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</p></td></tr></table><br /><br /><br /><p class="no-print"><span class="atitle"><a name="rate">Rate this page</a></span></p><span class="no-print"><form method="post" action="http://www-128.ibm.com/developerworks/utils/RatingsHandler"><input type="hidden" name="SITE_ID" value="1"/><input type="hidden" name="ArticleTitle" value="Speaking UNIX 14: The best-kept secrets of UNIX power users"/><input type="hidden" name="Zone" value="AIX and UNIX"/><input type="hidden" name="RedirectURL" value="http://www.ibm.com/developerworks/thankyou/feedback-thankyou.html"/><input type="hidden" name="ArticleID" value="12345"/><input type="hidden" name="publish-date" value="03052010"/><input type="hidden" name="author1-email" value="martin.streicher@gmail.com" /><input type="hidden" name="author1-email-cc" value="" /><script language="javascript" type="text/javascript">document.write('<input type="hidden" name="url" value="'+location.href+'" />');</script><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/gray_rule.gif" width="100%"/><br /><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border" width="100%"><tr><td width="100%"><table cellspacing="0" cellpadding="0" border="0" width="100%"><tr><td colspan="3"><p>Please take a moment to complete this form to help us better serve you.</p></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Goal">Did the information help you to achieve your goal?</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td><input type="radio" name="goal" id="goal-yes" value="Yes"/><label for="goal-yes">Yes</label></td><td><input type="radio" name="goal" id="goal-no" value="No"/><label for="goal-no">No</label></td><td><input type="radio" name="goal" id="goal-undecided" value="Don't know"/><label for="goal-undecided">Don't know</label></td></tr></table></td><td width="100%"> </td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="12" alt=""/></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Comments">Please provide us with comments to help improve this page:</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td><textarea name="Comments" id="Comments" wrap="virtual" rows="5" cols="35" class="iform"> </textarea></td></tr></table></td><td width="100%"> </td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="12" alt=""/></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Rating">How useful is the information?</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="58" align="left"><input type="radio" name="Rating" id="Rating1" value="1"/><label for="Rating1">1</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating2" value="2"/><label for="Rating2">2</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating3" value="3"/><label for="Rating3">3</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating4" value="4"/><label for="Rating4">4</label></td><td width="61" align="left"><input type="radio" name="Rating" id="Rating5" value="5"/><label for="Rating5">5</label></td></tr><tr><td width="60" align="left"><span class="greytext">Not</span><br /><span class="greytext">useful</span></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="63" align="left"><span class="greytext">Extremely<br />useful</span></td></tr></table></td><td width="100%"> </td></tr></table></td></tr></table><table cellspacing="0" cellpadding="0" border="0" width="100%" class="v14-gray-table-border"><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="8" alt=""/></td></tr><tr><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td colspan="3"><input type="image" src="../web/www.ibm.com/i/v14/buttons/submit.gif" border="0" width="120" height="21" alt="Submit"/></td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="8" alt=""/></td></tr></table></form><br /></span><br /><p><!--#include virtual="/developerworks/inc/s-reserved-social-tagging.inc" --></p><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><span class="no-print"><table align="right" cellpadding="0" cellspacing="0"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /></span></td><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td></tr></table></td></tr></table><!--FOOTER_BEGIN--><!--#include virtual="/developerworks/inc/s-footer14.inc" --><!--FOOTER_END--><!--XSLT stylesheet used to transform this file:  dw-document-html-5.12.xsl--></body></html>

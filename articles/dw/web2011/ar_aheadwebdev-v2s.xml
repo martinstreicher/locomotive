@@ -1,0 +1,409 @@
+<?xml-stylesheet type="text/xsl" href="../xsl/6.0/en_US/dw-document-html-worldwide-6.0.xsl"?>
+<dw-document xmlns:dw="http://www.ibm.com/developerWorks/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../schema/6.0/dw-document-6.0.xsd">
+
+<dw-article local-site="worldwide" skill-level="3" page-end-btt-link="yes">
+<id cma-id="12345" domino-uid="" content-id="" original="yes" />
+<keywords content="Martin Streicher, Web development, 2011"/>
+
+<meta-dctype>
+	<cma-defined-type />
+</meta-dctype>
+
+<meta-dcsubject>
+	<cma-defined-subject />
+</meta-dcsubject>
+
+<meta-last-updated day="04" month="12" year="2010" initials="ma" />
+
+<content-area-primary name="web" />
+
+<title>Emerging Web technologies</title>
+	<subtitle>A look ahead to 2011</subtitle>
+
+<author jobtitle="Software Developer" email-cc="" email="martin.streicher@gmail.com">
+	<bio>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</bio>
+	<img alt="Martin Streicher" src="images\Bio_mstreicher.jpg"/>
+	<author-name>
+		<GivenName>Martin</GivenName>
+		<FamilyName>Streicher</FamilyName>
+	</author-name>
+	<company-name>Pixel, Byte, and Comma</company-name>
+</author>
+
+<date-published day="06" month="12" year="2010" />
+
+<abstract></abstract>
+
+<abstract-extended>At 20, the World Wide Web remains abuzz with innovation. But unlike the past,
+	implementation now trumps invention. Developers can expect to spend more time creating
+	and less time coding.
+</abstract-extended>
+
+<docbody>
+	<p>Believe it or not, December 2010 marked only the twentieth anniversary of the creation of
+		the World Wide Web. In its birthday suit, the Web was composed of a single
+		computer<mdash />a NeXT workstation, to be specific<mdash />running both a rudimentary
+		Web server and a nascent browser. Fast-forward just two decades, and that <em>one</em> device
+		has become <em>one hundred million</em> devices (or more), ranging from traditional
+		desktop computers to wireless handsets to automobile dashboards. If humans had evolved
+		at the same pace as the Web<mdash />well, let's just say that the missing link would have
+		hunted in microfleece and Five Fingers, and cave drawings would depict how to lightly
+		braise mammoth in shallots and red wine.
+	</p>
+
+<sidebar width="35%">
+	<heading refname="fua" type="sidebar">Frequently used acronyms</heading>
+		<ul>
+			<li><strong>API:</strong> Application programming interface</li>
+			<li><strong>HTML:</strong> Hypertext Markup Language</li>
+			<li><strong>HTTP:</strong> Hypertext Transfer Protocol</li>
+			<li><strong>REST:</strong> Representational State Transfer</li>
+			<li><strong>SMS:</strong> Short Message Service</li>
+			<li><strong>SQL:</strong> Structured Query Language</li>
+			<li><strong>URI:</strong> Uniform Resource Identifier</li>
+		</ul>
+</sidebar>
+
+	<p>Twenty years on, the pace of innovation on the Web does not appear to be slowing. HTML5,
+		although not yet ratified, is being adopted almost universally and rather quickly, driven by
+		emergent, even good support in most major browsers. There is something of an arms race
+		among JavaScript engines and libraries, yielding better interactivity for users, better tools
+		for software developers, and even new forms of highly scalable computing. And, of course,
+		each week debuts some new, clever Web site, proving that the Web remains a remarkable
+		platform to realize ideas.
+	</p>
+	<p>However, the lion's share of inventiveness on the Web today isn't tied to new technology. HTML
+		and HTTP just work, browsers are more uniform, and the few good parts of JavaScript are
+		well understood. Instead of new technology, the current emphasis is on implementation.
+		Tools and techniques change rapidly, and developers experiment and eviscerate bad ideas,
+		refining remaining good ones, and canonizing the best notions as best practices.
+	</p>
+	<p>Web development in 2011 is to be <em>evolutionary,</em> not <em>revolutionary.</em> It's
+		all about tools, not technology. Here are the trends sure to appear or be bolstered in
+		the coming year.
+	</p>
+
+	<heading refname="root_prompt" type="major">Look ma: no root prompt!</heading>
+		<p>Cloud computing has been widely hyped as the cure for the common cold and far
+			better than whole-grain sliced bread. Perhaps those claims exaggerate the promises,
+			but not by much. Cloud computing has been remarkably impactful<mdash />and
+			joyously so. Services like Amazon Elastic Compute Cloud (Amazon EC2), The
+			Rackspace Cloud, and other similar virtual server farms have obsolesced
+			the machine room and the need for
+			capital investments. Turning a machine on is as simple as clicking the mouse.
+		</p>
+		<p>Further, truly turnkey hosting providers such as Heroku provide clouds with silver linings:
+		  application hosting with no system administration. Just install your code and go. Heroku is especially notable,
+			because it has fomented a cottage industry of specialized cloud providers that complement
+			its core services. Need search? Plug in Websolr. Global SMS? Drop in Moonshado. Prefer
+			a "no SQL" database? Choose from Mongo, Redis, and JasonDB.
+		</p>
+		<p>So long, root prompt! It's been nice knowing you. With less or no systems administration,
+			developers are free to focus on application code.
+		</p>
+
+	<heading refname="phone" type="major">Application, phone home</heading>
+		<p>As Tim Berners-Lee <a href="http://www.scientificamerican.com/article.cfm?id=long-live-the-web">writes</a>,
+			even the newborn Web "demonstrated a profound concept: that any person could
+			share information with anyone else, anywhere." Indeed, given the Web, a browser,
+			and a little handle called a <em>URI</em><mdash />the now familiar "dub dub dub"
+			notation<mdash />one can instantly find the current weather in Mumbai, read the challenges
+			and victories of fellow cancer patients, or read the complete works of Shakespeare,
+			among countless other possibilities. Berners-Lee's and others' HTML and HTTP, the
+			protocol used to request and transport HTML, have served their purposes well.
+		</p>
+		<p>But the Web is no longer just hypertext documents; moreover, the browser is more
+			engine or operating system than document viewer. Fundamentally, the Web is no
+			longer "read only." Pages, feeds, and downloads have been replaced with tweets,
+			callbacks, and synchronization. The expectation is that new content is delivered
+			as soon as it's available.
+		</p>
+		<p>To date, only a relatively small number of applications have taken advantage of such
+			dynamism. Think Apple's Push service and the failed but nonetheless ground-breaking
+			Google Wave. Otherwise, the technology has been too complex or
+			proprietary to make inroads.
+		</p>
+		<p>Yet the barriers are falling. HTML5's sockets add two-way communication to the browser
+			as well as frameworks are cropping up to standardize server implementations. PubSubHub,
+			too, precludes the need to poll for new content. Simply register your interest in a
+			feed using PubSubHubbub, and the server calls back whenever the feed is updated. The
+			open source Diaspora project, a decentralized Twitter, also promotes the notion of
+			subscriptions.
+		</p>
+		<p>In a wired, wired, wired world, sites should stay in touch with you.</p>
+
+	<heading refname="safe" type="major">Just when you thought it was safe . . . </heading>
+		<p>For years, developers have wrestled with support for multiple platforms. Recall coding
+			shrink-wrapped software for Mac and Windows<reg /> (in all its flavors); porting
+			scientific programs to different incarnations of UNIX<reg /> (and
+			eighteen flavors of windowing systems);
+			and building Web pages for Windows Internet Explorer<reg /> version 6 and, well,
+			every other browser. Travails all, yet such hassles pale in comparison to the recent
+			explosion of incompatible devices. Count Mac OS X, Apple iOS, Google Android,
+			the Blackberry, the good 'ole desktop, and Internet
+			Explorer among them. At times, it's difficult to discern whether so much competition
+			is a blessing or a curse.
+		</p>
+		<p>The good news is that robust cross-platform development tools do exist. For example, Rhodes is
+		  a Ruby on Rails-like framework that generates applications for a number of
+			devices. Similarly, Appcelerator Titanium combines JavaScript and HTML to build
+			native applications for portable devices. Throw in Ruby, PHP, or Python, and you
+			can also use Titanium for desktop applications. There are other nascent options,
+			too<mdash />PhoneGap and MoSync<mdash />and most are offered under liberal
+			open source licenses.
+		</p>
+		<p>In general, each solution produces dynamic, embedded Web sites for the device. Many
+			of the frameworks integrate with truly native features such as geolocation, making
+			the application appear truly native. jQuery Mobile is a recent addition to the
+			cross-platform corpus of tools and also generates an embedded Web site.
+		</p>
+		<p>Software application developers tend to specialize in a single platform. If your platform
+			is the Web, such cross-platform tools can help you conquer the rest of the Wide
+			World.
+		</p>
+
+	<heading refname="javascript" type="major">R.I.P. JavaScript</heading>
+		<p>Admittedly, it's premature to eulogize JavaScript. The language continues to enjoy
+			a renaissance, even as some long for its untimely demise. You either hate
+			JavaScript or love it, perhaps depending on your threshold for pain, how much
+			caffeine you've had to drink, or the problem at hand. Ideally, JavaScript would be
+			replaced with another language (something, anything) that's not as quirky. Alas,
+			that's unlikely to occur in the coming year or any time soon, and Nostradamus is
+			strangely quiet on the whole topic.
+		</p>
+		<p>If you are in the "hate it" camp, find solace in polished JavaScript
+		  toolkits such as jQuery and Prototype and clever dialects like
+		  CoffeeScript. Here's how the CoffeeScript site describes the
+		  project's inspiration:
+		</p>
+
+<blockquote>"Underneath all of those embarrassing braces and semicolons, JavaScript has always had a
+	gorgeous object model at heart. CoffeeScript is an attempt to expose the good parts of
+	JavaScript in a simple way."
+</blockquote>
+
+		<p>Amen. Hallejulah. Word.</p>
+		<p>CoffeeScript compiles into pretty-printed, readable JavaScript, or
+		you can include CoffeeScript directly in the browser, where it compiles and runs
+		in situ. CoffeeScript syntax is sure to please the most ardent minimalist, is easy to
+		learn, and is gaining in popularity. It's like adding cream and sugar to
+		a bitter cup-o-joe.
+		</p>
+
+	<heading refname="location" type="major">It's location, location, location</heading>
+		<p>The realtor proverb that it's all about "location, location, location" is an apt mantra
+			for Web development in the immediate future. With the browser unchained from
+			the confines of the desktop, developers have the opportunity to build applications
+			that instantly affect people's lives. Want to find the closest metro stop? Looking for
+			the best Thai restaurant in the neighborhood? Or perhaps you want to know how
+			much every house on the block sold for?
+		</p>
+		<p>Geolocation, derived from Global Positioning System (GPS), cellular signal triangulation,
+			or IP address, is near-ubiquitous, so there's little reason to ignore it. Indeed, ignore
+			it at your own peril.
+		</p>
+
+	<heading refname="sync" type="major">Synchronization, synchronization, synchronization</heading>
+		<p>In addition to the variety of devices used to access the Web, there's the sheer numbers
+			of devices now online. It is quite common in 2010 for an individual to carry a laptop,
+			a cell phone, and perhaps an e-Reader, all with connectivity and unique features
+			and purposes. But, to paraphrase Spider-man,
+			with great convenience comes great complication. Namely, if you
+			use the same application on multiple devices, how do you keep the information in
+			sync?
+		</p>
+		<p>If the device remains connected, a site or service can house the data. Otherwise, the
+			data must be synced opportunistically and (ideally) automatically. Apple MobileMe
+			provides such seamless syncing (and is one of the service's best selling points), but
+			the service is proprietary to Mac OS X and iOS and requires an annual subscription.
+			Some developers create their own tools to synchronize content and data, including
+			offline "widgets" that serve as proxies for connectivity. Simply enter your data locally
+			and sync whenever a connection is available. The Harvest time-management
+			application is one such example. The Apple iPhone version of the application, say,
+			retains hours worked until a connection is made, when it transfers everything to its
+			Web service.
+		</p>
+		<p>Consistency is increasingly crucial. Again, HTML5 offers new features for local storage,
+			but stand-alone applications will likely prefer an "incrementally consistent" database,
+			where local and remote instances can replicate as peers back and forth. CouchDB is
+			one such database, as is Riak. A RESTful API is an additional benefit of the two.
+		</p>
+		<p>If your user is constantly changing location, location, location, consider the tools for
+			synchronization.
+		</p>
+
+	<heading refname="ui" type="major">Put the "user" back in "user interface"</heading>
+		<p>Finally, given all the tools listed above, a Web application need not resemble the DOS
+			prompt. Fine typography on the Web became a reality last year, and there is no
+			shortage of best practices and source material for beautiful and functional
+			navigation, information architecture, forms, and interactivity. The browser,
+			although now stretched far beyond its original intent, remains nonetheless resilient.
+		</p>
+
+		<p>That said, the browser is just one medium, and an application that
+		  works well with a browser and attached keyboard and mouse may not
+		  translate universally. For example, hover is useless without a mouse,
+		  and drag and drop and complex forms are anathema for a small screen or
+		  large thumbs.
+		  </p>
+
+		<p>Product managers, developers, and designers would be wise to invest
+		  extra effort to make applications simple, direct, concise, pleasing,
+		  and conformant to the capabilities of each target device. After all,
+		  there is no <em>i</em> in <em>user.</em> Design for the intended
+		  audience -- and device.
+		</p>
+
+	<heading refname="web" type="major">The Web? What's that?</heading>
+		<p>In a sense, it's something of a misnomer to continue to label Web applications as such.
+			More and more, applications and information are accessed via other platforms
+			and devices, directly
+			and indirectly. It may be more appropriate to call Web development <em>Internet
+			development</em> or <em>service development</em> or just <em>application
+			development.</em> How the utility is consumed is increasingly irrelevant.
+		</p>
+		<p>Yet like years past, application development continues to require mastery of many
+			disciplines. Data structures are no less important; parsing strings is a common task;
+			careful and thoughtful interaction design and presentation are mandatory. As
+			application development circles again to many devices and many operating systems,
+			choosing the right tools for the task is an invaluable skill. In 2011, you have a great
+			suite to choose from. No root prompt required.
+		</p>
+</docbody>
+
+<resources>
+	<resource resource-category="Learn">
+		According to it's home page, the <a href="http://aws.amazon.com/ec2/">Amazon
+		Elsatic Compute Cloud (Amazon EC2)</a> "... presents a true virtual computing
+		environment." Booting a machine requires a click of the mouse.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.appcelerator.com/">Appcelerator Titanium</a>
+		is a free and open source application development platform to create native mobile,
+		tablet, and desktop applications, using existing web technologies.
+	</resource>
+
+	<resource resource-category="Learn">
+		If you like JavaScript, but dislike its syntax, try
+		<a href="http://jashkenas.github.com/coffee-script/">CoffeeScript</a>. It
+		exposes the good parts of JavaScript in a simple way.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="https://joindiaspora.com/">Diaspora</a> is an open source, decentralized
+		social network that emphasizes privacy. Anyone can host a Diaspora server, or "seed",
+		and information is shared only with seeds you authorize. The code for Diaspora
+		is hosted on <a href="https://github.com/diaspora/diaspora">Github</a>.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.google.com/wave/">Google Wave</a> is a real-time collaboration
+		platform to share messages and media.
+	</resource>
+
+	<resource resource-category="Learn">
+		A dedicated Ruby hosting platform, <a href="http://heroku.com/">Heroku</a>
+		offers virtual computing resources with no system administration.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://jquerymobile.com/">jQuery Mobile</a>
+		builds a unified user interface across all popular mobile device platforms. It is
+		built on the <a href="http://jquery.com/">jQuery</a> and
+		<a href="http://jqueryui.com/">jQuery UI</a> foundation.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.mongodb.org/">MongoDB</a> (the name is derived from
+		"hu<i>mongo</i>us") is a scalable, high-performance, open source,
+		document-oriented database.
+	</resource>
+
+	<resource resource-category="Learn">
+		The oddly-named, but effective
+		<a href="http://code.google.com/p/pubsubhubbub/">PubSubHubbub</a> is a simple,
+		open, server-to-server publish/subscribe protocol extension to Atom and RSS. Register
+		your interest in a feed (subscribe) and PubSubHubbub contacts you when the feed
+		has new content available (publish).
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://moonshado.com/">Moonshado</a> A simple, open, server-to-server web-hook-based pubsub (publish/subscribe) protocol as an extension to Atom and RSS.
+	</resource>
+
+	<resource resource-category="Learn">
+		The <a href="http://www.rackspacecloud.com/">Rackspace Cloud</a>, much like EC2,
+		provides instant-on, virtualized computing resources, including hosts, file storage,
+		and turnkey web sites.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://code.google.com/p/redis/">Redis</a> is an advanced key-value store.
+		It is similar to <a href="http://memcached.org/">Memcached</a>, but data are
+		not volatile, and values can be strings, lists, sets, and ordered sets.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://rhomobile.com/">Rhodes</a> allows programmers to
+		rapidly write native smartphone applications.
+	</resource>
+
+	<resource resource-category="Learn">
+		The <a href="http://websolr.com/">WebSolr</a> service hosts Solr indices. An API
+		  is available for .NET, PHP, Python, and Ruby.
+	</resource>
+
+	<resource resource-category="Learn">
+		The <a href="http://www.ibm.com/developerworks/web/">Web development zone</a>
+			specializes in articles covering various Web-based solutions.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	</resource>
+
+	<resource resource-category="Learn">
+		Stay current with developerWorks'
+			<a href="http://www.ibm.com/developerworks/offers/techbriefings/?S_TACT=105AGX44&amp;S_CMP=ART">technical
+			events and webcasts</a>.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.ibm.com/developerworks/offers/lp/demos/">developerWorks on-demand
+			demos</a>: Watch demos ranging from product installation and setup for beginners
+			to advanced functionality for experienced developers.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://www.ibm.com/developerworks/downloads/">Download IBM product evaluation
+			versions</a> or <a href="http://www.ibm.com/developerworks/downloads/soasandbox/">explore
+			the online trials in the IBM SOA Sandbox</a> and get your hands on application
+			development tools and middleware products from DB2<reg />, Lotus<reg />, Rational<reg />,
+			Tivoli<reg />, and WebSphere<reg />.
+	</resource>
+
+	<resource resource-category="Discuss">
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	</resource>
+
+	<resource resource-category="Discuss">
+		<a href="https://www.ibm.com/developerworks/community/">My developerWorks</a>: Connect
+			with other developerWorks users while exploring the developer-driven blogs,
+			forums, groups, and wikis.
+	</resource>
+</resources>
+
+	</dw-article>
+</dw-document>

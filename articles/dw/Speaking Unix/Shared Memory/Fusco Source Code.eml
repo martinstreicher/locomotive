@@ -1,0 +1,155 @@
+Return-path: <martin.streicher+caf_=martin.streicher=mac.com@gmail.com>
+Received: from smtpin127.mac.com ([unknown] [10.150.68.127])
+ by ms082.mac.com (Sun Java(tm) System Messaging Server 7u3-12.01 64bit (built
+ Oct 15 2009)) with ESMTP id <0L2Y00I6K037L6H0@ms082.mac.com> for
+ martin.streicher@mac.com; Mon, 24 May 2010 14:09:07 -0700 (PDT)
+Original-recipient: rfc822;martin.streicher@mac.com
+Received: from mail-wy0-f178.google.com ([74.125.82.178])
+ by smtpin127.mac.com (Sun Java(tm) System Messaging Server 7u3-16.01 64bit
+ (built May 20 2010)) with ESMTP id <0L2Y00FT7035F310@smtpin127.mac.com> for
+ martin.streicher@mac.com (ORCPT martin.streicher@mac.com); Mon,
+ 24 May 2010 14:09:06 -0700 (PDT)
+X-Proofpoint-Virus-Version: vendor=nai engine=5400 definitions=5992
+ signatures=621959
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ ipscore=0 phishscore=0 bulkscore=0 adultscore=0 classifier=spam adjust=0
+ reason=mlx engine=5.0.0-0908210000 definitions=main-1005240147
+Received: by wyb33 with SMTP id 33so2654714wyb.23 for
+ <martin.streicher@mac.com>; Mon, 24 May 2010 14:09:05 -0700 (PDT)
+Received: by 10.216.87.75 with SMTP id x53mr1991913wee.160.1274735345372; Mon,
+ 24 May 2010 14:09:05 -0700 (PDT)
+X-Forwarded-To: martin.streicher@mac.com
+X-Forwarded-for: martin.streicher@gmail.com martin.streicher@mac.com
+Delivered-to: martin.streicher@gmail.com
+Received: by 10.216.30.207 with SMTP id k57cs290725wea; Mon,
+ 24 May 2010 14:09:05 -0700 (PDT)
+Received: by 10.143.154.1 with SMTP id g1mr4012314wfo.36.1274735344058; Mon,
+ 24 May 2010 14:09:04 -0700 (PDT)
+Return-path:
+ <s-XnTRuHXFomodOswIdhpx5wH_5urd6BmgGCZ9OAwk6Irdaywfnpw6CE@bounce.linkedin.com>
+Received: from mail15-a-ac.linkedin.com
+ (mail15-a-ac.linkedin.com [208.111.169.137]) by mx.google.com with ESMTP id
+ b12si11595447wam.33.2010.05.24.14.09.02; Mon, 24 May 2010 14:09:03 -0700 (PDT)
+Received-SPF: pass (google.com: domain of
+ s-XnTRuHXFomodOswIdhpx5wH_5urd6BmgGCZ9OAwk6Irdaywfnpw6CE@bounce.linkedin.com
+ designates 208.111.169.137 as permitted sender) client-ip=208.111.169.137;
+DomainKey-Status: good (test mode)
+Authentication-results: mx.google.com; spf=pass (google.com: domain of
+ s-XnTRuHXFomodOswIdhpx5wH_5urd6BmgGCZ9OAwk6Irdaywfnpw6CE@bounce.linkedin.com
+ designates 208.111.169.137 as permitted sender)
+ smtp.mail=s-XnTRuHXFomodOswIdhpx5wH_5urd6BmgGCZ9OAwk6Irdaywfnpw6CE@bounce.linkedin.com;
+ domainkeys=pass (test mode) header.From=messages-noreply@linkedin.com
+DomainKey-Signature: s=prod; d=linkedin.com; c=nofws; q=dns;
+ h=Sender:Date:From:To:Message-ID:Subject:MIME-Version:
+ Content-Type:X-LinkedIn-fbl;
+ b=W4FJsxh94vpQOEIfVijB4SxRMSAJ+/5WLQOpB8J3P8Sm+Wf2cbz0rWdw
+ kwtpN3oEEbvMIacdDvQyYD8HRqr/u2BsbjIByT8tMogwn5Lrs7DoOYHa3   nzbCEZpGxWmUj48;
+Sender: messages-noreply@bounce.linkedin.com
+Date: Mon, 24 May 2010 14:08:51 -0700 (PDT)
+From: Debra Williams Cauley <Debra_Williams@prenhall.com>
+To: Martin Streicher <martin.streicher@gmail.com>
+Message-id: <1010050139.2986607.1274735331366.JavaMail.app@ech3-cdn08.prod>
+Subject: Fusco Source Code
+MIME-version: 1.0
+Content-type: multipart/alternative;
+ boundary="----=_Part_2986606_493775621.1274735331363"
+X-LinkedIn-fbl: s-XnTRuHXFomodOswIdhpx5wH_5urd6BmgGCZ9OAwk6Irdaywfnpw6CE
+
+------=_Part_2986606_493775621.1274735331363
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+LinkedIn
+------------
+Debra Williams Cauley has sent you a message
+
+Date: 5/24/2010
+Subject: Fusco Source Code
+
+Martin,
+
+I understand that you want to use some source code from John Fusco's book, The LInux Programmer's Toolbox. I can grant permission for that but definitely include the following publication information.  
+
+Copyright 2007 Pearson Education, Inc.
+Published by Prentice Hall Professional, March 2007, isbn 0132198576
+For a full table of contents, visit the publisher site:
+www.informit.com/title/0132198576 
+
+Please send along the URL for the article when it publishes.
+
+Debra Williams Cauley
+
+View/reply to this message:
+http://www.linkedin.com/e/KUiBbMs6PGbbS2CwJT25cChXWPyJbVkq5U9lJS-z/mbi/I2068853893_2/
+
+Don't want to receive e-mail notifications? Adjust your message settings:
+http://www.linkedin.com/e/KUiBbMs6PGbbS2CwJT25cChXWPyJbVkq5U9lJS-z/blk/I2068853893_2/s6hJbOYWrSlI/mdp/
+
+
+ 
+------
+(c) 2010, LinkedIn Corporation
+------=_Part_2986606_493775621.1274735331363
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+<html>
+  <body>
+
+  
+
+
+<table border="0" width="550" cellpadding="0" cellspacing="0" style="max-width:550px; border-top:4px solid #39C; font: 12px arial, sans-serif; margin: 0 auto;"><tr><td>  
+  <h1 style="color: #000; font: bold 23px arial; margin:5px 0;" >LinkedIn</h1>
+
+<p style="margin: 0 0 4px 0"><strong>Debra Williams Cauley</strong> has sent you a message.</p>
+
+<p style="margin: 0 0 4px 0">
+  <strong>Date:</strong>
+  5/24/2010
+</p>
+<p style="margin: 0 0 4px 0">
+  <strong>Subject:</strong>
+  Fusco Source Code
+</p>
+
+<p style="margin: 0 0 4px 0">
+  Martin,
+<br/>
+
+<br/>
+I understand that you want to use some source code from John Fusco's book, The LInux Programmer's Toolbox. I can grant permission for that but definitely include the following publication information.  
+<br/>
+
+<br/>
+Copyright 2007 Pearson Education, Inc.
+<br/>
+Published by Prentice Hall Professional, March 2007, isbn 0132198576
+<br/>
+For a full table of contents, visit the publisher site:
+<br/>
+www.informit.com/title/0132198576 
+<br/>
+
+<br/>
+Please send along the URL for the article when it publishes.
+<br/>
+
+<br/>
+Debra Williams Cauley
+</p>
+
+<p style="margin: 15px 0 3px 0; background: #DCF0F6; padding: 5px 15px; width: 50%; text-align: center;"><a href="http://www.linkedin.com/e/KUiBbMs6PGbbS2CwJT25cChXWPyJbVkq5U9lJS-z/mbi/I2068853893_2/" style="color:#0066CC;">View/reply to this message</a></p>
+
+<p style="border-top: 2px solid #ccc; padding-top: 15px; margin-top: 15px; font-size: 10px; color: #999;">Don't want to receive e-mail notifications? <a href="http://www.linkedin.com/e/KUiBbMs6PGbbS2CwJT25cChXWPyJbVkq5U9lJS-z/blk/I2068853893_2/s6hJbOYWrSlI/mdp/" style="color:#0066CC;">Adjust your message settings</a>.</p>
+
+
+
+
+
+  <p style="width: 550px; margin: 3px auto; font: 10px arial, sans-serif; color: #999;">&#169; 2010, LinkedIn Corporation</p>
+
+</body>
+</html>
+------=_Part_2986606_493775621.1274735331363--

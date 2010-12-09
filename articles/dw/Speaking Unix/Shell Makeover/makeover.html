@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2 {
+    font-size: 125%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    border: 5px black solid;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  div.image {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 1em;
+    text-align: center;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+    visibility: visible;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  table {
+    width: 100%;
+    padding: 0 2em;
+  }
+
+  th, td {
+    padding: 4px 12px;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<p>
+</p>
+
+<h1>
+  Extreme Shell Makeover
+  </h1>
+
+<p>
+  No matter what car you drive, you have to appreciate the hot rod. There's nothing quite like a 1969 Dodge Charger with five-spoke mag wheels, wide tires, a midnight black finish, lots of chrome, and a snarling big block. It's a masterpiece -- the car Rodin's Thinker would drive. A classic.</p>
+
+<p>
+  The Unix shell is a classic, too, sans the big fenders. But with a little elbow grease, wrench-time, and after-market mods, it can look and perform like a hot rod, too. You might call this "Top Gear-head", "Geek Eye for the Straight Guy", or "Extreme Shell Makeover". I call it "Pimp My Shell".</p>
+
+<h2>
+  It's Got Moving Parts
+  </h2>
+
+<p>
+  Beneath that blinking prompt, your shell -- be it Bash, Z Shell, or something else -- has lots of moving parts that can be augmented, tuned, and tweaked. Here's a summary (as many of these have been discussed in detail in prior columns).</p>
+
+<ul>
+  <li>An <em>alias</em> can abbreviate command names and command-line phrases. For example, <tt>alias ll 'ls -hlt'</tt> reduces a commonly-used command to two letters -- less to type and less to remember. Most often, an alias abbreviates literals. However, much like a shell script or a shell function, an alias can also accept parameters. The command <tt>alias print 'lpr -h -Pps5 \!*'</tt> replaces <tt>\!*</tt> with command-line arguments. Thus, typing <tt>print manual.ps schematic.ps form.ps</tt> is expanded to <tt>lpr -h -Pps5 manual.ps schematic.ps form.ps</tt>.</li>
+
+  <li><em>Environment variables</em> store settings across commands, even commands that spawn new processes. Some environment variables have special meaning due to convention: <tt>PRINTER</tt> is recognized by commands and applications as your preferred output device, while <tt>EDITOR</tt> and <tt>PAGER</tt> indicate what text editor and viewer to use for modifying and displaying text, respectively. Other environment variables are germane to individual utilities. One example is <tt>PS1</tt>. It tells your shell what to render for your initial prompt. Another workhorse environment variable is the shell's <tt>PATH</tt>, which enumerates directories to search for executable. (To find what environment variables are recognized in a specific application or command, look for a section called "Environment Variables" in its man page.)</li>
+
+  <li><em>Functions</em> are callable from the command-line, too, and fill the gap between an alias and a full-blown script. If you need to manipulate arguments or apply logic, an alias is likely insufficient, yet an entire script may be overkill. Functions can be combined to achieve cumulative effects, too. You need a modicum of programming savvy to create functions, but nothing onerous.</li>
+
+  <li><em>Shell options</em> control the behavior of the shell. Shell options typically vary from shell to shell, and a rich shell such as Bash or Z Shell can have hundreds of tunable parameters. (The Z shell has a dedicated man page, <em>zshoptions</em>, just to document configurability.) For example, if you enable the Z Shell option <tt>pushd_ignore_dups</tt>, <em>pushd</em> won't push a directory onto the directory stack if it's already there. You can literally spend hours exploring options. Once you find a combination you want to keep, type <tt>set</tt> (Bash) or <tt>setopt</tt> and redirect the output to a file. You can copy some or all the captured settings to a startup file to recreate your workspace each time you open a shell.</li>
+  </ul>
+
+<p>
+  In addition to these gears and levers, you can also change how your shell <em>looks</em>. The nondescript "dollar sign" prompt can sport colors, reflect your current working directory, and even show the weather. If you can capture bits of information with a command, you can probably display that data at the prompt.</p>
+
+
+<h2>
+  Like Pinstripes
+  </h2>
+
+<p>
+	Much like other operations in the shell, an environment variable controls what's drawn each time the shell presents a prompt. The variable, <tt>PS1</tt>, or "prompt string level 1", is interpreted when rendered much like the command-line itself. <tt>PS1</tt> can contain other shell and environment variables, in-place command evaluation (via backquotes), and specialized literals. Here's an initial example:</p>
+
+<pre>
+$ <b>export PS1="\u@\h \w &gt;"</b>
+strike@nostromo ~ > whoami; hostname; pwd
+strike
+nostromo
+/home/strike
+strike@nostromo ~ &gt;
+</pre>
+
+<p>
+	Initially, the prompt was the simple <tt>$</tt>. Setting the environment variable <tt>PS1</tt> (hence, <tt>export</tt> instead of <tt>set</tt>) to <tt>\u@\h \w ></tt> renders your user name (the meaning of <tt>\u</tt>), the literal <tt>@</tt>, your hostame (<tt>\h</tt>), your present working directory (<tt>\w</tt>), and the literal string <tt> > </tt>.</p>
+
+<p>
+	Other special literals include <tt>\t</tt> for the time (in 24-hour format), <tt>\d</tt> for the date (in weekday, month, date format), and <tt>\!</tt> for the shell history number. If you keep your shell window open for extended periods, you can quickly repeat a previous command with <tt>!<em>nnn</em></tt>, where <tt><em>nnn</em></tt> is the number shown in the prompt for the command.</p>
+
+<pre>
+strike@nostromo ~ &gt; <b>export PS1="\! $ "</b>
+776 $ <b>find . -name ...</b>
+...
+999 $ <b>!776</b>
+find . -name ...
+1000 $
+</pre>
+
+	<p>
+	  Have you ever wondered how the shell prompt changes to the octothorpe (<tt>#</tt>) whenever you are or behave like the superuser, root? By default, the standard prompt is actually the special operator <tt>\$ </tt>. If your effective UID is 0, this emits <tt>#</tt>; otherwise, it emits a <tt>$</tt>.</p>
+
+	</p>
+	  Abbreviations also exist to change colors. Another sample demonstrates:</p>
+
+<pre>
+strike@nostromo ~ &gt; <b>export PS1='$ '</b>
+$ <b>blue='\e[0;34m'</b>
+$ <b>none='\e[m'</b>
+$ <b>export PS1="$blue\u@\h$none\w>"</b>
+<span style="color: blue;">strike@nostromo </span>~ &gt;
+</pre>
+
+<p>
+	The (rather unwieldy) abbreviation <tt>\e[0;34m</tt> enables blue. Its complement, <tt>\e[m</tt>, resets the rendering color to the default for your shell window. Both codes are enclosed in single quotes to prevent the shell from interpolating characters that have special meaning. This example also shows you can use variables in a prompt, too. Here, the variables <tt>blue</tt> and <tt>none</tt> are expanded <em>when the command-line is interpreted</em> and the prompt is set to the string that results from the expansion. If you want to expand a variable dynamically each time the prompt is rendered, you must escape its interpretation when set. Let's look at just that:</p>
+
+<pre>
+<span style="color: blue;">strike@nostromo </span>~ &gt;<b>export PS1="\$somevar $ "</b>
+$ <b>somevar="hello"</b>
+hello $
+</pre>
+
+<p>
+	The phrase <tt>\$somevar</tt> escapes the dollar sign, avoiding interpretation of the variable in the command where the prompt is set. Instead, the interpretation occurs whenever the prompt is drawn. If <tt>somevar</tt> changes -- because of other commands , the prompt displays its new value.</p>
+
+<p>
+	You can also call any command or function in the prompt, as mentioned above. Simply use the backquotes (<tt>``</tt>). For example, if you use the Ruby Version Manager (RVM) to switch between Ruby language versions and interpreters, you may want to know which Ruby binary is active. There are two approaches.</p>
+
+<pre>
+hello $ <b>export PS1="(`which ruby`) \w $ "</b>
+(/Users/strike/.rvm/rubies/ruby-1.9.2-p0/bin/ruby) ~ $
+</pre>
+
+<p>
+	This first technique applies <em>which</em> to find the first Ruby executable in the current <tt>PATH</tt>. This next technique achieves the same goal, but demonstrates how complex an in-place command evaluation can be. If you set the prompt to the string <tt>"(`rvm info | grep 'ruby:' | grep bin | cut -f2 -d: | tr \\" ' '`)"</tt>, you get the same result, albeit through a more circuitous route.</p>
+
+<p>
+  By the way, you may have wondered why <tt>PS1</tt> is "prompt string level 1".  Are there other prompt levels? The answer is yes. Environment variables exist for <tt>PS2</tt>, <tt>PS3</tt>, and <tt>PS4</tt>, and these prompts appear any time you open a new block. Here is one occurrence:</p>
+
+<pre>
+$ <b>for i in [A-Z]*</b>
+&gt;
+</pre>
+
+<p>
+  After you type <tt>for i in [A-Z]*</tt> and press Return, the shell presents the <tt>PS2</tt> prompt (the default is the <tt>&gt;</tt>) to highlight that you are now within the body of the <tt>for</tt> loop. In other words, you are now "nested" in the loop, or at the next deeper level. If you finish the loop with <tt>done</tt>, the first level prompt reappears.</p>
+
+<pre>
+$ <b>for i in [A-Z]*</b>
+&gt; <b>do</b>
+&gt; <b>echo $i</b>
+&gt; <b>done</b>
+Gemfile
+Gemfile.lock
+README
+Rakefile
+$
+</pre>
+
+<p>
+  In fact, a new prompt appears any time you do not complete the command-line at the previous prompt. This explains why an unmatched single- or double quote causes a new prompt to appear. The shell is prompting you (no pun intended) to continue what you started.
+
+<p>
+  Embedding information in the prompt is a great way to track state, such as your current host, working directory, and more. Once you create a prompt you like, distribute the shell startup files to all your accounts. If, like most modern users, your screen fills with remote shell windows, the prompts can help you discern one from another. You might craft a function to change the prompt to a different color on each host.</p>
+
+
+<h2>
+  Modders and Rodders
+  </h2>
+
+<p>
+  Customizing the shell is a perennial geek pastime and you can find a great deal of inspiration and source code online to found your own work. Two sources deserve special mention: Oh My Z Shell! and Bash It! The former is for Z Shell users and the latter is for Bash aficianados. Both are a collection of shell modifications, including completions, themes (colors and prompts), functions, and ready-made "dot" files. Both are open source and available from Github. Here, let's try Oh, My Z Shell! (or OMZ! for short). You must have Z Shell 4.3.9 or later to use the code.</p>
+
+<p>
+  You can install the package and change your shell to Z Shell automatically with <em>wget</em>. </p>
+
+<pre>
+$ wget http://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
+...
+Cloning Oh My Zsh...
+Cloning into /Users/strike/.oh-my-zsh...
+remote: Counting objects: 1312, done.
+remote: Compressing objects: 100% (750/750), done.
+remote: Total 1312 (delta 796), reused 944 (delta 520)
+Receiving objects: 100% (1312/1312), 153.63 KiB, done.
+Resolving deltas: 100% (796/796), done.
+Looking for an existing zsh config...
+Using the Oh My Zsh template file and adding it to ~/.zshrc
+Copying your current PATH and adding it to the end of ~/.zshrc for you.
+Time to change your default shell to zsh!
+Changing shell for strike.
+Password for strike:
+chsh: /usr/bin/env zsh: non-standard shell
+         __                                     __
+  ____  / /_     ____ ___  __  __   ____  _____/ /_
+ / __ \/ __ \   / __ `__ \/ / / /  /_  / / ___/ __ \
+/ /_/ / / / /  / / / / / / /_/ /    / /_(__  ) / / /
+\____/_/ /_/  /_/ /_/ /_/\__, /    /___/____/_/ /_/
+                        /____/
+</pre>
+
+<p>
+  Optionally, you can install the kit manually. This is likely preferable if you are running another shell and just want to try the Z Shell. Use Git to clone the package and then run <em>zsh</em>.</p>
+
+<pre>
+$ git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+$ cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+$ zsh
+</pre>
+
+<p>
+  You should see a screen and prompt that resembles Figure 1. The default them for OMZ! is called "robbyrussell", named eponymously after the steward of OMZ! You can change this to any of the themes listed in <em>~/.oh-my-zsh/themes</em>.  To change a theme, open the <em>~/.zshrc</em> file and set the <tt>ZSH_THEME</tt> variable to the base name of the theme file. For example, to use <em>cloud.zsh-theme</em>, set <tt>ZSH_THEME=cloud</tt>.</p>
+
+<div class="image">
+<p class="image">
+  <img src="images/fig1.png" />
+  </p></div>
+
+
+<p>
+  You'll likely notice that many of the themes print status information in the prompt <em>and to the far-right of the prompt</em>. For example, the Clean theme prints the current time at far-right. Screen emulators typically don't include a status line at bottom (unlike their hardware progenitors), but can use the real estate found to the right of the prompt for dynamic feedback. Recall the funny <tt>\e[</tt> codes to set colors in the prompt? There is an extensive set of such "escapes" to move the cursor around a screen. Further, rather than use archane symbols and numbers, modern Unix systems use <em>tput</em> to look up and emit escapes by name or purpose. Z Shell uses all this trickery to provide an <tt>RPS1</tt> and <tt>RPS2</tt> for right-side prompts on the initial and subsequent lines, respectively.</p>
+
+<p>
+  Beyond thematic treatments of colors and prompts, OMZ! includes plug-ins that group like functions and features together. If you use Git for source control, for instance, you can enable the Git OMZ! plug-in to amend your prompt with Git status. Again, open the <em>~/.zshrc</em> file and edit the plug-ins line to include <tt>git></tt>. Now, when you switch to a Git repo, the prompt reflects state. For instance, Figure 2 shows the Clean theme and a repo with modifications that are not yet staged.</p>
+
+<div class="image">
+<p class="image">
+  <img src="images/fig2.png" />
+  </p></div>
+
+<p>
+  Smartly, the prompt shows the current branch ("rubricmods") and a red X, indicating the repo is dirty. Once the changes are committed, the X is elided. The Git plugin also adds helpful aliases for common Git command combinations and context-sensitive completions for Git options. If you type <tt>git branch</tt> followed by the Tab key, the Git plug-in lists the available branches. Other plug-ins exist for OS X, Ruby on Rails development, MySQL, and more.</p>
+
+<p>
+  Bash It! has similar features for Bash users.</p>
+
+
+<h2>
+  Burning Virtual Rubber
+  </h2>
+
+<p>
+  Pop open the hood of OMZ! or Bash It! to see what makes shell customizations tick. You can also find wisdom and novelty by searching the Web for "dot files"; many Unix gearheads post configurations online for others to cull from. Showing off your dot files may not land you a starring role in the next Fast and the Furious, but it'll likely boost your geek cred.</p>
+</body>
+</html>

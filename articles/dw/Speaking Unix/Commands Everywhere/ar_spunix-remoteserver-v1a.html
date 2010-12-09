@@ -1,0 +1,552 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Speaking UNIX 17: Managing multitudes of machines the mild-mannered way</title><meta http-equiv="PICS-Label" content="(PICS-1.1 &#34;http://www.icra.org/ratingsv02.html&#34; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &#34;http://www.rsac.org/ratingsv01.html&#34; l gen true r (n 0 s 0 v 0 l 0) &#34;http://www.classify.org/safesurf/&#34; l gen true r (SS~~000 1))"/><link rel="schema.DC" href="http://purl.org/DC/elements/1.0/"/><link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico"/><meta name="Owner" content="dW Information/Raleigh/IBM"/><meta name="DC.Language" scheme="rfc1766" content="en"/><meta name="IBM.Country" content="ZZ"/><meta name="Security" content="Public"/><meta name="IBM.SpecialPurpose" content="SP001"/><meta name="IBM.PageAttributes" content="sid=1003"/><meta name="Source" content="v16 Template Generator"/><meta name="Robots" content="index,follow"/><meta name="Abstract" content="Cloud computing may currently be all the rage, but there is a silicon lining to each calculating cumulus: hardware and software that require very real upkeep. Learn how to manage gobs of machines right from the command line."/><meta name="Description" content="Cloud computing may currently be all the rage, but there is a silicon lining to each calculating cumulus: hardware and software that require very real upkeep. Learn how to manage gobs of machines right from the command line."/><meta name="Keywords" content="Martin Streicher, UNIX, speaking UNIX, remote server, tips, dddauca"/><meta name="DC.Date" scheme="iso8601" content="2010-05-13"/><meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316"/><meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="SWG10"/><meta scheme="IBM_WTMCategory" name="IBM.WTMCategory" content="SOFDCAIXZZ"/><meta name="DC.Rights" content="© Copyright IBM Corporation 2010"/><meta name="IBM.Effective" scheme="W3CDTF" content="2010-05-13"/><meta name="title" content="Speaking UNIX 17: Managing multitudes of machines the mild-mannered way"/><!-- HEADER_SCRIPTS_AND_CSS_INCLUDE --><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/all.css" media="all" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/screen-uas.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/zz/en/screen-fonts.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/handheld.css" media="handheld" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/print.css" media="print" rel="stylesheet" title="www" type="text/css"/><!-- dW-specific CSS --><link href="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/css/dw-screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.cluetip.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><script src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/js/ibmcommon.js" type="text/javascript">//</script><!-- dW functional JS --><script language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/urltactic.js" type="text/javascript">//</script><!-- Rating_START --><script language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/artrating/artrating.js" type="text/javascript">//</script><style type="text/css">
+.metavalue {
+  display: none;
+}
+</style><!-- Rating_END --><!-- RESERVED_HEADER_INCLUDE --><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/ajax1.js" type="text/javascript">//</script><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/search_counter-maverick.js" type="text/javascript">//</script><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/request_referer_capture-maverick.js" type="text/javascript">//</script><script language="JavaScript" type="text/javascript"><!--
+ setDefaultQuery('');
+ //--></script><script language="JavaScript" type="text/javascript"><!--
+ function openNewWindow(url,tar,arg){window.open(url,tar,arg);}
+ //--></script></head><body id="ibm-com"><div id="ibm-top" class="ibm-landing-page"><!-- MASTHEAD_BEGIN --><div class="ibm-access"><a href="#ibm-content">Skip to main content</a></div><div id="ibm-masthead"><div id="ibm-logo"><a href="http://www.ibm.com/"><img height="50" src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/v16/t/ibm-logo.gif" width="110" alt="IBM®"/></a></div><ul id="ibm-geo"><li id="ibm-country" class="ibm-first">Country/region</li><li id="ibm-change-country">[ <a href="http://www.ibm.com/developerworks/country/">select</a> ]</li></ul><form id="ibm-search-form" action="http://www.ibm.com/developerworks/search/searchResults.jsp" method="get" name="form1"><input type="hidden" name="searchType" value="1"/><input type="hidden" name="searchSite" value="dW"/><p><span id="ibm-search-scope"><label for="sn"><img src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/c.gif" width="1" height="1" alt="Search in:"/></label><select name="searchScope" id="sn"><option value="dW" selected="selected">All of dW</option><option value="dW">-----------------</option><option value="aixunix"> AIX and UNIX</option><option value="db2"> Information Mgmt</option><option value="lotus"> Lotus</option><option value="rdd"> Rational</option><option value="tivoli"> Tivoli</option><option value="WSDD"> WebSphere</option><option value="dW">-----------------</option><option value="archZ"> Architecture</option><option value="javaZ"> Java technology</option><option value="linuxZ"> Linux</option><option value="paZ"> Multicore resources</option><option value="opensrcZ"> Open source</option><option value="webservZ"> SOA/Web services</option><option value="webarchZ"> Web development</option><option value="xmlZ"> XML</option><option value="dW">-----------------</option><option value="forums"> dW forums</option><option value="dW">-----------------</option><option value="aW">alphaWorks</option><option value="dW">-----------------</option><option value="all">All of IBM</option></select></span><label for="q"><img alt="Search for:" height="1" width="1" src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/c.gif"/></label><input type="text" name="query" maxlength="100" id="q"/><input type="submit" id="ibm-search" class="ibm-btn-search" name="Search" value="Search"/></p></form><div id="ibm-site-name"><!-- IBM site name container --></div><div id="ibm-universal-nav"><ul><li id="ibm-unav-home" class="ibm-first"><a href="http://www.ibm.com/">Home</a></li><li id="ibm-unav-solutions"><a href="http://www.ibm.com/businesssolutions/">Business solutions</a></li><li id="ibm-unav-services"><a href="http://www.ibm.com/technologyservices/">IT services</a></li><li id="ibm-unav-products"><a href="http://www.ibm.com/products/">Products</a></li><li id="ibm-unav-support"><a href="http://www.ibm.com/support/">Support &amp; downloads</a></li><li id="ibm-unav-myibm"><a href="http://www.ibm.com/account/">My IBM</a></li></ul></div></div><!-- MASTHEAD_END --><div id="ibm-pcon"><!-- CONTENT_BEGIN --><div id="ibm-content"><!-- Navigation_Trail_BEGIN --><!----><div xmlns="" id="ibm-content-head"><ul id="ibm-navigation-trail"><li class="ibm-first"><a href="http://www.ibm.com/developerworks/">developerWorks</a></li><li><a href="http://www.ibm.com/developerworks/aix/">AIX and UNIX</a></li><li><a href="http://www.ibm.com/developerworks/views/aix/library.jsp">Technical library</a></li></ul></div><!-- Navigation_Trail_END --><!-- dW_Summary Area_START --><div id="dw-summary-article"><div class="dw-content-head"><h1 xmlns="">Speaking UNIX 17: Managing multitudes of machines the mild-mannered way</h1><p xmlns=""/></div><div class="ibm-container-body ibm-two-column"><div class="ibm-column ibm-first"><div class="author"><a class="dwauthor" rel="#authortip1" href="#author1">Martin Streicher</a> (<a href="mailto:martin.streicher@gmail.com?subject=Speaking UNIX 17: Managing multitudes of machines the mild-mannered way">martin.streicher@gmail.com</a>), Software Developer, Pixel, Byte, and Comma</div><div id="authortip1" class="dwauthor-onload-state ibm-no-print"><div xmlns="" class="position"><img src="images\Bio_mstreicher.jpg" width="64" height="80" alt="Martin Streicher" /></div>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em xmlns=""><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a xmlns="" href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</div><p/><p><b>Summary:</b>  Cloud computing may currently be all the rage, but there is a silicon lining 
+	to each calculating cumulus: hardware and software that require very real upkeep. Learn
+	how to manage gobs of machines right from the command line.
+</p><p class="ibm-no-print"><div id="dw-tag-this" class="ibm-no-print"><a class="ibm-external-link" onclick="jQuery.launchTagThisWindow(); return false;" href="#">Tag this!</a></div></p></div><div class="ibm-column ibm-second"><p class="leading"><b xmlns="">Date:</b>&nbsp; 13 May 2010<br /><b>Level: </b>&nbsp;Intermediate<br /><b>Comments:</b>   <span id="nCmts"><img alt="" src="http://www.ibm.com/developerworks/i/circle-preloader.gif" height="12" width="50"/><img alt="" src="http://www.ibm.com/i/gif" height="14" width="1"/></span><!-- Rating_Area_Begin --><!-- Ensure that div id is based on input id and ends with -widget --><input id="art-rating" name="ratinga" type="hidden" value="0"/><div id="art-rating-widget"></div><script language="JavaScript" type="text/javascript">
+// 
+   // widget div id and article id as args
+   window.artRating.init('art-rating-widget');
+// 
+</script><!-- Rating_Area_End --></p></div></div></div><!-- dW_Summary_Area_END --><!-- CONTENT_BODY --><div id="ibm-content-body"><!-- MAIN_COLUMN_BEGIN --><div id="ibm-content-main"><!-- Related_Searches_Area_Begin --><script type="text/javascript" language="javascript">
+	     capture_referrer();
+</script><div id="dw-related-searches-article" style="display:none"><div class="ibm-container ibm-alternate-two"><div class="ibm-container-body"><!--  START : HTML FOR ARTICLE SEARCH --><div id="article_results" style="display:block"></div><!--  END : HTML FOR ARTICLE SEARCH --></div></div></div><!-- Related_Searches_Area_End --><!-- MAIN_COLUMN_CONTAINER_BEGIN --><div class="ibm-container"><!-- MAIN_COLUMN_CONTENT_BEGIN -->
+	<p xmlns="">A cloud is ultimately constituted from hardware and software&#8212;components that 
+		require real and regular upkeep. Hardware failures demand repair or replacement; 
+		software requires patching, updates, and upgrades; and systems must be configured 
+		to keep ahead of demand and potential security threats. Application developers may 
+		find compute clouds soft, fluffy, and convenient, but a cloud administrator faces the 
+		grimy truth.
+	</p>
+	<p xmlns="">But you don't have to manage a cloud to face gritty issues. A LAN, a small server farm, and a 
+		compute cluster pose many of the same systems administration challenges. When the 
+		number of machines climbs, workaday tools such as Secure Shell (ssh), <code>scp</code>,
+		and <code>sftp</code> become cumbersome. This installment of 
+		<a href="http://www.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX:">Speaking
+		UNIX</a> looks at effective techniques to manage gobs of machines from the command 
+		line, starting with just a handful of systems and scaling upward.
+	</p>
+
+	<p xmlns=""><a name="brute"><span class="atitle">A brute force approach</span></a></p>
+		<p xmlns="">A simple and obvious approach to running a command on a collection of machines 
+			wraps the common ssh utility in a script. Assuming that you have distributed 
+			your public key to each remote system you want to access (to avoid typing a 
+			password each time), this script, named <em>mssh.sh,</em> runs a single command 
+			on each machine specified and prints the collected results at the end (see
+			<a href="#list1">Listing 1</a>).
+		</p>
+
+<br /><a xmlns="" name="list1"><b>Listing 1. mssh.sh</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+#!/bin/bash
+# Usage: mssh.sh "machine1 [machine2...]" "command"
+
+OUTPUT_LOG=/tmp/output-$$.log
+ERROR_LOG=/tmp/error-$$.log
+MACHINES=$1; shift
+COMMAND=$1; shift
+
+for machine in $MACHINES
+do
+    ssh $machine $COMMAND &gt;&gt;$OUTPUT_LOG.$machine 2&gt;&gt;$ERROR_LOG.$machine &amp;
+done
+
+wait
+
+cat $OUTPUT_LOG.*
+cat $ERROR_LOG.* &gt;&amp;2
+rm -f $OUTPUT_LOG.* $ERROR_LOG.*
+</pre></td></tr></table><br />
+
+		<p xmlns="">For example, the command:</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+mssh.sh "example.com joe@sample.com" "uptime -a"&gt;
+</pre></td></tr></table><br />
+
+		<p xmlns="">runs <code>uptime -a</code> on two hosts: example.com and sample.com.
+			The list of machine names is quoted to lump the names together into one argument, 
+			and the command is quoted for exactly the same reason. Each machine name must 
+			conform to the paradigms for ssh&#8212;either <code><em>hostname</em></code>,
+			if the remote user name is the same as the local user name, or 
+			<code><em>username@hostname</em></code> if the remote user name 
+			differs from the local login. Running:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+mssh.sh "example.com joe@sample.com" "uptime -a"&gt;
+</pre></td></tr></table><br />
+
+		<p xmlns="">produces something akin to this:</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ mssh.sh "example.com joe@sample.com" "uptime"
+example.com
+08:34:35 up 66 days, 17:29,  0 users,  load average: 0.40, 0.19, 0.07
+joe@sample.com
+08:34:28 up 104 days, 10:18,  0 users,  load average: 0.15, 0.10, 0.10
+</pre></td></tr></table><br />
+
+		<p xmlns="">This script is rudimentary but can be extended to include other features, such as 
+			a tunable timeout to prevent interminable delays when a single host is down 
+			(look at the <code>ssh -o</code> option) and a named directory to 
+			capture output. Indeed, many packages build on the spirit of this script to simplify 
+			distributed systems administration. One of those is the Distributed Shell (dsh).
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="better_tool"><span class="atitle">A better tool for the task</span></a></p>
+		<p xmlns="">Specifically designed to run shell commands on remote systems, dsh provides a 
+			handful of conveniences to make working with groups of machines easier. The shell
+			is available in both binary and source form. For binaries, consult your Linux&#174;
+			or UNIX&#174; distribution for the <code>libdshconfig</code> and 
+			<code>dsh</code> packages. For example, Ubuntu and Debian users 
+			can install dsh in one fell swoop with <code>apt-get</code>:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ sudo apt-get install libdshconfig1 libdshconfig1-dev dsh
+</pre></td></tr></table><br />
+
+		<p xmlns="">If you cannot find pre-built packages for your system, dsh is readily built from source 
+			code. Find the latest version of both the library and the utility, download and 
+			unpack both tarballs, and build and install both with the typical technique of 
+			<code>./configure; make; sudo make install</code> (see 
+			<a href="#list2">Listing 2</a>).
+		</p>
+
+<br /><a xmlns="" name="list2"><b>Listing 2. Building dsh from source</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ # Build and install the library first
+$ wget http://www.netfort.gr.jp/~dancer/software/downloads/libdshconfig-0.20.13.tar.gz
+$ tar xzvf libdshconfig-0.20.13.tar.gz
+$ cd libshconfig-0.20.13
+$ ./configure
+$ make
+$ sudo make install
+
+$ # Then build and install the utility
+$ wget http://www.netfort.gr.jp/~dancer/software/downloads/dsh-0.25.9.tar.gz
+$ tar xzvf dsh-0.25.9.tar.gz
+$ cd dsh-0.25.9
+$ ./configure
+$ make
+$ sudo make install
+</pre></td></tr></table><br />
+
+		<p xmlns="">The shell is a fairly small application; the <code>dsh</code> and
+			<code>dsh.conf</code> man pages provide all the details required 
+			to master the utility. For instance, to run <code>uptime</code>
+			across a set of hosts, as in the first example, you simply type:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ dsh --show-machine-names -m example.com -m joe@sample.com -- uptime
+example.com: 11:34:57 up 66 days, 20:29,  0 users,  load average: 0.04, 0.06, 0.01
+joe@sample.com: 11:35  up 2 days, 14:59, 8 users, load averages: 0.46 0.35 0.31
+</pre></td></tr></table><br />
+
+		<p xmlns="">You specify a machine with <code>-m</code>, and host names follow 
+			the same rules as ssh. The two dashes in the command line separate options for 
+			the <code>dsh</code> command itself from the command to run. 
+			Output appears in the order the machines are named. The command 
+			<code>--show-machine-names</code> prepends each machine name 
+			to whatever is emitted from the remote command.
+		</p>
+		<p xmlns="">If you tend to work with the same set or subset of machines, you can define one or 
+			more collections and specify a collection to operate on. You can create one global
+			collection and any number of groups. The file $HOME/.dsh/machines.list is the 
+			global collection. If you specify <code>dsh -a</code>, the given 
+			command runs on all machines listed in machines.list. Hence, if machines.list
+			contained:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+example.com
+joe@sample.com
+</pre></td></tr></table><br />
+
+		<p xmlns="">the command:</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+dsh -a --show-machine-names -- uptime
+</pre></td></tr></table><br />
+
+		<p xmlns="">would produce the same output as the previous command:</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ dsh -a --show-machine-names -- uptime
+example.com:  11:57:03 up 66 days, 20:51,  0 users,  load average: 0.29, 0.18, 0.07
+joe@sample.com: 11:57  up 2 days, 15:21, 8 users, load averages: 0.52 0.31 0.26
+</pre></td></tr></table><br />
+
+		<p xmlns="">You can create smaller or specialized collections of machines in individual files 
+			named $HOME/.dsh/group/<em>groupname,</em> where <em>groupname</em> is 
+			a meaningful name you assign. For example, if you create a file named 
+			<em>$HOME/.dsh/group/servers</em>, the command 
+			<code>dsh -g servers -- uptime</code> runs <code>uptime</code>
+			on all machines listed in the <em>servers</em> file.
+		</p>
+		<p xmlns="">Feel free to mix and match <code>-m</code> with 
+			<code>-a</code> and <code>-g</code> to extend the 
+			global list or a group, respectively. Additionally, you can use 
+			<code>--file <em>filename</em></code> to add all machines listed 
+			in <code><em>filename</em></code> to the list of hosts. By default, 
+			dsh runs commands in parallel. If you would like instead to run a command 
+			sequentially&#8212;one machine after another&#8212;specify 
+			<code>--wait-shell</code>.
+		</p>
+		<p xmlns="">While handy, dsh has one substantial detractor: It cannot copy files. If you want to 
+			deploy data, say, to more than one machine, you'll have to write a new script, 
+			adopt a distribution infrastructure such as <code>rsync</code>, or 
+			consider a more robust tool, such as Parallel SSH (pssh).
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="parallel"><span class="atitle">Just like ssh, only in parallel</span></a></p>
+		<p xmlns="">Like dsh, pssh aims to streamline the administration of lots of machines. In addition to
+			all the capabilities of dsh, pssh is able to copy files to and from a central server 
+			and kill processes across a bank of systems. The shell and its underlying library 
+			are written in Python, and pssh is easy to install, assuming that your system 
+			already has the Python interpreter and core libraries (see <a href="#list3">Listing 3</a>).
+		</p>
+
+<br /><a xmlns="" name="list3"><b>Listing 3. Installing pssh</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ # For systems with apt-get (apt-get installs Python if necessary)
+$ sudo apt-get install pssh
+
+$ # For all others, install Python and then continue
+$ wget http://peak.telecommunity.com/dist/ez_setup.py
+$ sudo python ez_setup.py
+$ wget http://parallel-ssh.googlecode.com/files/pssh-2.1.1.tar.gz
+$ tar xzvf pssh-2.1.1.tar.gz
+$ cd pssh-2.1.1
+$ sudo python setup.py install
+</pre></td></tr></table><br />
+
+		<p xmlns="">The pssh package installs five utilities: <code>parallel-ssh</code>,
+			<code>parallel-scp</code>, <code>parallel-slurp</code>,
+			<code>parallel-nuke</code>, and <code>parallel-rsync</code>.
+			Each utility operates on multiple hosts in parallel.
+		</p>
+			<ul xmlns="">
+				<li><code>parallel-ssh</code> runs a command on multiple 
+					hosts in parallel.
+				</li>
+				<li><code>parallel-scp</code>, as its name implies, copies files 
+					to multiple remote hosts in parallel.
+				</li>
+				<li><code>parallel-rsync</code>, true to its moniker, efficiently 
+					copies files to multiple hosts in parallel via the <code>rsync</code>
+					protocol.
+				</li>
+				<li><code>parallel-slurp</code> copies files from multiple remote 
+					hosts to a central host in parallel.
+				</li>
+				<li><code>parallel-nuke</code> kills processes on multiple remote 
+					hosts in parallel.
+				</li>
+			</ul>
+		<p xmlns="">Unlike dsh, the hosts are always named via a <em>manifest,</em> a file in which each 
+			line takes the form <code><em>host[:port] [user]</em></code>. Here's 
+			how to run <code>uptime</code> across a swath of hosts with 
+			<code>parallel-ssh</code>:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ parallel-ssh -h servers.txt uptime
+[1] 16:15:14 [SUCCESS] example.com 22
+16:15  up 2 days, 19:39, 9 users, load averages: 0.09 0.10 0.12
+[2] 16:15:28 [SUCCESS] sample.com 22
+16:15:28 up 67 days,  1:09,  0 users,  load average: 0.09, 0.07, 0.01
+</pre></td></tr></table><br />
+
+		<p xmlns="">The file servers.txt has two lines:</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+example.com
+sample.com joe
+</pre></td></tr></table><br />
+
+		<p xmlns="">By default, output from each instance of the command appears in stdout. The 
+			output is divided into sections, one section per host. However, you can name a 
+			directory to capture the stdout of each instance. For example, if you run the 
+			previous command and add <code>--outdir /tmp/uptime</code>,
+			a transcript of the command from each host is captured in a separate file in 
+			/tmp/uptime, as <a href="#list4">Listing 4</a> shows.
+		</p>
+
+<br /><a xmlns="" name="list4"><b>Listing 4. Capturing output in a separate file</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ parallel-ssh -h servers.txt uptime
+[1] 16:15:14 [SUCCESS] example.com 22
+[2] 16:15:28 [SUCCESS] sample.com 22
+
+$ ls -1 /tmp/uptime
+example.com
+sample.com
+
+$ cat /tmp/uptime/*
+16:22  up 2 days, 19:46, 9 users, load averages: 0.47 0.28 0.19
+16:22:32 up 67 days,  1:17,  0 users,  load average: 0.06, 0.04, 0.00
+</pre></td></tr></table><br />
+
+		<p xmlns="">The <code>parallel-ssh</code> utility can spawn a maximum of 32 
+			processes to connect to various nodes in parallel. If a remote command does 
+			not complete after 60 seconds, the connection is terminated. If your command 
+			requires more processing time, use <code>-t</code> to set a longer 
+			expiration time. (<code>parallel-scp</code> and <code>parallel-rsync</code>
+			do not have a default expiration, but you can specify one using 
+			<code>-t</code>.)
+		</p>
+		<p xmlns="">You can use <code>parallel-scp</code> to copy one or more files or 
+			directories to many machines in parallel. It should seem familiar if you've mastered 
+			the traditional <code>scp</code>.
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ parallel-scp -h servers.txt /etc/hosts /tmp/hosts
+[1] 16:49:38 [SUCCESS] example.com 22
+[2] 16:49:55 [SUCCESS] sample.com 22
+</pre></td></tr></table><br />
+
+		<p xmlns="">The previous command copies the local file /etc/hosts to /tmp/hosts on each 
+			machine listed in servers.txt. <code>parallel-rsync</code> works 
+			similarly, running <code>rsync</code> in parallel to manage files 
+			between the local host and the remote hosts listed in the manifest. 
+			<code>parallel-slurp</code> works something like 
+			<code>parallel-scp</code> in reverse but with one twist: It collects 
+			the named file from each remote machine but does not overwrite the local version 
+			of the file. Instead, <code>parallel-slurp</code> creates a subdirectory
+			for each remote machine and copies the named file to that location.
+		</p>
+		<p xmlns="">As a demonstration, imagine that you want to copy the /etc/hosts file from each remote
+			machine to the local machine. To achieve the goal, you'd execute 
+			<code>parallel-slurp -h servers.txt /etc/hosts</code>, as shown in
+			<a href="#list5">Listing 5</a>.
+		</p>
+
+<br /><a xmlns="" name="list5"><b>Listing 5. Copying /etc/hosts from remote machines to 
+		the local machine
+	</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ parallel-slurp -h servers.txt -L /tmp/hosts /etc/hosts hosts_file
+1] 17:03:32 [SUCCESS] example.com 22
+[2] 17:03:50 [SUCCESS] dcauto.gotdns.com 22
+
+$ ls -R /tmp/hosts
+/tmp/hosts/example.com:
+hosts_file
+
+/tmp/hosts/sample.com:
+hosts_file
+</pre></td></tr></table><br />
+
+		<p xmlns="">The <code>parallel-slurp</code> utility copies the named remote file 
+			to the local machine and stores each copy in a specific file in an individual 
+			subdirectory named after the remote host. Here, the remote file was /etc/hosts; 
+			each local copy is named <em>hosts_file.</em> The <code>-L</code> 
+			option specifies where to create the subdirectories. Here, the target was 
+			/tmp/hosts, yielding subdirectories /tmp/hosts/example.com and 
+			/tmp/hosts/sample.com.
+		</p>
+		<p xmlns="">Finally, <code>parallel-nuke</code> is the equivalent of running 
+			<code>ssh host killall</code>. The argument to 
+			<code>parallel-nuke</code> is a pattern. Any process running on the 
+			remote machine whose name matches the pattern is killed. The command is handy 
+			for stopping the same daemon on a collection of servers.
+		</p>
+		<p xmlns="">To use the pssh tools, you must configure public key access to each remote server you 
+			want to administer. If a pssh utility yields <code>[FAILURE]</code>,
+			verify your configuration by connecting with vanilla ssh. If you are prompted for a 
+			password, rectify the problem by installing your public key on the remote host and
+			try again. (For instructions, see the <code>ssh</code> and 
+			<code>ssh-keygen</code> man pages.)
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="machinery"><span class="atitle">Machinery en masse</span></a></p>
+		<p xmlns="">For 5, 10, or tens of machines, the tools described here likely suffice, especially for 
+			infrequent and ad hoc administration tasks. However, when the number of 
+			machines climbs higher or you repeat the same chores often, it may be prudent to 
+			consider other tools and subsystems designed to automate the maintenance of 
+			many machines. Reflexively, some software intended for large networks can be 
+			applied to a handful of machines, too. Finding the right tools and a balance 
+			between manual intervention and automation is a perennial challenge.
+		</p>
+		<p xmlns="">Here are some tools to consider:</p>
+			<ul xmlns="">
+				<li><strong><code>rsync</code>.</strong> This is an excellent 
+					tool for distributing files from a central server and keeping distributed 
+					file systems in sync. A <a href="http://www.ibm.com/developerworks/aix/library/au-spunix_rsync/index.html">prior 
+					installment of Speaking UNIX</a> covered <code>rsync</code>
+					in detail.
+				</li>
+				<li><strong>Puppet.</strong> Puppet is an increasingly popular subsystem for 
+					UNIX and Linux that automates configuration maintenance. According to 
+					its Web site, "[Puppet] provides a powerful framework to simplify the 
+					majority of technical tasks that [systems administrators] need to perform.
+					[A chore] is written as code in Puppet’s custom language, which is shareable
+					just like any other code." Puppet can describe dependencies between 
+					components, define the proper state of a file, query the state of the system,
+					and more. If you ever perform a chore more than once, chances are it's best
+					to capture it as a Puppet task.
+				</li>
+				<li><strong>Capistrano.</strong> Capistrano is another popular tool for remote 
+					systems administration. Its home page describes the tool well: "Simply put,
+					Capistrano is a tool for automating tasks on one or more remote servers. It 
+					executes commands in parallel on all targeted machines and provides a 
+					mechanism for rolling back changes across multiple machines. It is ideal for 
+					anyone doing any kind of system administration, either professionally or 
+					incidentally." Like Puppet, Capistrano is scripted. Scripts are based on the 
+					Ruby programming language and the Capistrano domain-specific extensions.
+					Here's an example:
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycodeliquid">
+task :search_libs, :hosts =&gt; "www.capify.org" do
+  run "ls -x1 /usr/lib | grep -i xml"
+end
+</pre></td></tr></table><br />
+
+					<p>This task is named <code>search_libs</code>. It connects to
+						www.capify.org and runs the command
+						<code>ls -x1 /usr/lib | grep -i xml</code>. Capistrano 
+						supports groups of machines via <em>roles,</em> among hundreds of 
+						other features. Tasks are launched via the <code>cap</code>
+						command, as in <code>cap search_libs</code>. Capistrano
+						is used widely among Ruby and Rails developers to deploy code to 
+						servers, but it's an excellent choice for automating most distributed 
+						systems administration tasks. Tutorials explain how to mix Capistrano 
+						with the Java&#8482; language, Perl, Python, and other programming 
+						languages and how to use Capistrano with application engines, such as 
+						Drupal and Expression Engine. Capistrano works best when paired with a 
+						source control system, but it's not required. You can distribute binaries
+						with the <code>put</code> operation.
+					</p>
+				</li>
+				<li><strong>Nagios.</strong> Maintenance is important, but so too is monitoring.
+					Outages and errors can wreak havoc on a network, especially when many 
+					systems are running identical configurations. Nagios is an open source 
+					monitor that watches servers, services, resources, and more. It's easy to 
+					install and deploy and can be used via any Web browser.
+				</li>
+			</ul>
+		<p xmlns="">You may also want to look at compute cluster tools such as Oak Ridge National Laboratories'
+			(ORNL) Cluster Command and Control (C3) and pdsh. C3 was developed to operate a 
+			massive compute cluster at ORNL and offers a number of command-line tools that 
+			increase systems manager productivity by reducing the time and effort required to 
+			operate and manage a cluster. The pdsh shell is similar in many ways to pssh but can 
+			also manage system images.
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="little_time"><span class="atitle">So many machines, so little time</span></a></p>
+		<p xmlns="">Using tools such as dsh and pssh save time and reduce errors. You can run the same 
+			command on a large number of systems and see the combined results almost instantly.
+			Manifests lump like machines together, too, reducing the risk of omissions. Puppet and
+			Capistrano can capture oft-repeated tasks in scripts. If you manage more then a handful
+			of machines, automation is key. See, even compute clouds can have a silver lining.
+		</p>
+<!-- CMA ID: 12345 --> <!-- Site ID: 1 --> <!-- XSLT stylesheet used to transform this file: dw-document-html-6.0.xsl --> <br /><p xmlns=""><a name="resources"><span class="atitle">Resources</span></a></p><p xmlns=""><b>Learn</b></p><ul xmlns=""><li>
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/aix/library/au-rsyncfamily/index.html">The rsync
+			family</a> (Federico Kereki, developerWorks, April 2009): Get to know 
+			<code>rsync</code> and a variety of utilities based on the 
+			<code>rsync</code> protocols.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	<br /><br /></li></ul><p xmlns=""><b>Get products and technologies</b></p><ul xmlns=""><li>
+		<a href="http://www.netfort.gr.jp/~dancer/software/downloads">dsh</a>: This shell can 
+			run a shell command on many machines in parallel.
+	<br /><br /></li><li>
+		<a href="http://parallel-ssh.googlecode.com">pssh</a>. Parallel ssh runs commands, copies 
+			files, and manages processes on many machines in parallel.
+	<br /><br /></li><li>
+		<a href="http://projects.puppetlabs.com/&gt;Puppet">Puppet</a>. Learn more about Puppet,
+			one of the most popular distributed systems administration tools.
+	<br /><br /></li><li>
+		<a href="http://www.capify.org/index.php/Capistrano">Capistrano</a>. Visit the Capistrano
+			site to learn more about scripting administration with Ruby and the Capistrano
+			domain-specific language.
+	<br /><br /></li><li>
+		<a href="http://www.nagios.org/">Nagios</a>. This open source monitoring platform can 
+			be combined with automated maintenance tools to improve the overall stability
+			of any size network.
+	<br /><br /></li><li>
+		<a href="http://www.csm.ornl.gov/torc/C3/">ORNL Cluster Command and Control</a>. The
+			C3 tools manage hundreds of compute nodes.
+	<br /><br /></li><li>
+		<a href="http://sourceforge.net/projects/pdsh/">pdsh</a>: This compute cluster management
+			tool can run a command on multiple machines in parallel.
+	<br /><br /></li></ul><p xmlns=""><b>Discuss</b></p><ul xmlns=""><li>
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	<br /><br /></li><li>
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L&#8212;technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools&#8212;technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	<br /></li></ul><p xmlns=""><a name="author"><span class="atitle">About the author</span></a></p><div xmlns="" class="ibm-container ibm-portrait-module ibm-alternate-two"><div class="ibm-container-body"><img src="images\Bio_mstreicher.jpg" class="dw-author-img" width="64" height="80" alt="Martin Streicher" /><p><a name="author1"></a>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</p></div></div><!-- MAIN_COLUMN_CONTENT_END --><!-- INLINE_COMMENTS_START --><p class="ibm-no-print"><span class="atitle"><a name="icomments">Comments</a></span></p><div id="dw-icomments-container" class="ibm-no-print"><div class="ibm-alternate-rule"><hr/></div><div class="ibm-alternate-rule"><hr/></div><!-- Comment_Script --><a id="comments" href="comments"/><script language="JavaScript" src="http://www.ibm.com/developerworks/js/insertcomment.js" type="text/javascript">//</script><div id="threadShow"></div><script language="JavaScript" type="text/javascript">
+// 
+jQuery('threadShow').insertComment('95%',5,'nCmts','icomments');
+// 
+</script></div><!-- INLINE_COMMENTS_END --><p class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p><a href="http://www.ibm.com/developerworks/ibm/trademarks/">Trademarks</a></p></div><!-- MAIN_COLUMN_CONTAINER_END --><!-- Rating_Meta_BEGIN --><!--Rating_Meta_BEGIN--><div xmlns="" class="metavalue">static.content.url=http://www.ibm.com/developerworks/js/artrating/</div><div xmlns="" class="metavalue">SITE_ID=1</div><div xmlns="" class="metavalue">Zone=AIX and UNIX</div><div xmlns="" class="metavalue">ArticleID=12345</div><div xmlns="" class="metavalue">ArticleTitle=Speaking UNIX 17: Managing multitudes of machines the mild-mannered way</div><div xmlns="" class="metavalue">publish-date=05132010</div><div xmlns="" class="metavalue">author1-email=martin.streicher@gmail.com</div><div xmlns="" class="metavalue">author1-email-cc=</div><script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href+'</div>');</script><!--Rating_Meta_END--><!-- Rating_Meta_END --></div><!-- MAIN_COLUMN_END--><!-- RIGHT_COLUMN_BEGIN --><div id="ibm-content-sidebar"><!-- RIGHT_COLUMN_CONTENT_BEGIN --><div xmlns="" class="ibm-container"><h2>Table of contents</h2><div class="ibm-container-body"><img src="//www.ibm.com/i/c.gif" width="1" height="1" alt=""/><ul class="ibm-bullet-list"><li><a href="#brute" class="ibm-feature-link">A brute force approach</a></li><li><a href="#better_tool" class="ibm-feature-link">A better tool for the task</a></li><li><a href="#parallel" class="ibm-feature-link">Just like ssh, only in parallel</a></li><li><a href="#machinery" class="ibm-feature-link">Machinery en masse</a></li><li><a href="#little_time" class="ibm-feature-link">So many machines, so little time</a></li><li><a href="#resources" class="ibm-feature-link">Resources</a></li><li><a href="#author" class="ibm-feature-link">About the author</a></li><li><a href="#icomments" class="ibm-feature-link">Comments</a></li></ul></div></div><!-- Dig_Deeper --><!-- High_Visibility_Offer --><!-- Special_Offers --><!-- RIGHT_COLUMN_CONTENT_END --></div><!-- RIGHT_COLUMN_END --><!-- CONTENT_BODY_END --></div></div><!-- CONTENT_END --><!-- END_IBM-PCON --></div><!-- FOOTER_BEGIN --><div id="ibm-page-tools"><!-- IBM page tools container --></div><div id="ibm-footer"><ul><li class="ibm-first"><a href="http://www.ibm.com/ibm/">About IBM</a></li><li><a href="http://www.ibm.com/privacy/">Privacy</a></li><li><a href="http://www.ibm.com/contact/">Contact</a></li><li><a href="http://www.ibm.com/legal/">Terms of use</a></li></ul></div><!-- FOOTER_END --><!-- END_IBM-TOP --></div><!-- SCRIPTS_INCLUDE_BEGIN --><!-- JQuery start --><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.dimensions-1.2.js">//</script><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.hoverIntent.minified.js">//</script><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.cluetip.js">//</script><script type="text/javascript" language="JavaScript">
+	jQuery.noConflict();     
+	// Put all your code in your document ready area
+	jQuery(document).ready(function(jQuery) {
+	// Do jQuery stuff using jQuery 
+	jQuery('a.dwauthor').cluetip({
+		local: true,
+		showTitle: false,
+		positionBy: 'bottomTop',
+		sticky: true,	
+		mouseOutClose: true,
+		closeText: '<img src="http://www.ibm.com/developerworks/js/jquery/cluetip98/i/x.gif" alt="Close"/>',
+		arrows: false,
+		dropShadow: true,
+		cluetipClass: 'dwbasic'
+		});   	
+	});
+ </script><!-- JQuery end --><div id="ibm-metrics"/></body></html>

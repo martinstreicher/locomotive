@@ -1,0 +1,542 @@
+<?xml-stylesheet type="text/xsl" href="../xsl/5.12/dw-document-html-5.12.xsl"?>
+<dw-document xmlns:dw="http://www.ibm.com/developerWorks/" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:noNamespaceSchemaLocation="../schema/5.12/dw-document-5.12.xsd">
+
+<dw-article local-site="worldwide" skill-level="3">
+<id cma-id="12345" domino-uid="" content-id="" original="yes" />
+<keywords content="Martin Streicher, UNIX, speaking UNIX, power user"/>
+
+<meta-dctype>
+	<cma-defined-type />
+</meta-dctype>
+
+<meta-dcsubject>
+	<cma-defined-subject />
+</meta-dcsubject>
+
+<meta-last-updated day="04" month="03" year="2010" initials="ma" />
+
+<content-area-primary name="aix" />
+
+<title>Speaking UNIX 14: The best-kept secrets of UNIX power users</title>
+
+<author jobtitle="Software Developer" email-cc="" email="martin.streicher@gmail.com">
+	<bio>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<i><a href="http://www.linux-mag.com">Linux Magazine</a>.</i> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</bio>
+	<img alt="Martin Streicher" src="images\Bio_mstreicher.jpg"/>
+	<author-name>
+		<GivenName>Martin</GivenName>
+		<FamilyName>Streicher</FamilyName>
+	</author-name>
+	<company-name>Pixel, Byte, and Comma</company-name>
+</author>
+
+<date-published day="05" month="03" year="2010" />
+
+<abstract>You don't have to break into a Watergate office to uncover the secrets of UNIX power
+	users. There's an informant, and this month he's spilling the beans.
+</abstract>
+
+<docbody>
+	<p>If you're wondering why I'm wearing dark sunglasses, a fake moustache, and a baseball 
+		cap (featuring the logo of professional curling team The Floating Stones), I'm on the 
+		lam. I'm dodging black remote-controlled helicopters, pasty-white systems 
+		administrators, and the combined forces of many daemons to bring you some of the 
+		best-kept secrets of UNIX<reg /> power users. Don your aluminum foil hat, and read on.
+	</p>
+
+	<heading refname="environment_variables" type="major">Save the environment variables</heading>
+		<p>Most UNIX users amass settings in shell startup files, such as .bashrc (for the 
+			Bash shell) and .zshrc (for the Z shell), to recreate a preferred shell environment 
+			time and again. Startup files can create aliases, set shell options, and set 
+			environment variables. Essential environment variables include HOME (which 
+			points to your home directory), PATH (which enumerates directories in which to 
+			search for applications), and MANPATH (which lists directories in which to search 
+			for man pages). To see which environment variables are set in your shell, type
+			<code type="inline">printenv</code>.
+		</p>
+		<p>Like the shell, you can customize many Linux<reg /> and UNIX applications through
+			environment variables. For example, the Java<trade /> subsystem requires that you 
+			define JAVA_HOME to point to the root of a Java run time. Similarly, the suite of 
+			Amazon Web Services (AWS) utilities mandates the use of AWS_CREDENTIAL_FILE
+			to point to valid private key credentials. Individual applications provide environment 
+			variables, too. The trick is discovering the variables. Luckily, the work need not 
+			involve breaking and entering; instead, simply consult the man page of the utility
+			at hand, and look for a section titled "Environment Variables."
+		</p>
+		<p>For example, the pager utility <code type="inline">less</code> defines a number of 
+			useful environment variables:
+		</p>
+			<ul>
+				<li>The environment variable LESS records command-line options, reducing
+					what you type each time you invoke the pager. For instance, if you
+					read a good number of log files, put:
+
+<code type="section" width="50%">
+export LESS='--RAW-CONTROL-CHARACTERS --squeeze-lines --ignore-case'
+</code>
+
+					<p>in a shell startup file to interpret control characters (usually syntax 
+						coloring), reduce runs of blank lines to a single line, and ignore 
+						case in string matches, respectively. If you work with code:
+					</p>
+
+<code type="section" width="50%">
+export LESS='--LINE-NUMBERS --quit-if-one-screen --quit-on-intr'
+</code>
+
+				</li>
+				<li>The environment setting named LESSKEY points to a file of key bindings.
+					You can use key bindings to customize the behavior of
+					<code type="inline">less</code>, say, to match the behavior of another 
+					pager or editor.
+				</li>
+				<li>Like the shell, <code type="inline">less</code> can also maintain history 
+					between uses. Set LESSHISTFILE and LESSHISTSIZE to point to a file of 
+					persist commands and to set the maximum number of commands to 
+					record, respectively.
+				</li>
+			</ul>
+		<p>Another good application of environment variable can be found in the GNU Compiler 
+			Collection (GCC). GCC defines a variety of environment variables to customize its 
+			operation. LIBRARY_PATH, as its name implies, is a list of directories to search for 
+			libraries to link to; COMPILER_PATH works much like the shell's PATH but is used 
+			internally by GCC to find subprograms used during the compilation process.
+		</p>
+		<p>If you write code and build binaries for a single platform, you may never use these 
+			environment variables, However, if you cross-compile the same code for a number 
+			of platforms, such variables are essential for accessing the varied headers and 
+			libraries for each platform. You might set variables to one collection of values for 
+			one kind of machine and set the values to another collection for a system of an 
+			alternate flavor.
+		</p>
+		<p>In fact, you can take a cue from GCC: Maintain many sets of environment variables per 
+			application, and switch from one pool to another depending on your assignment.
+			One approach is to keep an environment initialization file in each project directory
+			and <code type="inline">source</code> it as needed. For instance, many Ruby 
+			developers use such a solution to switch between Ruby versions, changing 
+			environment variables PATH, GEM_HOME, and GEM_PATH as needed to hop from 
+			one version to another.
+		</p>
+
+	<heading refname="landscape" type="major">Dotting the landscape</heading>
+		<p>Much like environment variables, many Linux and UNIX applications provide a <i>dot</i>
+			file<mdash />a small file whose name begins with a period<mdash />for 
+			customizations. However, unlike environment variables that capture a handful of 
+			flags or a relatively tiny amount of information, a dot file can be much more 
+			extensive, even complex, with its own peculiar syntax rules and programming 
+			language. A dot file is a convenient place to keep options and settings, because 
+			(per UNIX and Linux heritage) file names that begin with a dot do not appear in 
+			a standard directory listing. (Use <code type="inline">ls -a</code> to see these 
+			so-called <i>hidden files.</i>) Except for its special name, a dot file is a plain text
+			file.
+		</p>
+		<p>A dot file is usually found in your home directory, but some utilities look for a dot file 
+			in the present working directory, too. If an application supports more than one dot 
+			file, the program typically has precedence rules to favor one file over another. In 
+			general, a "local" dot file<mdash />one found in the current working directory<mdash />has
+			highest precedent, followed by one in your home directory, and then by a system-wide
+			configuration. None, one, or all of these files can exist, and it's up to the application
+			to treat the files as mutually exclusive or incremental. In the former case, the first
+			dot file found in the precedent chain is definitive. In the latter case, the 
+			configuration might cascade or be merged into a final result.
+		</p>
+		<p>An example of a simple dot file is <code type="inline">less</code>'s key bindings file,
+			located in $HOME/.lesskey. Each line in the file is a pair: a keystroke and a command,
+			resembling something like this snippet:
+		</p>
+
+<code type="section" width="65%">
+\r        forw-line
+\n        forw-line
+e         forw-line
+j         forw-line
+^E        forw-line
+^N        forw-line
+k         back-line
+y         back-line
+^Y        back-line
+</code>
+
+		<p>At the other extreme, consider <code type="inline">fetchmail</code>. The utility 
+			picks up e-mail from multiple remote sources and delivers the messages locally. 
+			The operation of the utility is controlled solely through $HOME/.fetchmailrc. (See
+			the man page for its many options.) <code type="inline">cron</code>,
+			<code type="inline">git</code>, <code type="inline">vi</code>, and many other 
+			commands recognize dot files, too. Again, read the man page for the application
+			to learn what you configure in a dot file. Some dot files are rich enough to warrant
+			a separate man page, such as <code type="inline">crontab</code>.
+		</p>
+
+	<heading refname="secrets" type="major">Shhh . . . secrets about SSH</heading>
+		<p>Secure Shell (SSH) is a rich subsystem used to log in to remote systems, copy files, 
+			and tunnel through firewalls<mdash />securely. And because SSH is a subsystem,
+			it offers plenty of options for customizing and streamlining its operation. In fact,
+			SSH provides a "dot directory" named $HOME/.ssh to contain all its data. (Your .ssh
+			directory must be mode 600 to preclude access by others.) Specifically, the file
+			$HOME/.ssh/config can define lots of shortcuts, including aliases for machine names,
+			per-host access controls, and more.
+		</p>
+		<p>Here is a typical block f customize SSH for a specific host:</p>
+
+<code type="section" width="65%">
+Host worker
+HostName worker.example.com
+IdentityFile ~/.ssh/id_rsa_worker
+User joeuser
+</code>
+
+		<p>Each block in ~/.ssh/config configures one or more hosts. Separate individual blocks 
+			with a blank line. This block uses four options: <code type="inline">Host</code>,
+			<code type="inline">HostName</code>, <code type="inline">IdentityFile</code>,
+			and <code type="inline">User</code>. <code type="inline">Host</code> establishes
+			a nickname for the machine specified by <code type="inline">HostName</code>.
+			A nickname allows you to type <code type="inline">ssh worker</code> instead of
+			<code type="inline">ssh worker.example.com</code>. Moreover, the
+			<code type="inline">IdentityFile</code> and <code type="inline">User</code> options
+			dictate how to log in to <code type="inline">worker</code>. The former option 
+			points to a private key to use with the host; the latter option provides the login ID.
+			Thus, this block is the equivalent of the command:
+		</p>
+
+<code type="section" width="65%">
+ssh joeuser@worker.example.com -i ~/.ssh/id_rsa_worker
+</code>
+
+		<p>A powerful but little-known option is <code type="inline">ControlMaster</code>. If set,
+			multiple SSH sessions to the same host share a single connection. Once the first
+			connection is established, credentials are not required for subsequent commands.
+			This ability eliminates the drudgery of typing a password each and every time you 
+			connect to the same machine. <code type="inline">ControlMaster</code> is so 
+			handy, you'll likely want to enable it for every machine. That's accomplished easily
+			enough with the host wildcard, <code type="inline">*</code>:
+		</p>
+
+<code type="section" width="65%">
+Host *
+ControlMaster auto
+ControlPath ~/.ssh/master-%r@%h:%p
+</code>
+
+		<p>As you might guess, a block tagged <code type="inline">Host *</code> applies to every 
+			host, even those not named in the config file. <code type="inline">ControlMaster auto</code>
+			tries to reuse an existing connection but will create a new connection if a shared
+			connection cannot be found. <code type="inline">ControlPath</code> points to a 
+			file to persist a control socket for sharing. <code type="inline">%r</code> is 
+			replaced by the remote login user name, <code type="inline">%h</code> is 
+			replaced by the target host name, and <code type="inline">%p</code> stands in for 
+			the port used for the connection. (You can also use <code type="inline">%l</code>:
+			It is replaced with the local host name.) The specification above creates control 
+			sockets with file names akin to:
+		</p>
+
+<code type="section" width="65%">
+master-joeuser@worker.example.com:22
+</code>
+
+		<p>Each control socket is removed when all connections to the remote host are severed.
+			If you want to know which machines you are connected to at any time, simply type
+			<code type="inline">ls ~/.ssh</code> and look at the host name portion of the 
+			control socket (<code type="inline">%h</code>).
+		</p>
+		<p>The SSH configuration file is so expansive, it too has its own man page. Type
+			<code type="inline">man ssh_config</code> to see all possible options. And here's a
+			clever SSH trick: You may know you can tunnel from a local system to a remote one
+			via SSH. The (albeit bizarre) command line to use looks something like this:
+		</p>
+
+<code type="section" width="65%">
+$ ssh example.com -L 5000:localhost:3306
+</code>
+
+		<p>This command says, "Connect via example.com and establish a tunnel between port
+			5000 on the local machine and port 3306 [the MySQL server port] on the machine
+			named 'localhost.'" Because <code type="inline">localhost</code> is interpreted on 
+			example.com as the tunnel is established, <code type="inline">localhost</code> is
+			example.com. With the outbound tunnel<mdash />formally called a <i>local
+			forward</i><mdash />established, local clients can connect to port 5000 and talk 
+			to the MySQL server running on example.com.
+		</p>
+		<p>This is the general form of tunneling:</p>
+
+<code type="section" width="65%">
+$ ssh <i>proxyhost</i> <i>localport</i>:<i>targethost</i>:<i>targetport</i>
+</code>
+
+		<p>Here, <code type="inline"><i>proxyhost</i></code> is a machine you can access via SSH
+			and one that has a network connection (not via SSH) to 
+			<code type="inline"><i>targethost</i></code>. <code type="inline"><i>localport</i></code>
+			is a non-privileged port (any unused port above 1024) on your local system, and
+			<code type="inline"><i>targetport</i></code> is the port of the service you want 
+			to connect to.
+		</p>
+		<p>The previous command tunnels <i>out</i> from your machine to the outside world.
+			You can also use SSH to tunnel <i>in,</i> or connect to your local system from
+			the outside world. This is the general form of an inbound tunnel:
+		</p>
+
+<code type="section" width="65%">
+$ ssh <i>user</i>@<i>proxyhost</i> -R <i>proxyport</i>:<i>targethost</i><i>targetport</i>
+</code>
+
+		<p>When establishing an inbound tunnel<mdash />formally called a <i>remote forward</i><mdash />the
+			roles of <code type="inline"><i>proxyhost</i></code> and
+			<code type="inline"><i>targethost</i></code> are reversed: The target is your 
+			local machine, and the proxy is the remote machine. <code type="inline"><i>user</i></code>
+			is your login on the proxy. This command provides a concrete example:
+		</p>
+
+<code type="section" width="65%">
+$ ssh joe@example.com -R 8080:localhost:80
+</code>
+
+		<p>The command reads, "Connect to example.com as joe and connect the remote port 
+			8080 to local port 80." This command gives users on example.com a tunnel to Joe's
+			machine. A remote user can connect to 8080 to hit the Web server on Joe's 
+			machine.
+		</p>
+
+	<heading refname="history" type="major">Rewriting with history</heading>
+		<p>If you spend a lot of time at the shell prompt, recording shell history can save time
+			and typing. But there are a few annoyances with history, if left unmodified: History
+			records duplicate commands, and multiple shell instances can clobber each other's
+			history. Both complications are easily overcome. Add two lines to your .bashrc:
+		</p>
+
+<code type="section" width="65%">
+export HISTCONTROL=ignoreboth
+shopt -s histappend
+</code>
+
+		<p>The first line removes consecutive duplicate commands from your shell history. If 
+			you want to remove all duplicates independent of sequence, change
+			<code type="inline">ignoreboth</code> to <code type="inline">erasedups</code>.
+			The second line appends a shell's history to your history file when the shell exits.
+			By default, the Bash history file is named (yes, a dot file) <i>~/~/.bash_history.</i>
+			You can change its location by setting (yes, an environment variable) HISTFILE. If
+			you want to save a shell's most recent 10,000 commands in a history file with 
+			100,000 entries, add <code type="inline">export HISTSIZE=10000 HISTFILESIZE=100000</code>
+			to your shell startup file. To see a shell's history, type <code type="inline">history</code>
+			at any prompt.
+		</p>
+		<p>Saving a history of commands is of little use if you cannot recall it. That's the purpose
+			of the shell <code type="inline">!</code>, or bang, operator:
+		</p>
+			<ul>
+				<li><code type="inline">!!</code> ("bang bang") repeats the last command
+					in its entirety.
+				</li>
+				<li><code type="inline">!:0</code> is the name of the previous command.</li>
+				<li><code type="inline">!^</code> is the first argument of the previous 
+					command. <code type="inline">!:2</code>, <code type="inline">!:3</code>,
+					and so on, ending with <code type="inline">!$</code> are the second,
+					third, and eventually the last argument of the previous command.
+				</li>
+				<li><code type="inline">!*</code> is all the arguments of the last command,
+					except the command name.
+				</li>
+				<li><code type="inline">!<i>n</i></code> repeats the command numbered
+					<code type="inline"><i>n</i></code> in history.
+				</li>
+				<li><code type="inline">!<i>handle</i></code> repeats the last command that
+					begins with the string of characters in <code type="inline"><i>handle</i></code>.
+					For example, <code type="inline">!ca</code> would repeat the last
+					command that began with the characters <code type="inline">ca</code>,
+					such as <code type="inline">cat README</code>.
+				</li>
+				<li><code type="inline">!?<i>handle</i></code> repeats the last command that
+					<i>contains</i> the string of characters in <code type="inline"><i>handle</i></code>.
+					For example, <code type="inline">!?READ</code> would also match
+					<code type="inline">cat README</code>.
+				</li>
+				<li><code type="inline">^<i>original</i>^<i>substitution</i></code> replaces
+					the <i>first</i> occurrence of <code type="inline"><i>original</i></code>
+					with <code type="inline"><i>substitution</i></code>. For example, if
+					the previous command was <code type="inline">cat README</code>,
+					the command <code type="inline">^README^license.txt</code> would
+					yield a new command <code type="inline">cat license.txt</code>.
+				</li>
+				<li><code type="inline">!:gs/<i>original</i>/<i>substitution</i></code> replaces
+					<i>all</i> occurrences of <code type="inline"><i>original</i></code> with
+					<code type="inline"><i>substitution</i></code>. (<code type="inline">!:gs</code>
+					means "global substitution.")
+				</li>
+				<li><code type="inline">!-2</code> is the penultimate command,
+					<code type="inline">!-3</code> is third most recent command, and so 
+					on.
+				</li>
+			</ul>
+		<p>You can even combine history expressions to yield sigil soup such as 
+			<code type="inline">!-2:0 -R !^ !-3:2</code>, which would expand to the command 
+			name of the penultimate command, followed by <code type="inline">-R</code>, the
+			first argument of the previous command, and the second argument of the third most
+			recent command. To make such cryptic commands more readable, you can expand 
+			history references as you type. Type the command <code type="inline">bind Space:magic-space</code>
+			at any prompt, or add it to a startup file to bind the Space key to the function
+			magic-space, which expands history substitutions inline.
+		</p>
+
+	<heading refname="expand" type="major">Expand-o-Matic</heading>
+		<p>With so much code available on the Internet, you likely download tens of files every day.
+			And chances are, all those files are packaged differently<mdash />a ZIP file here, a RAR
+			file there, and tarballs galore, albeit each one compressed with a different utility.
+			Remembering how to decompress and expand each package format can be taxing. So,
+			why not capture all those tasks in a single command? This function is widely available
+			in many sample dot files:
+		</p>
+
+<code type="section" width="65%">
+ex () {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1        ;;
+      *.tar.gz)    tar xzf $1     ;;
+      *.bz2)       bunzip2 $1       ;;
+      *.rar)       rar x $1     ;;
+      *.gz)        gunzip $1     ;;
+      *.tar)       tar xf $1        ;;
+      *.tbz2)      tar xjf $1      ;;
+      *.tgz)       tar xzf $1       ;;
+      *.zip)       unzip $1     ;;
+      *.Z)         uncompress $1  ;;
+      *.7z)        7z x $1    ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+</code>
+
+		<p>This function, <code type="inline">ex</code>, expands 11 file formats and can be extended
+			if you deal with some other package type. Once defined<mdash />say, in a shell startup
+			file<mdash />you can simply type <code type="inline">ex <i>somefile</i></code>, where
+			<code type="inline"><i>somefile</i></code> ends with one of the named extensions:
+		</p>
+
+<code type="section" width="65%">
+$ ls
+source
+$ tar czf source.tgz source
+$ ls -1
+source
+source.tgz
+$ rm -rf source
+$ ex source.tgz
+$ ls -1
+source
+source.tgz
+</code>
+
+		<p>By the way, if you ever misplace something you downloaded today, run
+			<code type="inline">find</code> to discover it:
+		</p>
+
+<code type="section" width="65%">
+$ find ~ -type f -mtime 0
+</code>
+
+		<p>The command <code type="inline">-type f</code> looks for plain files, and
+			<code type="inline">-mtime 0</code> looks for files created since midnight
+			of the current day.
+		</p>
+
+	<heading refname="secrets" type="major">Many more secrets</heading>
+		<p>There are a lot more expert secrets to be discovered. Search the Web for "shell
+			auto-complete" to learn more about automatic completion, a feature that 
+			provides context-sensitive expansions as you type a command. Also search for
+			"shell prompts" to learn how to customize your shell prompt. You can make it
+			colorful; you can show your current working directory or Git branch; you can also
+			show the history number<mdash />a convenient reference if you recall history a
+			good deal. For working examples, search Github for "dot files." Many experts post
+			their shell configurations on Github.
+		</p>
+		<p>Now, if you'll excuse me, I have to find my wig and bronzer. It's not easy to hide when
+			you resemble Groucho Marx.
+		</p>
+</docbody>
+
+<resources>
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://dotfiles.org/">dotfiles.org</a>: You can find a large collection of dot 
+			files online.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://en.wikipedia.org/wiki/Unix_shell">UNIX shells</a>: Learn more about
+			UNIX shells.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.gnu.org/software/bash/">GNU Bash shell</a>: Find documentation 
+			and source for the GNU Bash Shell on its project page.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	</resource>
+
+	<resource resource-category="Learn">
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	</resource>
+
+	<resource resource-category="Get products and technologies">
+		<a href="http://www.github.com">Github</a>: Github houses thousands of Git repositories,
+			including the personal dot files of many expert users. Search for "dot files" to find 
+			examples. (You can learn more about Git online and in the
+			<a href="http://github.com/guides/home">Github Guides</a>.)
+	</resource>
+
+	<resource resource-category="Discuss">
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	</resource>
+
+	<resource resource-category="Discuss">
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L<mdash />technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools<mdash />technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=748amp;&amp;amp;cat=72">Virtualization<mdash />technical</a></li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	</resource>
+</resources>
+
+	</dw-article>
+</dw-document>

@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2 {
+    font-size: 125%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    padding: 5px;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  div.image {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 1em;
+    text-align: center;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+    visibility: visible;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  th, td {
+    padding: 4px 12px;
+  }
+
+  td {
+    vertical-align: top;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+    vertical-align: bottom;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<p>
+  <em>
+    Abstract: Unix provides a number of technologies for interprocess communication, or cooperative computing between two or more applications. Shared memory is the fastest and most flexible of the techniques and is surprisingly easy to implement.
+  </em>
+</p>
+
+
+<h1>
+  Interprocess Communication with Shared Memory</h1>
+
+<p>
+  Based on appearance, a Unix application has sole command of the underlying host. It has ready and free access to the processor; its memory is sacrosanct; and attached devices serve the application's every whim. But true to the maxim "Appearances can be deceiving," such sovereignty is a clever illusion. A Unix system runs any number of applications simultaneously, sharing its finite physical resources judiciously among all. CPU capacity is doled out in slices; application images are constantly shuffled in and out of real memory; and device access is driven by demand and policed by access rights. While your shell prompt blinks attentively, a Unix machine teems with activity.</p>
+
+<p>
+  Complexity notwithstanding, most applications are happily oblivious to shared tenancy. However, you can write applications to interact with each other. For example, one application could collect or generate data, while another monitors progress and analyzes the information on-the-fly. Chat, an instant exchange of messages, is another instance of cooperating code, where the application both transmits and receives data from a peer. ssh is another tandem, potentially coordinating between two entirely different hosts. In each instance, code connects to other, independent code to swap information, often using a protocol to negotiate and control the interchange.</p>
+
+<p>
+  Unix provides a number of technologies for such <i>interprocess communication</i>. Some techniques provide for communication on the same host, while others facilitate host-to-host exchanges. Speed varies among the techniques, too, so you must choose that option that best suits your requirements. Coordination -- enforcing timing and exclusivity -- is almost always required, too. For example, if one application produces data and another consumes it, the consumer must pause and wait for the producer whenever it exhausts the shared pool. Reflexively, the producer may slow or stall if the consumer cannot deplete the pool quickly enough.</p>
+
+<p>
+  Table 1 summarizes the forms of interprocess communication available on a typical Unix system.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Scope</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>File</td>
+      <td>Data is written to and read from a typical Unix file. Any number of processes can interoperate.</td>
+      <td>Local</td>
+      <td>Sharing large data sets</td>
+    </tr>
+
+    <tr>
+      <td>Pipe</td>
+      <td>Data is read from and written to using dedicated file descriptors. Communication occurs only between a parent and child process.</td>
+      <td>Local</td>
+      <td>Simple data sharing, such as producer and consumer</td>
+    </tr>
+
+    <tr>
+      <td>
+        Named Pipe
+      </td>
+      <td>Data is read from and written to using dedicated file descriptors. Communication can occur between any two peer processes on the same host.</td>
+      <td>Local</td>
+      <td>Producer and consumer, or command-and-control, as demonstrated with the MySQL server and its command-line query utility</td>
+    </tr>
+
+    <tr>
+      <td>
+        Signal
+      </td>
+      <td>An interrupt alerts the application to a specific condition.</td>
+      <td>Local</td>
+      <td>Cannot transfer data in a signal, so mostly useful for process management</td>
+    </tr>
+
+    <tr>
+      <td>Shared Memory</td>
+      <td>Information is shared by reading and writing from a common segment of memory.</td>
+      <td>Local</td>
+      <td>Cooperative work of any kind, especially if security is required</td>
+    </tr>
+
+    <tr>
+      <td>
+        Socket
+      </td>
+      <td>After special setup, data is transferred using common input/output operations</td>
+      <td>Local or Remote</td>
+      <td>Network services such as ftp, ssh, and the Apache Web server</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  As mentioned above, each technique suits a particular need. Assuming coordination between multiple processes is roughly equally intricate, each approach has advantages and disadvantages.</p>
+
+<ul>
+    <li>Sharing data via a common Unix file is simple, since it uses familiar file operations. However, sharing data via the file system is inherently slow, since disk input and output operations cannot match the expediency of memory. Further, it is difficult to coordinate reads and writes via a file only, and ultimately, saving sensitive data in a file is not secure, since root and other privileged users can access the information. In a sense, files are best used when viewed as read-only or write-only.</li>
+
+    <li>The pipe and named pipe are also simple mechanisms to use, using two standard file descriptors on each end of the connection, one exclusive for read and another exclusive for write. A pipe, though, can only be used between a parent and child process, and cannot be used between two arbitrary processes. The named pipe addresses the latter shortcoming, and is an excellent choice for data exchange on the same system. However, neither a pipe nor named pipe provides random access, however, since each operates as a first-in-first-out (FIFO) device.</li>
+
+    <li>A signal cannot transfer data from one process to another. In general, signals should only be used to communicate exceptional conditions between one process and another.</li>
+
+    <li>Shared memory is well-suited to larger collections of data, and since it uses memory, grants fast, random access. Shared memory is slightly more complicated to implement, but is otherwise an excellent choice for <i>intra</i>host collaboration between multiple processes.</li>
+
+    <li>A socket functions much like a named pipe, but can span hosts. <i>Local sockets</i> (also called <i>Unix sockets</i>) are restricted to local (same host) connectivity. <i>Inet</i> and <i>Inet6</i> sockets, which use the IPv4 and IPv6 Internet protocols, respectively, accept remote connections (and local connections via the local machine's Internet addressing). The socket is he obvious choice for any networking application, such as distributed processing or a Web browser. Coding is a little more complicated than named pipes, but the pattern is well-established and well-documented in any Unix network programming book.</li>
+  </ul>
+
+<p>
+  Ignoring <i>inter</i>host applications, let's look at shared memory for interprocess communication on the same host.
+  </p>
+
+
+<h2>
+  How Shared Memory Works</h2>
+
+<p>
+  As its name implies, shared memory makes a segment of memory accessible to more than one process. Special system calls, or requests to the Unix kernel, allocate and free the memory and set permissions; common read and write operations put and get data from the region.</p>
+
+<p>
+  Shared memory is not drawn from a process's own memory -- that memory is always private. Instead, shared memory is allocated from the system's free memory pool and is annexed by each process that wants access. Annexation is called <i>mapping</i>, where the shared segment of memory is assigned local addresses in each process' own address space. Figures 1-4 depict the process.</p>
+
+<ol>
+	<li>Assume two processes, A and B, are running on the same system, as shown in Figure 1, and have been specifically coded to coordinate and share information via shared memory. A and B have disproportionate sizes in the figure to emphasize that the applications need not be identical.
+
+	<div class="image">
+	  <img src="images/fig1.png" /></div></li>
+
+	<li>In figure 2, Process A requests a segment of shared memory. Process A initializes the memory segment, preparing it for use. Process A also names the segment so that other processes can find it. Typically, a segment name is not dynamically assigned; instead, it is well-known, such as a constant in a header file, and easily referenced from other code.</li>
+
+	<li>Process A annexes, or maps, the shared memory segment into its own address space. Process B finds the segment via its named and also maps the segment into its address space. This is shown in Figure 3. Both processes are enlarged by the size of the shared memory segment. </li>
+
+	<li>Finally, in figure 4, Process A and B can now read and write from the shared memory segment freely. The shared memory is treated the same as local process memory. <tt>read()</tt> and <tt>write()</tt> operate as normal.</li>
+  </ol>
+
+<p>
+  Much of the work shown in the figures is captured in the Unix shared memory application programmatic interface (API). In fact, there are two variants of the shared memory API, the POSIX API and the older, but no less effective, System V API. Since POSIX is the ratified standard and likely found on Unix and Linux and derivations of those systems, let's use that version. Additionally, the POSIX API uses simple file descriptors for read and write, so should seem much more familiar.</p>
+
+<p>
+  POSIX provides five entry points to create, map, synchronize and undo shared memory segements.</p>
+
+<ul>
+  <li><tt>shm_open()</tt> creates a shared memory region or attaches to an existing, named region. This system call returns a file descriptor.</li>
+
+  <li><tt>shm_unlink()</tt> deletes a shared memory region given a file descriptor (returned from <tt>shm_open()</tt>. The region is not actually removed until all processes accessing the region exit, much like any file in Unix. However, once <tt>shm_unlink()</tt> is called (typically by the originating process), no other processes can access the region.</li>
+
+  <li><tt>mmap()</tt> maps a shared memory region into the process's memory. This system call requires the file descriptor from <tt>shm_open()</tt> and returns a pointer to memory. (In some cases, you can also map a file descriptor to a plain file or another device into memory, too. A discussion of those options is beyond the scope of this introduction; consult the <tt>mmap()</tt> documentation for your operating system for specifics.)</li>
+
+  <li><tt>munmap()</tt> is the inverse of <tt>mmap()</tt>.</li>
+
+  <li><tt>msync()</tt> is used to synchronize a shared memory segment with the file system, a technique useful when mapping a file into memory.</li>
+  </ul>
+
+<p>
+  The pattern for shared memory is to create a segment with <tt>shm_open()</tt>, size it with <tt>write()</tt> or <tt>ftruncate()</tt>, map it into process memory with <tt>mmap()</tt> and do the work required with one or more additional participants. To finish, the originating process calls <tt>munmap()</tt> and <tt>shm_unlink()</tt> and exits.</p>
+
+
+<h2>
+  A Sample Application
+  </h2>
+
+<p>
+  Listing 1 shows a very small shared memory example. (Code derived from John Fusco's book, <i>The Linux Programmer's Toolbox</i>,  and used with the permission of the author.) The code implements a parent and child process that communicate via a shared memory segment.</p>
+
+<pre>
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/file.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;sys/wait.h&gt;
+
+void error_and_die(const char *msg) {
+  perror(msg);
+  exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[]) {
+  int r;
+
+  const char *memname = "sample";
+  const size_t region_size = sysconf(_SC_PAGE_SIZE);
+
+  int fd = shm_open(memname, O_CREAT | O_TRUNC | O_RDWR, 0666);
+  if (fd == -1)
+    error_and_die("shm_open");
+
+  r = ftruncate(fd, region_size);
+  if (r != 0)
+    error_and_die("ftruncate");
+
+  void *ptr = mmap(0, region_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (ptr == MAP_FAILED)
+    error_and_die("mmap");
+  close(fd);
+
+  pid_t pid = fork();
+
+  if (pid == 0) {
+    u_long *d = (u_long *) ptr;
+    *d = 0xdbeebee;
+    exit(0);
+  }
+  else {
+    int status;
+    waitpid(pid, &status, 0);
+    printf("child wrote %#lx\n", *(u_long *) ptr);
+  }
+
+  r = munmap(ptr, region_size);
+  if (r != 0)
+    error_and_die("munmap");
+
+  r = shm_unlink(memname);
+  if (r != 0)
+    error_and_die("shm_unlink");
+
+  return 0;
+}
+</pre>
+
+<p>
+  Here are some highlights from the code:</p>
+
+<ul>
+  <li>The call to shm_open() should look familar: it is much like the <tt>open()</tt> function, including how to initialize the segment and permissions. Here, the segment is world-readable and world-writeable. The next unused file descriptor is returned if the call is successful; otherwise, <tt>-1</tt> is returned and errno is set accordingly.</li>
+
+  <li><tt>ftruncate()</tt> sizes the file to <tt>region_size</tt> bytes, which was previously set to the system's standard page size. <tt>sysconf()</tt> is provided as part of libc. (You can use the shell utility <i>getconf</i> to explore your system's configuration settings, too.)</li>
+
+  <li><tt>mmap()</tt> annexes the shared memory segment and returns a pointer suitable for reading and writing bytes directly from the segment. PROT_READ and PROT_WRITE indicate that the pages in the segment can be read from and written to, respectively. MAP_SHARED specifies that any changes to the memory segment should be "public" to all cooperating processes.</li>
+
+  <li>The computation part of the code should seem familiar if you've worked at all with <tt>fork()</tt>: After the fork, the parent and child have copies of all open file descriptors and data values, so the pointer works for both. <tt>pid</tt>, however, differs. The child gets 0, the parent gets the process ID of the child, and the value of the variable determines which of the if/then/else branches to take. The child writes some bytes to the pointer and then exits. The parent waits for the child to exit and then reads what was written. </li>
+
+  <li>Before the parent can exit, it must free the shared memory. <tt>munmap()</tt> and <tt>shm_unlink()</tt> do the trick.</li>
+  </ul>
+
+<p>
+  This example is very elementary. A real application would use semaphores or other techniques to control reading and writing to the shared segment. Such control is typically application-specific, and you can find many examples in the BSD and Linux source, if your Unix is not open source. </p>
+
+<h2>
+  All for One
+  </h2>
+
+<p>
+  Because Unix runs many applications seemingly at the same time, it's an ideal platform for monitoring, data collection, cooperative and distributed computing, and client/server applications. Shared memory is the fastest of the inteprocess communication options available, and is quite flexible. You can map files into memory as well, an ideal solution for accelerating data access. </p>
+</body>
+</html>

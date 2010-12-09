@@ -1,0 +1,560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Speaking UNIX: Creating great graphical applications with shell scripts</title><meta http-equiv="PICS-Label" content="(PICS-1.1 &#34;http://www.icra.org/ratingsv02.html&#34; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &#34;http://www.rsac.org/ratingsv01.html&#34; l gen true r (n 0 s 0 v 0 l 0) &#34;http://www.classify.org/safesurf/&#34; l gen true r (SS~~000 1))"/><link rel="schema.DC" href="http://purl.org/DC/elements/1.0/"/><link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico"/><meta name="Owner" content="dW Information/Raleigh/IBM"/><meta name="DC.Language" scheme="rfc1766" content="en"/><meta name="IBM.Country" content="ZZ"/><meta name="Security" content="Public"/><meta name="IBM.SpecialPurpose" content="SP001"/><meta name="IBM.PageAttributes" content="sid=1003"/><meta name="Source" content="v16 Template Generator"/><meta name="Robots" content="index,follow"/><meta name="Abstract" content="The command line isn't suitable for every user. Indeed, some users may only feel comfortable when armed with a mouse. To accommodate those users or build custom desktop applications using only the shell, add GUIs to your scripts. Here's how."/><meta name="Description" content="The command line isn't suitable for every user. Indeed, some users may only feel comfortable when armed with a mouse. To accommodate those users or build custom desktop applications using only the shell, add GUIs to your scripts. Here's how."/><meta name="Keywords" content="Martin Streicher, UNIX, speaking UNIX, GUI, shell scripting, dddauca"/><meta name="DC.Date" scheme="iso8601" content="2010-09-23"/><meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316"/><meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="SWG10"/><meta scheme="IBM_WTMCategory" name="IBM.WTMCategory" content="SOFDCAIXZZ"/><meta name="DC.Rights" content="© Copyright IBM Corporation 2010"/><meta name="IBM.Effective" scheme="W3CDTF" content="2010-09-23"/><meta name="title" content="Speaking UNIX: Creating great graphical applications with shell scripts"/><!-- HEADER_SCRIPTS_AND_CSS_INCLUDE --><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/all.css" media="all" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/screen-uas.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/zz/en/screen-fonts.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/handheld.css" media="handheld" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/print.css" media="print" rel="stylesheet" title="www" type="text/css"/><!-- dW-specific CSS --><link href="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/css/dw-screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.cluetip.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><script src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/js/ibmcommon.js" type="text/javascript">//</script><!-- dW functional JS --><script language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/urltactic.js" type="text/javascript">//</script><!-- Rating_START --><script language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/artrating/artrating.js" type="text/javascript">//</script><style type="text/css">
+.metavalue {
+  display: none;
+}
+</style><!-- Rating_END --><!-- RESERVED_HEADER_INCLUDE --><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/ajax1.js" type="text/javascript">//</script><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/search_counter-maverick.js" type="text/javascript">//</script><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/request_referer_capture-maverick.js" type="text/javascript">//</script><script language="JavaScript" type="text/javascript"><!--
+ setDefaultQuery('');
+ //--></script><script language="JavaScript" type="text/javascript"><!--
+ function openNewWindow(url,tar,arg){window.open(url,tar,arg);}
+ //--></script></head><body id="ibm-com"><div id="ibm-top" class="ibm-landing-page"><!-- MASTHEAD_BEGIN --><div class="ibm-access"><a href="#ibm-content">Skip to main content</a></div><div id="ibm-masthead"><div id="ibm-logo"><a href="http://www.ibm.com/"><img height="50" src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/v16/t/ibm-logo.gif" width="110" alt="IBM®"/></a></div><ul id="ibm-geo"><li id="ibm-country" class="ibm-first">Country/region</li><li id="ibm-change-country">[ <a href="http://www.ibm.com/developerworks/country/">select</a> ]</li></ul><form id="ibm-search-form" action="http://www.ibm.com/developerworks/search/searchResults.jsp" method="get" name="form1"><input type="hidden" name="searchType" value="1"/><input type="hidden" name="searchSite" value="dW"/><p><span id="ibm-search-scope"><label for="sn"><img src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/c.gif" width="1" height="1" alt="Search in:"/></label><select name="searchScope" id="sn"><option value="dW" selected="selected">All of dW</option><option value="dW">-----------------</option><option value="aixunix"> AIX and UNIX</option><option value="db2"> Information Mgmt</option><option value="lotus"> Lotus</option><option value="rdd"> Rational</option><option value="tivoli"> Tivoli</option><option value="WSDD"> WebSphere</option><option value="dW">-----------------</option><option value="archZ"> Architecture</option><option value="javaZ"> Java technology</option><option value="linuxZ"> Linux</option><option value="paZ"> Multicore resources</option><option value="opensrcZ"> Open source</option><option value="webservZ"> SOA/Web services</option><option value="webarchZ"> Web development</option><option value="xmlZ"> XML</option><option value="dW">-----------------</option><option value="forums"> dW forums</option><option value="dW">-----------------</option><option value="aW">alphaWorks</option><option value="dW">-----------------</option><option value="all">All of IBM</option></select></span><label for="q"><img alt="Search for:" height="1" width="1" src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/c.gif"/></label><input type="text" name="query" maxlength="100" id="q"/><input type="submit" id="ibm-search" class="ibm-btn-search" name="Search" value="Search"/></p></form><div id="ibm-site-name"><!-- IBM site name container --></div><div id="ibm-universal-nav"><ul><li id="ibm-unav-home" class="ibm-first"><a href="http://www.ibm.com/">Home</a></li><li id="ibm-unav-solutions"><a href="http://www.ibm.com/businesssolutions/">Business solutions</a></li><li id="ibm-unav-services"><a href="http://www.ibm.com/technologyservices/">IT services</a></li><li id="ibm-unav-products"><a href="http://www.ibm.com/products/">Products</a></li><li id="ibm-unav-support"><a href="http://www.ibm.com/support/">Support &amp; downloads</a></li><li id="ibm-unav-myibm"><a href="http://www.ibm.com/account/">My IBM</a></li></ul></div></div><!-- MASTHEAD_END --><div id="ibm-pcon"><!-- CONTENT_BEGIN --><div id="ibm-content"><!-- Navigation_Trail_BEGIN --><!----><div xmlns="" id="ibm-content-head"><ul id="ibm-navigation-trail"><li class="ibm-first"><a href="http://www.ibm.com/developerworks/">developerWorks</a></li><li><a href="http://www.ibm.com/developerworks/aix/">AIX and UNIX</a></li><li><a href="http://www.ibm.com/developerworks/views/aix/library.jsp">Technical library</a></li></ul></div><!-- Navigation_Trail_END --><!-- dW_Summary Area_START --><div id="dw-summary-article"><div class="dw-content-head"><h1 xmlns="">Speaking UNIX: Creating great graphical applications with shell scripts</h1><p xmlns=""/></div><div class="ibm-container-body ibm-two-column"><div class="ibm-column ibm-first"><div class="author"><a class="dwauthor" rel="#authortip1" href="#author1">Martin Streicher</a> (<a href="mailto:martin.streicher@gmail.com?subject=Speaking UNIX: Creating great graphical applications with shell scripts">martin.streicher@gmail.com</a>), Software Developer, Pixel, Byte, and Comma</div><div id="authortip1" class="dwauthor-onload-state ibm-no-print"><div xmlns="" class="position"><img src="images\Bio_mstreicher.jpg" width="64" height="80" alt="Martin Streicher" /></div>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em xmlns=""><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a xmlns="" href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</div><p/><p><b>Summary:</b>  The command line isn't suitable for every user. Indeed, some users may 
+	only feel comfortable when armed with a mouse. To accommodate those users or build 
+	custom desktop applications using only the shell, add GUIs to your scripts. Here's how.
+</p><p class="ibm-no-print"><div id="dw-tag-this" class="ibm-no-print"><a class="ibm-external-link" onclick="jQuery.launchTagThisWindow(); return false;" href="#">Tag this!</a></div></p></div><div class="ibm-column ibm-second"><p class="leading"><b xmlns="">Date:</b>&nbsp; 23 Sep 2010<br /><b>Level: </b>&nbsp;Intermediate<br /><b>Comments:</b>   <span id="nCmts"><img alt="" src="http://www.ibm.com/developerworks/i/circle-preloader.gif" height="12" width="50"/><img alt="" src="http://www.ibm.com/i/gif" height="14" width="1"/></span><!-- Rating_Area_Begin --><!-- Ensure that div id is based on input id and ends with -widget --><input id="art-rating" name="ratinga" type="hidden" value="0"/><div id="art-rating-widget"></div><script language="JavaScript" type="text/javascript">
+// 
+   // widget div id and article id as args
+   window.artRating.init('art-rating-widget');
+// 
+</script><!-- Rating_Area_End --></p></div></div></div><!-- dW_Summary_Area_END --><!-- CONTENT_BODY --><div id="ibm-content-body"><!-- MAIN_COLUMN_BEGIN --><div id="ibm-content-main"><!-- Related_Searches_Area_Begin --><script type="text/javascript" language="javascript">
+	     capture_referrer();
+</script><div id="dw-related-searches-article" style="display:none"><div class="ibm-container ibm-alternate-two"><div class="ibm-container-body"><!--  START : HTML FOR ARTICLE SEARCH --><div id="article_results" style="display:block"></div><!--  END : HTML FOR ARTICLE SEARCH --></div></div></div><!-- Related_Searches_Area_End --><!-- MAIN_COLUMN_CONTAINER_BEGIN --><div class="ibm-container"><!-- MAIN_COLUMN_CONTENT_BEGIN -->
+	<p xmlns="">If you walk into any crowded machine room, chances are, you'll catch chit-chat about 
+		"shebangs," slashes, dot-dots, root, pipes, ports, and dash-dash this and that. If you 
+		speak UNIX&#174;, you'll no doubt grok the local lingo&#8212;acronyms, command 
+		names, shortcuts, options, file names, and colloquialisms about UNIX&#8212;and 
+		feel right at home. Like practitioners of other art, UNIX users have an extensive 
+		vernacular for describing the specifics of their work.
+	</p>
+
+<div xmlns="" class="ibm-container ibm-alt-header dw-container-sidebar"><a name="fua"></a><h2>Frequently used acronyms</h2><div class="ibm-container-body">
+	
+		<ul>
+			<li><strong>GUI:</strong> Graphical user interface</li>
+			<li><strong>HTML:</strong> Hypertext Markup Language</li>
+		</ul>
+</div></div>
+
+	<p xmlns="">But not everyone speaks UNIX; in fact, some may find the command line daunting or 
+		perplexing. Further, you simply may not want to entrust the entirety of the 
+		command line to an occasional or inexperienced user. To assist those unaccustomed 
+		to the command line or to build custom solutions around the shell, you can build 
+		GUIs for your scripts. With such tools&#8212;<code>dialog</code> and 
+		Zenity are two worthy of mention (see <a href="#resources">Resources</a>)&#8212;you
+		can use dialog boxes, file browsers, and other common "windowing" controls and 
+		techniques to interact with your users. Indeed, dialog boxes provide for more natural 
+		conversations: You present information, ask for a response, and react accordingly.
+	</p>
+	<p xmlns="">This installment of "Speaking UNIX" looks at <code>dialog</code> and Zenity 
+		and shows how you can turn any script into a convincing GUI application. You use 
+		<code>dialog</code> with traditional, text-based interfaces; Zenity proffers 
+		the style of the modern, windowed desktop.
+	</p>
+
+	<p xmlns=""><a name="add_dialog_box"><span class="atitle">Add dialog boxes to any shell script</span></a></p>
+		<p xmlns="">A command-line utility typically offers sufficient options to completely control 
+			each invocation. Some switches may enable or disable a feature, while other 
+			switches may process arguments, such as a list of names. On the command line, 
+			you present (nearly) all the information up front and let the job go. Graphical 
+			applications are very different. Choices are made through menus, check boxes, 
+			and file browsers. A graphical application takes in a little information, processes
+			it, and then usually asks for more information. It's said that GUI applications 
+			are <em>event driven.</em>
+		</p>
+		<p xmlns="">The <code>dialog</code> utility spans the two worlds. You invoke the 
+			utility whenever you need input from the user, and then return to your script
+			to continue processing whatever data was provided. In other words, if you write 
+			a script to use <code>dialog</code>, you'll likely ignore 
+			command-line arguments and instead use <code>dialog</code> to 
+			prompt for information when necessary.
+		</p>
+		<p xmlns="">If your system lacks the <code>dialog</code> utility, you can easily 
+			install it with your distribution's own package manager, or you can build it 
+			directly from source. For example, if your system uses Aptitude, you can install
+			<code>dialog</code> with the command:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+sudo apt-get install dialog
+</pre></td></tr></table><br />
+
+		<p xmlns="">Otherwise, to build from source, download the code from maintainer Thomas Dickey's 
+			Web site (see <a href="#resources">Resources</a>) and run the typical trio of 
+			commands: <code>./configure &amp;&amp; make &amp;&amp; 
+			make install</code>:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ wget http://invisible-island.net/datafiles/release/dialog.tar.gz
+$ tar xzf dialog.tar.gz
+$ cd dialog-1.1-20100428
+$ ./configure
+$ make
+$ sudo make install
+</pre></td></tr></table><br />
+
+		<p xmlns="">After the installation, you should have a new utility named <code>dialog</code>
+			in your path. Type <code>man dialog</code> to see the bundled 
+			documentation.
+		</p>
+		<p xmlns="">Using <code>dialog</code> is simple: It's just another UNIX command.
+			You display a dialog box of your choice using the command's options, then capture 
+			the result and perform some logic based on that value. Some variations of 
+			<code>dialog</code> place the result of the command directly in the 
+			special shell status variable, <code>$?</code>, which you should save
+			or interrogate immediately after the <code>dialog</code> command 
+			exits (because a subsequent command will immediately change its value). Other,
+			typically more complicated variations of the <code>dialog</code>
+			command both set the shell status variable and generate other results. To make 
+			things simple, <code>dialog</code> provides the <code>--stdout</code>
+			option to always emit its result to standard output, making it easy to capture data
+			with command evaluation (a combination of a command in backquotes and an 
+			assignment statement).
+		</p>
+		<p xmlns="">For example, the command <code>dialog --yesno</code> is one of the 
+			simplest variants. It presents a question, prompts for either a yes or no response,
+			and returns either <code>0</code> or <code>1</code> in 
+			<code>$?</code> depending on whether the user selected "Yes" or 
+			"No," respectively. You can test the value of <code>$?</code> and 
+			execute some conditional code. Here's is a working snippet you can add to a shell
+			script:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+dialog --yesno "Do you want to continue?" 0 0
+rc=$?
+if [ "${rc}" == "0" ]; then
+  echo Yes
+else
+  echo No
+fi
+</pre></td></tr></table><br />
+
+		<p xmlns="">The <code>--yesno</code> option requires at least three arguments: text 
+			for the question and the height and width of the dialog box itself, measured in rows
+			and columns. If you don't require specific dimensions, you can always use 
+			<code>0</code> for either height or width to size the dialog box 
+			automatically. (There are also options for placing the window relative to the top 
+			left corner of the window.) <a href="#fig1">Figure 1</a> shows 
+			<code>--yesno</code> in operation.
+		</p>
+
+			
+				<br /><a xmlns="" name="fig1"><b>Figure 1. The --yesno operation</b></a><br />
+				<img xmlns="" alt="The --yesno operation" src="images/figure1.png"/>
+			<br />
+
+		<p xmlns="">The <code>dialog</code> option <code>--calendar</code>
+			presents a calendar to allow the user to choose a specific date. If the user 
+			chooses a date, and then clicks <strong>OK</strong>, the command returns 
+			<code>0</code>. If, however, the user clicks <strong>Cancel</strong>,
+			the command returns <code>1</code>. Moreover, if the user clicks
+			<strong>OK</strong>, the command emits the date selected to standard output. 
+			Here's an example using command evaluation to yield a date:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+RESULT=`dialog --stdout --title "CALENDAR" 
+    --calendar "Please choose a date..." 0 0 9 1 2010`
+retval=$?
+</pre></td></tr></table><br />
+
+		<p xmlns="">The <code>--title</code> option uses the next argument to add a title 
+			to the dialog box and can be used with any <code>dialog</code>
+			command. Much like <code>--yesno</code>, you provide some text 
+			to prompt the user. Next, the options <code>0 0</code> again specify
+			automatic height and width, and the options <code>9 1 2010</code>
+			dictate the initial day, month, and year, respectively, shown in the calendar. The 
+			Tab and arrow keys alter the calendar and choose a date. After the dialog box is 
+			dismissed, if <code>retval</code> is <code>0</code>,
+			the value of <code>RESULT</code> is the date selected. 
+			<a href="#fig2">Figure 2</a> shows the calendar dialog box.
+		</p>
+
+			
+				<br /><a xmlns="" name="fig2"><b>Figure 2. The calendar dialog box</b></a><br />
+				<img xmlns="" alt="The calendar dialog box" src="images/figure2.png"/>
+			<br />
+
+		<p xmlns="">The <code>dialog</code> command offers most of the controls typically 
+			found in a graphical application:
+		</p>
+			<ul xmlns="">
+				<li><code>--infobox</code> simply presents information: It 
+					does not expect any input. The information box remains on screen 
+					only briefly. To prolong its display, place a <code>sleep</code>
+					command between it and the next command.
+				</li>
+				<li><code>--input</code> collects a single, typed response. You 
+					might use this command to collect your user's name or zip code.
+				</li>
+				<li><code>--textbox</code> displays the contents of a text file.
+					If the file exceeds the vertical height of the dialog box, a control allows 
+					for simple scrolling up and down.
+				</li>
+				<li><code>--menu</code> and <code>--radiolist</code>
+					present a list of choices and allow the user to select one. The two 
+					kinds of dialog box are functionally equivalent but have slightly different 
+					visual styles to better simulate what a GUI might present. Specifically, 
+					the <code>--radiolist</code> command renders 
+					<code>(&amp;nbsp;)</code> to mimic radio buttons.
+				</li>
+				<li><code>--checklist</code> displays a list of items that the user can
+					enabled or disabled individually.
+				</li>
+			</ul>
+		<p xmlns="">The output of each <code>dialog</code> variant differs but is either a 
+			single value or a list of quoted values separated by white space. For instance,
+			<code>--checklist</code>, which is great for choosing one or more 
+			options, emits a list of quoted values, where each value is associated with an 
+			enabled option. An example demonstrates the operation:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+RESULT=`dialog --stdout 
+   --checklist "Enable the account options you want:" 10 40 3 \
+  1 "Home directory" on \
+  2 "Signature file" off \
+  3 "Simple password" off`
+</pre></td></tr></table><br />
+
+		<p xmlns="">The backslash (<code>\</code>) at the end of lines 1, 2, and 3 are 
+			continuations; everything from <code>RESULT</code> to 
+			<code>off`</code> is one command. If the user enabled
+			<strong>Home directory</strong> and <strong>Simple password</strong>,
+			<code>$RESULT</code> would be <code>"1" "3"</code>.
+			The arguments to <code>--checklist</code> are the height and width,
+			the number of list elements at any time (you can scroll to see additional items if
+			some are occluded), and the checklist options, where each option is a value, a 
+			description, and whether the option is initially enabled or disabled.
+		</p>
+		<p xmlns="">You can type <code>dialog --help</code> at any time to see the list of 
+			general and <code>dialog</code>-specific options. There are tons 
+			of uses for <code>dialog</code>.
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="pixels"><span class="atitle">Got pixels? Use Zenity.</span></a></p>
+		<p xmlns="">Zenity is to the UNIX desktop what <code>dialog</code> is to simple 
+			terminal windows. You can use Zenity to open GTK+ dialog boxes from any shell
+			script. In fact, Zenity shares many of the same features as 
+			<code>dialog</code>; the only difference is that Zenity works in 
+			an X Window System environment. Zenity comes bundled with GNOME. If you don't 
+			run GNOME, you can install Zenity separately (however, expect a large number of 
+			GTK+ libraries to be installed, too). You can also download the source of Zenity 
+			from the GNOME project pages (see <a href="#resources">Resources</a> for a link).
+		</p>
+		<p xmlns="">Here's a quick example. The command:</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+zenity --question --text "Do you want to continue?"
+</pre></td></tr></table><br />
+
+		<p xmlns="">produces something like <a href="#fig3">Figure 3</a>. (The machine used for 
+			demonstration is running Ubuntu 10.) If you click <strong>OK</strong>, the 
+			command returns <code>0</code>. Otherwise, it returns 
+			<code>1</code>.
+		</p>
+
+			
+				<br /><a xmlns="" name="fig3"><b>Figure 3. A simple question</b></a><br />
+				<img xmlns="" alt="A simple question" src="images/figure3.png"/>
+			<br />
+
+		<p xmlns="">Like <code>dialog</code>, Zenity has a good number of options&#8212;perhaps
+			even more than <code>dialog</code>&#8212;but the options are 
+			well named and thus self-explanatory. You'll likely find Zenity more advantageous 
+			than <code>dialog</code>, especially as most computer users have 
+			an X desktop of some sort.
+		</p>
+		<p xmlns="">Zenity offers many of the same controls as <code>dialog</code>. Here 
+			is a snippet to collect a name:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+ENTRY=`zenity --entry --text "Please enter your name" 
+   --entry-text "Your name" --title "Enter your name"
+if [ $? == 0 ]; then
+  zenity --info --text "Hello $ENTRY\!"
+fi
+</pre></td></tr></table><br />
+
+		<p xmlns="">Again, if the exit code of <code>zenity</code> is <code>0</code>,
+			then <code>ENTRY</code> has the person's name. Here is the 
+			calendar example from above rewritten to use Zenity:
+		</p>
+
+<table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+DATE=`zenity --calendar --day "9" --month "1" --year "2010" --format "%Y-%m-%d"
+if [ $? == 0 ]; then
+  echo $DATE
+fi
+</pre></td></tr></table><br />
+
+		<p xmlns="">Although Zenity is a little more verbose&#8212;there are separate options for day,
+			month, and year, for example&#8212;the additional switches free you from 
+			remembering the precise usage sequence of arguments. Zenity's calendar also 
+			allows you to specify the format for output, using standard 
+			<code>strftime()</code> codes. The result of this command would be 
+			something like <code>2010-1-9</code> for 9 January 2010.
+		</p>
+		<p xmlns="">Zenity also provides a progress meter to show the state of an operation. It reads data 
+			from standard input line by line. If a line is prefixed with the octothorpe, or pound
+			sign (<code>#</code>), the text is updated with the text on that line.
+			If a line contains only a number, the percentage is updated with that number.
+			<a href="#list1">Listing 1</a> shows is an example from the Zenity documentation.
+		</p>
+
+<br /><a xmlns="" name="list1"><b>Listing 1. The Zenity progress meter</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+#!/bin/sh
+(
+  echo "10" ; sleep 1
+  echo "# Updating mail logs" ; sleep 1
+  echo "20" ; sleep 1
+  echo "# Resetting cron jobs" ; sleep 1
+  echo "50" ; sleep 1
+  echo "This line will just be ignored" ; sleep 1
+  echo "75" ; sleep 1
+  echo "# Rebooting system" ; sleep 1
+  echo "100" ; sleep 1
+) |
+zenity --progress \
+  --title="Update System Logs" \
+  --text="Scanning mail logs..." \
+  --percentage=0
+
+if [ "$?" = -1 ] ; then
+  zenity --error \
+    --text="Update canceled."
+fi
+</pre></td></tr></table><br />
+
+		<p xmlns="">The sub-shell (wrapped in parentheses) performs a series of tasks&#8212;albeit 
+			sleep delays in this contrived example&#8212;and emits output to a Zenity progress 
+			meter via a pipe. Before each step, the sub-shell emits a number to advance the 
+			progress meter, which starts at <code>0</code> per 
+			<code>--percentage 0</code>, and then emits a string prefaced with 
+			<code>#</code> to change the status message. Thus, the progress 
+			meter steps along to mark the work of the script. If Zenity exits with code 
+			<code>-1</code>, the <strong>Cancel</strong> button was clicked.
+		</p>
+		<p xmlns="">Again, to use <code>dialog</code> or Zenity, replace code where you 
+			previously referenced a command-line argument with a dialog box. With a little 
+			creativity, you can turn your shell scripts into first-class desktop citizens.
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="tools"><span class="atitle">Additional advanced tools</span></a></p>
+		<p xmlns="">At some point, you may find that your requirements exceed the capabilities of both 
+			shell scripting and the <code>dialog</code> and Zenity tools. In 
+			those instances, you may turn to <code>C/C++</code> and build 
+			native applications for the desktop, but you can also turn to advanced scripting 
+			languages and language bindings for any number of robust GUI frameworks.
+		</p>
+		<p xmlns="">One combination is the Ruby scripting language and the Ruby bindings for the wxWidgets
+			framework. Ruby is object oriented, expressive, concise, and runs on most operating
+			systems. The wxWidgets framework is also available on every major platform, 
+			including Mac OS X, Windows&#174;, Linux&#174;, and UNIX. Because both are 
+			portable, you can write an application once in Ruby and run it everywhere. Another,
+			simpler option is Shoes. Although not as rich as wxWidgets, Shoes is fairly quick to 
+			learn and use. The code in <a href="#list2">Listing 2</a> realizes a calculator in 70 
+			lines of code.
+		</p>
+
+<br /><a xmlns="" name="list2"><b>Listing 2. A calculator in Shoes</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+class Calc
+  def initialize
+    @number = 0
+    @previous = nil
+    @op = nil
+  end
+
+  def to_s
+    @number.to_s
+  end
+
+  (0..9).each do |n|
+    define_method "press_#{n}" do
+      @number = @number.to_i * 10 + n
+    end
+  end
+
+  def press_clear
+    @number = 0
+  end
+
+  {'add' =&gt; '+', 'sub' =&gt; '-', 'times' =&gt; '*', 'div' =&gt; '/'}.each do |meth, op|
+    define_method "press_#{meth}" do
+      if @op
+        press_equals
+      end
+      @op = op
+      @previous, @number = @number, nil
+    end
+  end
+
+  def press_equals
+    @number = @previous.send(@op, @number.to_i)
+    @op = nil
+  end
+end
+
+number_field = nil
+number = Calc.new
+Shoes.app :height =&gt; 250, :width =&gt; 200, :resizable =&gt; false do
+  background "#EEC".."#996", :curve =&gt; 5, :margin =&gt; 2
+
+  stack :margin =&gt; 2 do
+
+    stack :margin =&gt; 8 do
+      number_field = para strong(number)
+    end
+
+    flow :width =&gt; 218, :margin =&gt; 4 do
+      %w(7 8 9 / 4 5 6 * 1 2 3 - 0 Clr = +).each do |btn|
+        button btn, :width =&gt; 46, :height =&gt; 46 do
+          method = case btn
+            when /[0-9]/; 'press_'+btn
+            when 'Clr'; 'press_clear'
+            when '='; 'press_equals'
+            when '+'; 'press_add'
+            when '-'; 'press_sub'
+            when '*'; 'press_times'
+            when '/'; 'press_div'
+          end
+
+          number.send(method)
+          number_field.replace strong(number)
+        end
+      end
+    end
+  end
+end
+</pre></td></tr></table><br />
+
+		<p xmlns="">An introduction to Ruby and Shoes is beyond the scope of this article, but here are
+			some of the most important constructs:
+		</p>
+			<ul xmlns="">
+				<li>The bulk of the Ruby class <code>Calc</code> uses Ruby's 
+					metaprogramming features to define functions at run time for all the 
+					digit keys and for the math operation keys.
+				</li>
+				<li>The code beginning <code>Shoes.app...</code> creates the 
+					GUI for the calculator, rendering the layout and the buttons for it. 
+					Shoes provides two containers to assemble layouts: the <code>stack</code>
+					and the <code>flow</code>. A <em>stack</em> is a vertical 
+					stack of elements, with each element placed directly beneath the element
+					preceding it. A <em>flow</em> packs elements in as tightly as it can until 
+					it reaches the limits of its bounding box, and then wraps the remaining 
+					elements. (You can think of a stack as an HTML <code>&lt;div&gt;</code>
+					and a flow as an HTML <code>&lt;p&gt;</code>.) You create 
+					a stack or flow using a Ruby block.
+				</li>
+				<li>The innermost <code>flow</code> block loops, creating all the 
+					buttons in the application and effectively binding each button to its 
+					method. (The <code>case</code> statement returns a 
+					method name; the line <code>number.send(method)</code>
+					calls that method on the instantiated calculator.)
+				</li>
+				<li>The line <code>number_field.replace strong(number)</code>
+					updates the calculator display with the result of the most recent calculation.
+					Emitting <code>number</code> causes the class to call its 
+					own <code>to_s</code> ("to string") method.
+				</li>
+			</ul>
+		<p xmlns="">Other scripting languages have similar libraries, and there are many more choices for Ruby 
+			itself, including Ruby Cocoa to develop Cocoa applications on Mac OS X with Ruby. 
+			Pick your favorite open source scripting language, find a lightweight GUI toolkit, 
+			and start coding.
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="compiler"><span class="atitle">We don't need no stinkin' compiler!</span></a></p>
+		<p xmlns="">If you've already mastered shell scripting, combine your work with <code>dialog</code>
+			or Zenity to add interactivity. And once you need more programming power than what 
+			the shell provides, consider a language such as Ruby or Python and any one of 
+			several windowing toolkits. You don't need a compiler to write great desktop 
+			applications.
+		</p>
+<!-- CMA ID: 12345 --> <!-- Site ID: 1 --> <!-- XSLT stylesheet used to transform this file: dw-document-html-6.0.xsl --> <br /><p xmlns=""><a name="resources"><span class="atitle">Resources</span></a></p><p xmlns=""><b>Learn</b></p><ul xmlns=""><li>
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	<br /><br /></li><li>
+		<a href="http://www.wxwidgets.org/">wxWidgets</a>: Read more about wxWidgets,
+			the cross-platform GUI framework.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	<br /><br /></li></ul><p xmlns=""><b>Get products and technologies</b></p><ul xmlns=""><li>
+		<a href="http://invisible-island.net/dialog/dialog.html"><code>dialog</code>
+			project page</a>: Download the source code for <code>dialog</code>.
+	<br /><br /></li><li>
+		<a href="http://ftp.gnome.org/pub/gnome/sources/zenity/2.30/zenity-2.30.0.tar.bz2">Zenity</a>:
+			Get the source code for Zenity from the GNOME project pages.
+	<br /><br /></li><li>
+		<a href="http://github.com/shoes/shoes">Shoes</a>: Learn how to script applications with
+			Shoes, a GUI library for <a href="http://www.ruby-lang.org/en/">Ruby</a>.
+	<br /><br /></li></ul><p xmlns=""><b>Discuss</b></p><ul xmlns=""><li>
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	<br /><br /></li><li>
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L&#8212;technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools&#8212;technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	<br /></li></ul><p xmlns=""><a name="author"><span class="atitle">About the author</span></a></p><div xmlns="" class="ibm-container ibm-portrait-module ibm-alternate-two"><div class="ibm-container-body"><img src="images\Bio_mstreicher.jpg" class="dw-author-img" width="64" height="80" alt="Martin Streicher" /><p><a name="author1"></a>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</p></div></div><!-- MAIN_COLUMN_CONTENT_END --><!-- INLINE_COMMENTS_START --><p class="ibm-no-print"><span class="atitle"><a name="icomments">Comments</a></span></p><div id="dw-icomments-container" class="ibm-no-print"><div class="ibm-alternate-rule"><hr/></div><div class="ibm-alternate-rule"><hr/></div><!-- Comment_Script --><a id="comments" href="comments"/><script language="JavaScript" src="http://www.ibm.com/developerworks/js/insertcomment.js" type="text/javascript">//</script><div id="threadShow"></div><script language="JavaScript" type="text/javascript">
+// 
+jQuery('threadShow').insertComment('95%',5,'nCmts','icomments');
+// 
+</script></div><!-- INLINE_COMMENTS_END --><p class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p><a href="http://www.ibm.com/developerworks/ibm/trademarks/">Trademarks</a></p></div><!-- MAIN_COLUMN_CONTAINER_END --><!-- Rating_Meta_BEGIN --><!--Rating_Meta_BEGIN--><div xmlns="" class="metavalue">static.content.url=http://www.ibm.com/developerworks/js/artrating/</div><div xmlns="" class="metavalue">SITE_ID=1</div><div xmlns="" class="metavalue">Zone=AIX and UNIX</div><div xmlns="" class="metavalue">ArticleID=12345</div><div xmlns="" class="metavalue">ArticleTitle=Speaking UNIX: Creating great graphical applications with shell scripts</div><div xmlns="" class="metavalue">publish-date=09232010</div><div xmlns="" class="metavalue">author1-email=martin.streicher@gmail.com</div><div xmlns="" class="metavalue">author1-email-cc=</div><script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href+'</div>');</script><!--Rating_Meta_END--><!-- Rating_Meta_END --></div><!-- MAIN_COLUMN_END--><!-- RIGHT_COLUMN_BEGIN --><div id="ibm-content-sidebar"><!-- RIGHT_COLUMN_CONTENT_BEGIN --><div xmlns="" class="ibm-container"><h2>Table of contents</h2><div class="ibm-container-body"><img src="//www.ibm.com/i/c.gif" width="1" height="1" alt=""/><ul class="ibm-bullet-list"><li><a href="#add_dialog_box" class="ibm-feature-link">Add dialog boxes to any shell script</a></li><li><a href="#pixels" class="ibm-feature-link">Got pixels? Use Zenity.</a></li><li><a href="#tools" class="ibm-feature-link">Additional advanced tools</a></li><li><a href="#compiler" class="ibm-feature-link">We don't need no stinkin' compiler!</a></li><li><a href="#resources" class="ibm-feature-link">Resources</a></li><li><a href="#author" class="ibm-feature-link">About the author</a></li><li><a href="#icomments" class="ibm-feature-link">Comments</a></li></ul></div></div><!-- Dig_Deeper --><!-- High_Visibility_Offer --><!-- Special_Offers --><!-- RIGHT_COLUMN_CONTENT_END --></div><!-- RIGHT_COLUMN_END --><!-- CONTENT_BODY_END --></div></div><!-- CONTENT_END --><!-- END_IBM-PCON --></div><!-- FOOTER_BEGIN --><div id="ibm-page-tools"><!-- IBM page tools container --></div><div id="ibm-footer"><ul><li class="ibm-first"><a href="http://www.ibm.com/ibm/">About IBM</a></li><li><a href="http://www.ibm.com/privacy/">Privacy</a></li><li><a href="http://www.ibm.com/contact/">Contact</a></li><li><a href="http://www.ibm.com/legal/">Terms of use</a></li></ul></div><!-- FOOTER_END --><!-- END_IBM-TOP --></div><!-- SCRIPTS_INCLUDE_BEGIN --><!-- JQuery start --><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.dimensions-1.2.js">//</script><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.hoverIntent.minified.js">//</script><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.cluetip.js">//</script><script type="text/javascript" language="JavaScript">
+	jQuery.noConflict();     
+	// Put all your code in your document ready area
+	jQuery(document).ready(function(jQuery) {
+	// Do jQuery stuff using jQuery 
+	jQuery('a.dwauthor').cluetip({
+		local: true,
+		showTitle: false,
+		positionBy: 'bottomTop',
+		sticky: true,	
+		mouseOutClose: true,
+		closeText: '<img src="http://www.ibm.com/developerworks/js/jquery/cluetip98/i/x.gif" alt="Close"/>',
+		arrows: false,
+		dropShadow: true,
+		cluetipClass: 'dwbasic'
+		});   	
+	});
+ </script><!-- JQuery end --><div id="ibm-metrics"/></body></html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2 {
+    font-size: 125%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    padding: 5px;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  div.image {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 1em;
+    text-align: center;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+    visibility: visible;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  table {
+    width: 100%;
+    padding: 0 2em;
+  }
+
+  th, td {
+    padding: 4px 12px;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<p>
+  <em>In Unix, everything may be a file, but not every file is stored the same way. A file system dictates how a file is decomposed and organized on media. Historically, media meant tape or disk. But increasingly, file systems now translate virtually any source -- remote server, archive file, even other file systems -- into virtual media. Here's a look at some novel file systems.
+  </em>
+</p>
+
+
+<h1>
+  Speaking Unix: An introduction to new, emerging file systems
+  </h1>
+
+<p>
+  It's an old adage, but nonetheless accurate: "In Unix, everything is a file." Conceptually, every Unix resource is a simple file that you can open, read from, write to, or both. Your experiment data is a file, as is your shell startup script, the Unix kernel, your home directory, each network socket, and the <i>/bin/ls</i> executable, among others.</p>
+
+<p>
+   However, not every file is identical. Your experiment data may be a highly customized database. A shell script is a text file, albeit with one important distinction: the leading <tt>!#</tt> (often called "shebang" ) line dictates what application interprets the file. The kernel is a binary, as is each executable, both with predictable, specific formats that system tools can manipulate. A directory is a specialized index to catalog contents.</p>
+
+<p>
+  Further, not every file is stored the same. The structure and size of a file depends on the underlying <i>file system</i>, the subsystem that persists the file data to a physical device. The same data, say, two copies of the same file, is organized very differently on disparate file systems. Each file system dictates its own storage strategy, which may be designed to meet a specific criterium. For example, one file system may be optimized for speed, another for efficient use of space, and yet another for durability against data loss or corruption. Typically, there is no right or wrong file system to deploy. You must analyze your storage needs and pick the file system or combination of file systems that suit your purpose. Unix (and a battery of vendors) offer a great number of file systems, so you're sure to find something advantageous.</p>
+
+<p>
+  Table 1 lists just a few file systems available for Unix (and in many cases Linux). </p>
+
+<table>
+  <col width="30%" />
+  <col width="70%" />
+  <thead>
+    <tr>
+      <th>File system</th>
+      <th>Benefit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <td>Zettabyte File System</td>
+    <td>An essentially infinite file system (a zettabyte is 2<sup>70</sup> bytes) that can be constructed using common, off-the-shelf storage media. ZFS can also compress data on write, maximizing media even further.</td>
+    </tr>
+
+    <tr>
+      <td>Network File System</td>
+      <td>A stalwart feature of Unix, NFS makes remote file systems appear to be local. NFS is ideal for sharing data.</td>
+    </tr>
+
+    <tr>
+      <td>Journaling File System</td>
+      <td>JFS, among many other alternatives, retains a log, or journal, of changes made to each file. In the event of a crash or corruption, the journal is "replayed" to restore the file.</td>
+    </tr>
+
+    <tr>
+      <td>B-tree File System</td>
+      <td>One of the newest file systems and intended to be the default file system for upcoming versions of Linux, Btrfs, or "Better FS", maintains data and metadata checksums to bulletproof persistence. Btrfs also provides snapshots and can mix devices of almost any size.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2>
+  A Filesystem of Your Own
+  </h2>
+
+<p>
+  Commonly, a file system requires media to be tailored to it, so changing from one file system to another typically entails a backup, formatting physical drives, and a lengthy restore and validation process. Obviously, such changes are radical, and are rightly the sole purview of the system administrator. However, a recent extension to many Unix and Linux kernels allows any user to create and use a variety of file systems with no special privileges. Dubbed <i>FUSE</i>, short for <i>Filesystem in User Space</i>, the software can also be used to create new file systems with relatively little effort. File systems derived from FUSE can mount files via the Secure File Transfer Protocol (SFTP), automatically scan files for viruses, and treat a collection of read-only CD-ROM discs as local, resident data files.</p>
+
+<p>
+  Here, let's install FUSE on a common operating system platform and explore some of the novel file systems now available to any user. Modern Unix and Linux kernels typically include support FUSE, so building the software is similar to building any utility code. You must download the package, unpack it, run a configuration script to detect the capabiliities of your system, and build and install the code.</p>
+
+<pre>
+$ wget http://downloads.sourceforge.net/project/\
+  fuse/fuse-2.X/2.8.4/fuse-2.8.4.tar.gz
+$ tar xzf fuse-2.8.4.tar.gz
+$ cd fuse-2.8.4
+
+$ ./configure
+$ make
+$ sudo make install
+</pre>
+
+<p>
+  FUSE 2.8.4 was the latest version at publication time. Be sure to download the latest and greatest code from the FUSE project home page. After compilation, the FUSE package installs a number of libraries required to build new FUSE file systems and an application named <i>fusermount</i> to mount and unmount FUSE file systems. <i>fusermount</i> has a few special options, but otherwise accepts options you would normally provide to the vanilla <i>mount</i> command.</p>
+
+
+<h2>
+  Do-It-Yourself NFS</h2>
+
+<p>
+   With the foundational code installed, you can continue and install a FUSE file system. The first FUSE file system to try is <i>SSHFS</i>, a file system based on the <i>Secure File Transfer Protocol</i> (SFTP). Via SSHFS, you can mount any remote directory as a local file system as long your server supports SSH, which almost all do. Before you can continue, ensure your system has Glib 2.0 and Gthread 2.0. If your machine has GNOME, you likely have these libraries; otherwise, install from source or via your operating system's native package manager. (Debian Linux systems have <i>Aptitude</i>. Red Hat Linux systems provide <i>rpm</i> <i>yum</i>, and <i>YaST</i>.)</p>
+
+<pre>
+$ wget http://sourceforge.net/projects/\
+  fuse/files/sshfs-fuse/2.2/sshfs-fuse-2.2.tar.gz/download
+$ tar xzf sshfs-fuse-2.2.tar.gz
+$ cd sshfs-fuse-2.2
+$ ./configure
+$ make
+$ sudo make install
+</pre>
+
+<p>
+  If you run Ubuntu or another variant of Unix or Linux, your distribution may provide pre-built binaries of all software packages. For example, on Ubuntu, you can install all the FUSE software listed so far with the command:</p>
+
+<pre>
+$ apt-get install libglib2.0-dev fuse-utils libfuse2 sshfs
+</pre>
+
+<p>
+  If your dependencies are up-to-date, you may also be able to install SSHFS with the simple command <tt>apt-get install sshfs</tt>.</p>
+
+<p>
+  Once the FUSE libraries and sshfs is installed, you can mount any remote directory you can access via ssh as a local file system. Combining <i>ssh</i> and <i>mount</i>, you provide two the name of the remote system and your login credentials, the remote directory you want to mount, and a local mount point, which can be any local directory.</p>
+
+<pre>
+$ ssh me@example.org ls
+bin            Documents  lib      Media   Pictures  Sites   tmp
+Desktop        Downloads  Library  Movies  projects  Source
+Documentation  Dropbox    local    Music   Public    src
+
+$ cd ~
+$ mkdir -p mounts/example
+$ sshfs me@example.org:/home/me mounts/example
+$ cd mounts/example
+$ ls
+bin            Documents  lib      Media   Pictures  Sites   tmp
+Desktop        Downloads  Library  Movies  projects  Source
+Documentation  Dropbox    local    Music   Public    src
+</pre>
+
+<p>
+  As you can see, the contents of the remote directory are now available as readily as local files. If you're a developer and use multiple systems for your work, <i>sshfs</i> makes local commands -- think <i>cp</i>, <i>make</i>, and others -- operate on remote files.</p>
+
+<p>
+  To unmount a FUSE file system, you can type <tt>fusermount -u <i>/some/mount/point</i></tt>, or because FUSE file systems behave just like normal file systems, you can also type <tt>umount <i>/some/mount/point</i></tt>.
+
+<p>
+  Another remote file system variant is called <i>S3FS</i> Rather than use your own remote server and SFTP, S3FS mounts an Amazon Simple Storage Service (S3) <i>bucket</i> as a local file system. S3FS stores files "natively and transparently in S3" and you can enable local caching to minimize downloads. The maximum file size is 5 GB. Like SSHFS, you can download and build the source and use it right away. (The S3FS package depends on the Curl library development headers and the LibXML2 library.)</p>
+
+<pre>
+$ wget http://s3fs.googlecode.com/files/s3fs-r191-source.tar.gz
+$ tar xzf s3fs-r191-source.tar.gz
+$ cd s3fs
+$ make
+$ sudo make install
+</pre>
+
+<p>
+  Assuming you already have an Amazon S3 account, which provides an access key and a secret access key, you can mount any bucket you own with a command like:</p>
+
+<pre>
+$ s3fs <i>bucket_name</i> -ouse_cache=/tmp -o accessKeyId=your_access_key \
+  -o secretAccessKey=your_secret_access_key /mnt
+</pre>
+
+<p>
+  With S3FS, you can keep an entire Git repository right on S3 or use <i>rsync</i> to put backups on Amazon's storage system.</p>
+
+
+<h2>
+  Peer into Any Archive
+  </h2>
+
+<p>
+  Another great use of FUSE is <i>archivemount</i>, a utility to mount many forms of archives, including tarballs (or <i>gzip</i>-compressed <i>tar</i> archives), as a local file system. Assuming you have libarchive available on your system, you can build archivemount very quickly.</p>
+
+<pre>
+$ wget http://www.cybernoia.de/software/archivemount/archivemount-0.6.1.tar.gz
+$ tar xzf archivemount-0.6.1.tar.gz
+$ cd archivemount-0.6.1
+$ ./configure
+$ make
+$ sudo make install
+</pre>
+
+<p>
+  As an example, you can use archivemount to mount its own tarball as a file system.</p>
+
+<pre>
+$ tar tfz archivemount-0.6.1.tar.gz
+archivemount-0.6.1/
+archivemount-0.6.1/README
+...
+archivemount-0.6.1/archivemount.c
+archivemount-0.6.1/CHANGELOG
+
+$ mkdir -p ~/mnt/tgz
+$ archivemount archivemount-0.6.1.tar.gz ~/mnt/tgz
+$ cd ~/mnt/tgz/archivemount-0.6.1
+$ ls
+aclocal.m4         archivemount.c  configure     depcomp      Makefile.in
+archivemount.1     CHANGELOG       configure.ac  install-sh   missing
+archivemount.1.in  config.h.in     COPYING       Makefile.am  README
+</pre>
+
+<p>
+  As before with <i>sshfs</i>, archivemount provides seamless, local file system-like access to the tarball. By the way, if you modify, delete, or add any files to the "file system" of the tarball, all changes are saved to the original tarball when the FUSE file system is unmounted.  The command <tt>fusermount -u ~/mnt/tgz</tt> unmounts the FUSE file system from the given mount point.</p>
+
+<pre>
+$ cd ~/mnt/tgz/archivemount-0.6.1
+$ echo 'Remember this for later.' > NOTES
+$ ls
+aclocal.m4         CHANGELOG     COPYING      Makefile.in
+archivemount.1     config.h.in   depcomp      missing
+archivemount.1.in  configure     install-sh   NOTES
+archivemount.c     configure.ac  Makefile.am  README
+$ fusermount -u ~/mnt/tgz
+
+$ tar tfz archivemount-0.6.1.tar.gz
+archivemount-0.6.1/
+archivemount-0.6.1/README
+...
+archivemount-0.6.1/CHANGELOG
+archivemount-0.6.1/NOTES
+</pre>
+
+<p>
+ The final <i>tar</i> command above confirms that <i>NOTES</i> was indeed added to the tarball. One caveat about expanding archives with archivemount: the author of the software warns against writing into an archive, because if the write fails, all changes are lost. In general, though, a small number of writes work fine. Nonetheless, you'll likely find the read-only features of <i>archivemount</i> very compelling.</p>
+
+<p>
+  If you want to review what's mounted via FUSE, simply run the typical <i>mount</i> command and look for systems marked <tt>fuse</tt>.</p>
+
+<pre>
+$ mount
+/dev/sda1 on / type ext3 (rw,relatime,errors=remount-ro)
+tmpfs on /lib/init/rw type tmpfs (rw,nosuid,mode=0755)
+...
+udev on /dev type tmpfs (rw,mode=0755)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
+devpts on /dev/pts type devpts (rw,noexec,nosuid,gid=5,mode=620)
+fusectl on /sys/fs/fuse/connections type fusectl (rw)
+archivemount on /home/strike/mnt/tgz type fuse.archivemount (rw,nosuid,nodev,user=strike)
+</pre>
+
+<p>
+  The testbed for this article was Ubuntu 10 running on a Dell desktop PC. In the mount transcript immediately above, you can see the <i>archivemount</i> file system at bottom, and the typical physical devices mounted by a Linux machine at top.</p>
+
+
+<h2>
+  A File System for Your Secrets
+  </h2>
+
+<p>
+  Based on the previous two examples, you can imagine that many networked services and file formats can be wrapped by FUSE to provide seamless access to remote or packaged files. Indeed, there are many working implementations. WikipediaFS mounts Wikipedia as a local file system, where you can edit articles locally. Other packages provide much the same features for the Blogger, Flickr, and Google Mail services.
+
+  Another use of FUSE is <i>mirroring</i>, or maintaing copies of files in parallel. One canonical example is the FUSE-centric <i>Encrypted File System</i>, or EncFS. Given a source directory and a target directory, all files written to the source directory are automatically encrypted and saved to the target directory.</p>
+
+<p>
+  librlog, a flexible message logging library, is a prerequisite for EncFS. Install it from source or from your distribution's repository, and then continue to build EncFS.</p>
+
+<pre>
+$ wget http://encfs.googlecode.com/files/encfs-1.6-1.tgz
+$ tar xzf encfs-1.6-1.tgz
+$ cd encfs-1.6-1
+$ ./configure
+$ make
+$ sudo make install
+</pre>
+
+<p>
+  Once the package is installed, you are ready to go. You must create two new directories, one for the original files and one for the encrypted similes. The <i>encfs</i> utility maps the two together.</p>
+
+<pre>
+$ mkdir ~/data
+$ mkdir ~/encrypted_data
+$ encfs ~/encrypted_data ~/data
+Creating new encrypted volume.
+Please choose from one of the following options:
+ enter "x" for expert configuration mode,
+ enter "p" for pre-configured paranoia mode,
+ anything else, or an empty line will select standard mode.
+?&gt; p
+
+Paranoia configuration selected.
+
+Configuration finished.  The filesystem to be created has
+the following properties:
+Filesystem cipher: "ssl/aes", version 2:2:1
+Filename encoding: "nameio/block", version 3:0:1
+Key Size: 256 bits
+Block Size: 1024 bytes, including 8 byte MAC header
+Each file contains 8 byte header with unique IV data.
+Filenames encoded using IV chaining mode.
+File data IV is chained to filename IV.
+File holes passed through to ciphertext.
+
+-------------------------- WARNING --------------------------
+The external initialization-vector chaining option has been
+enabled.  This option disables the use of hard links on the
+filesystem. Without hard links, some programs may not work.
+The programs 'mutt' and 'procmail' are known to fail.  For
+more information, please see the encfs mailing list.
+If you would like to choose another configuration setting,
+please press CTRL-C now to abort and start over.
+
+Now you will need to enter a password for your filesystem.
+You will need to remember this password, as there is absolutely
+no recovery mechanism.  However, the password can be changed
+later using encfsctl.
+
+New Encfs Password:
+Verify Encfs Password:
+</pre>
+
+<p>
+  In general, you can choose "paranoia" mode. Next enter a password to protect your files and cofirm by entering the same password again.
+
+<pre>
+$ cd ~/data
+$ vi secrets.txt
+<i>[Create file with your secrets.]</i>
+$ ls
+secrets.txt
+$ ls ~/encrypted_data
+LKs2bi5sfttNlyExybM6eNck
+</pre>
+
+<p>
+  Each file that you create is reflected in the encrypted directory, albeit even the name of the file is encrypted. When you're finished, simply unmount the unencrypted directory. The contents of the directory are removed, leaving only the secure files.
+  </p>
+
+<pre>
+$ fusermount -u ~/data
+$ ls ~/data
+No such file or directory
+$ ls ~/encrypted_data
+LKs2bi5sfttNlyExybM6eNck
+</pre>
+
+<p>
+  To view your unencrypted files, connect a mount point to the previously encryted set of files. Enter your password when prompted to authenticate yourself.</p>
+
+<pre>
+$ encfs ~/encrypted_data ~/data
+EncFS Password:
+
+$ ls ~/data
+secrets.txt
+</pre>
+
+<p>
+  Once remounted, your original files are available and viewable as plain text. Any change to a file causes it to be re-encoded.
+  </p>
+
+
+<h2>
+  FUSE: It's Not a Toy!
+  </h2>
+
+<p>
+  While the previous examples are fairly simple, do not underestimate the power of FUSE. Some high-powered file storage solutions also run in user space. For example, <i>ZFS-Fuse</i> is an implementation of ZFS in user space. <i>MooseFS</i> is a fault tolerant, network distributed file system. It spreads data over several physical servers, but the user treats the amalgam as one Unix-like file system resource. And GlusterFS is a high-performance, distributed file system based on FUSE.</p>
+
+<p>
+  Describing a GlusterFS deployment is beyond the scope of this article, but a brief introduction should demonstrate the capabilities that can be built with FUSE, eschewing kernel modifications and patches. Specifically, GlusterFS can:</p>
+
+<ul>
+	<li>Span any number of machines.</li>
+
+	<li> Aggregate disparate, heterogenous storage devices and physical file systems -- what GlusterFS refers to as <i>bricks</i> -- into a unified pool or namespace.</li>
+
+	<li> Assemble file system features -- what GlusterFS calls <i>translators</i> -- in an ad hoc fashion to build customized storage solutions. One translator provides replication, while another implements connectivity via TCP/IP.</li>
+
+	<li> Boost performance with read-ahead, write-behind and a number of other tricks.</li>
+  </ul>
+
+<p>
+  GlusterFS Version 3 greatly simplifies initial setup of the software, which is only a little more complicated than, say, establish SSH keys across a subnetwork of systems. But better yet, GlusterFS requires no kernel updates or special customization. Because it is written with FUSE, it operates outside of the milieu of the kernel and can be extended by any developer.</p>
+
+
+<h2>
+  Light the FUSE!
+  </h2>
+
+<p>
+  FUSE is an incredible technology. With it, new file systems can be developed in any number of popular programming languages, including Python, Ruby, Lua, C/C++, Java, and more. Moreover, creating and deploying a new file system does not mandate changes to the kernel of all running systems. You can learn more about how FUSE works in tandem with the kernel in another developerWorks article titled <a href="http://www.ibm.com/developerworks/linux/library/l-fuse/">"Develop your own filesystem with FUSE: No kernel programming required."</a> Refer to the References section below for additional reading material and links to the projects mentioned here.
+</p>
+
+<p>
+  There are a great number of FUSE file systems now available and more appear each day. ZFS-Fuse and GlusterFS are two examples of very sophisticated solutions, yet archivemount and SSHFS are no less useful. All of the FUSE file systems address a particular requirement. If you have special demands, you might consider cooking up your own file system with FUSE and a little bit of code.</p>
+
+<p>
+
+
+<h2>
+  References</h2>
+
+<ul>
+  <li>Read more about the fantastic <a href="http://www.oracle.com/us/products/servers-storage/solaris/034779.pdf">Zettabyte File System</a> (ZFS), originally created by Sun and now maintained by Oracle.</li>
+
+  <li>
+    Learn more about the <a href="http://en.wikipedia.org/wiki/Network_File_System_(protocol)">Network File System</a> and its long history. The original version of NFS dates back to 1989.</li>
+
+  <li>
+    Many file systems provide journaling to prevent loss of data. The original <a href="http://en.wikipedia.org/wiki/JFS_(file_system)">Journaled File System</a> was created by IBMM in 1990.</li>
+
+  <li>
+    <a href="http://en.wikipedia.org/wiki/Btrfs">Wikipedia</a> provides a good introduction to the B-tree file system (Btrfs) and offers links to many other sources of code and technical information.</li>
+
+  <li>
+    You can download the source for <a href="http://code.google.com/p/libarchive/"><i>libarchive</i></a> from its repository on Google Code. libarchive is required to build and use <i>archivemount</i>.</li>
+
+  <li>
+    Download the source code for <i>archivemount</i> from its <a href="http://www.cybernoia.de/software/archivemount/">project page</a>.  The software mounts archive files as a local file system.</li>
+
+  <li>
+    To explore all the options of the Encrypted File System (EncFS), see its <a href="http://www.arg0.net/encfsintro">project page</a>. Pay special attention to the notes on the page to maintain EncFS backups.</li>
+
+  <li>
+    <a href="http://www.moosefs.org/">MooseFS</a> is a fault tolerant, network distributed file system. It works on any system with a FUSE implementation, including Mac OS X.</li>
+  </ul>
+</body>
+</html>

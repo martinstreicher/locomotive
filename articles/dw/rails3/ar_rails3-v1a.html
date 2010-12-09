@@ -1,0 +1,695 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>All aboard! An introduction to Rails 3</title><meta http-equiv="PICS-Label" content="(PICS-1.1 &#34;http://www.icra.org/ratingsv02.html&#34; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &#34;http://www.rsac.org/ratingsv01.html&#34; l gen true r (n 0 s 0 v 0 l 0) &#34;http://www.classify.org/safesurf/&#34; l gen true r (SS~~000 1))"/><link rel="schema.DC" href="http://purl.org/DC/elements/1.0/"/><link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico"/><meta name="Owner" content="dW Information/Raleigh/IBM"/><meta name="DC.Language" scheme="rfc1766" content="en-US"/><meta name="IBM.Country" content="ZZ"/><meta name="Security" content="Public"/><meta name="IBM.SpecialPurpose" content="SP001"/><meta name="IBM.PageAttributes" content="sid=1003"/><meta name="Abstract" content="xxx" /><meta name="Description" content="xxx" /><meta name="Keywords" content="Martin Streicher, Rails 3, Rails, tttwsca" /><meta name="DC.Date" scheme="iso8601" content="2010-03-01" /><meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316" /><meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="TT700" /><meta name="DC.Rights" content="Copyright (c) 2010 by IBM Corporation" /> <meta name="Robots" content="index,follow" /><meta name="IBM.Effective" scheme="W3CDTF" content="2010-03-01" /><meta name="Last update" content="27022010ma" /><link rel="stylesheet" type="text/css" media="screen,print" href="http://www.ibm.com/common/v14/table.css"/><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwcss14.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="http://www.ibm.com/common/v14/main.css"/><link rel="stylesheet" type="text/css" media="all" href="http://www.ibm.com/common/v14/screen.css"/><link rel="stylesheet" type="text/css" media="print" href="http://www.ibm.com/common/v14/print.css"/><script language="JavaScript" src="
+../web/www.ibm.com/common/v14/detection.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dropdown.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/grabtitle.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/email/emailfriend2.js" type="text/javascript"></script><script language="JavaScript" src="http://www.ibm.com/developerworks/js/dwplugin.js" type="text/javascript"></script><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-head1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><style type="text/css">
+pre.section {margin-top: 0; margin-bottom: 0; font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px}
+.boldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold} .rboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff0000}
+.gboldcode {font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #ff6600}
+.bboldcode {font-family: Andale Mono, Lucida  Console, Monaco, fixed, monospace; font-size: 11px; font-weight: bold; color: #3c5f84}
+</style><style type="text/css">
+.atitle { font-family:arial,sans-serif; font-size:18px; }
+</style><script type="text/javascript" language="JavaScript">var emailAbstract = "xxx"; </script></head><body><!--MASTHEAD_BEGIN--><!--#include virtual="/developerworks/inc/s-topmast14.inc" --><!--MASTHEAD_END--><!-- CMA ID: 12345 --> <!-- Site ID: 1 --><table width="100%" cellspacing="0" cellpadding="0" border="0" id="v14-body-table"><tr valign="top"><!--LEFTNAV_BEGIN--><td width="150" id="navigation"><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-spacer"><a class="left-nav-overview" href="http://www.ibm.com/developerworks"> </a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-overview" colspan="2"><a class="left-nav-overview" href="http://www.ibm.com/developerworks">developerWorks</a></td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="left-nav-highlight" colspan="2"><a class="left-nav" href="#">In this article:</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#changes">Big changes, little changes</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#app">A first Rails 3 application</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#wiki">Working on the wiki</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#switching">Switching Rails</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#resources">Resources</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#author">About the author</a></td></tr><tr class="left-nav-child-highlight"><td><img src="../web/www.ibm.com/i/v14/t/cl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="left-nav-child" href="#rate">Rate this page</a></td></tr><tr class="left-nav-last"><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/v14/t/left-nav-corner.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td colspan="2" class="related"><b class="related">Related links</b></td></tr><tr class="rlinks"><td><img src="../web/www.ibm.com/i/v14/t/rl-bullet.gif" width="2" height="8" alt=""/></td><td><a class="rlinks" href="http://www.ibm.com/developerworks/views/webservices/library.jsp">SOA and Web services technical library</a></td></tr><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><tr><td width="14"><img src="../web/www.ibm.com/i/c.gif" width="14" height="1" alt="" class="display-img"/></td><td width="136"><img src="../web/www.ibm.com/i/c.gif" width="136" height="19" alt="" class="display-img"/></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-left2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--></td><!--LEFTNAV_END--><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0" id="content-table"><tr valign="top"><td width="100%"><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr><td><a name="main"><img src="../web/www.ibm.com/i/c.gif" width="592" height="1" alt="skip to main content" border="0"/></a></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10" height="18"><img src="../web/www.ibm.com/i/c.gif" width="10" height="18" alt=""/></td><td width="100%"><img src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/><br /><a class="bctl" href="http://www.ibm.com/developerworks/">developerWorks</a><span class="bct">  &gt;  </span><a class="bctl" href="http://www.ibm.com/developerworks/webservices/">SOA and Web services</a><span class="bct">  &gt;</span><img src="../web/www.ibm.com/i/c.gif" width="1" height="1" alt=""/><br /><h1>All aboard! An introduction to Rails 3</h1><img class="display-img" src="../web/www.ibm.com/i/c.gif" width="1" height="6" alt=""/></td><td width="192" class="no-print"><a href="http://www.ibm.com/developerworks/"><img src="../web/www.ibm.com/developerworks/i/dw.gif" width="192" height="18" border="0" alt="developerWorks"/></a></td></tr></table></td></tr></table><table width="100%" cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td width="100%"><table align="right" cellpadding="0" cellspacing="0" width="160" border="0" class="no-print"><tr><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-1-small">Document options</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><script language="JavaScript" type="text/javascript">
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img alt="Set printer orientation to landscape mode" height="16" src="../web/www.ibm.com/i/v14/icons/printer.gif" width="16" vspace="3" /></td><td width="122"><p><b><a class="smallplainlink" href="javascript:print()">Print this page</a></b></p></td></tr>');
+//-->
+</script>
+<noscript></noscript><script language="JavaScript" type="text/javascript">
+<!-- 5.6 10/24 llk: added cdata around the subdirectory path of email gif-->
+<!--
+document.write('<tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/v14/icons/em.gif" height="16" width="16" vspace="3" alt="Email this page" /></td><td width="122"><p><a class="smallplainlink" href="javascript:void newWindow()"><b>E-mail this page</b></a></p></td></tr>');
+//-->
+</script><noscript><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td width="16"><img src="../web/www.ibm.com/i/c.gif" height="16" width="16" alt=""/></td><td width="122" class="small"><p><span class="ast">Document options requiring JavaScript are not displayed</span></p></td></tr></noscript></table></td></tr></table><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-right-column1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><table border="0" cellpadding="0" cellspacing="0" width="150"><tr><td class="v14-header-2-small">Rate this page</td></tr></table><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border"><tr><td width="150" class="no-padding"><table border="0" cellpadding="0" cellspacing="0" width="143"><tr valign="top"><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td><img src="../web/www.ibm.com/i/v14/icons/d_bold.gif" height="16" width="16" border="0" vspace="3" alt=""/></td><td width="125"><p><a class="smallplainlink" href="#rate"><b>Help us improve this content</b></a></p></td></tr></table></td></tr></table><br /></td></tr></table><p>Level: Intermediate</p><p><a href="#author">Martin Streicher</a> (<a href="mailto:martin.streicher@gmail.com?subject=All aboard! An introduction to Rails 3">martin.streicher@gmail.com</a>), Software Developer, Pixel, Byte, and Comma<br /></p><p> 01 Mar  2010</p><blockquote>xxx
+</blockquote><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center1.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES-->
+	<p>Over the past two years, the Ruby on Rails application framework has garnered a cottage 
+		industry of hosting and service providers, an expansive and impressive array of 
+		development tools, and a wide variety of complementary libraries&#8212;called
+		<i>gems</i> and <i>plug-ins</i> in Ruby parlance&#8212;that increase the capabilities
+		of the software. For example, Engine Yard and Heroku are just two companies that 
+		provide virtual and headache-free Rails software hosting; the colorfully named 
+		Oink and Bullet profile memory usage and performance, respectively; and Clearance
+		and Sunspot provide off-the-shelf authentication and fast, indexed search.
+	</p>
+
+<table width="30%" cellpadding="0" cellspacing="0" border="0" align="right"><tr><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td><td><table width="100%" cellpadding="5" cellspacing="0" border="1"><tr><td bgcolor="#eeeeee">
+	<a name="fua"><b>Frequently used acronyms</b></a><br />
+		<ul>
+			<li><b>CRUD:</b> Create, read, update, delete</li>
+			<li><b>HTML:</b> Hypertext Markup Language</li>
+			<li><b>REST:</b> Representational State Transfer</li>
+		</ul>
+</td></tr></table></td></tr></table>
+
+	<p>Since 2007, the Rails community has grown, too. The global legion of Rails developers is 
+		vibrant, helpful, and always eager to improve the software. Indeed, it's not hyperbole 
+		to say that the community is hell-bent on improving Rails, with coders constantly 
+		leapfrogging one another to build something better. Iteration after iteration, features 
+		quickly evolve from nascent to utilitarian to powerful to elegant and ultimately to 
+		indispensable. In many instances, gems and plug-ins the community finds essential 
+		are enshrined in the Rails core. Rails's <i>named scopes</i>&#8212;a query 
+		shorthand&#8212;followed that very trajectory, as did <i>nested forms,</i> a fairly 
+		recent addition that supplanted previous attempts to create and edit multiple models 
+		within the same HTML form. Indeed, perhaps the most difficult task for Rails developers 
+		is keeping pace with change. (Luckily, a number of weekly Ruby and Ruby on Rails 
+		podcasts organize and present trends and best practices.)
+	</p>
+	<p>Rails version 3, the next major release of Rails, continues the rapid advancement of the 
+		toolkit. True to its heritage, the software remains "opinionated," preferring convention 
+		over configuration. Rails's core components&#8212;RESTful routes, relationships, 
+		validations, templates, and database abstractions&#8212;persist. However, much 
+		of the internals of those units have been rewritten or refined. Most notably, and 
+		borrowing heavily from Merb, many of Rails's essential features are no longer tightly
+		coupled. For instance, the data-validation conveniences previously available only to 
+		a Rails application are now stand-alone components and can be included in vanilla 
+		Ruby code. Controller capabilities, such as rendering partials and templates, are also 
+		independent and can be embedded in any library.
+	</p>
+	<p>In this article, you take a look at Rails 3 and its many changes and additions and create 
+		a new Rails 3 application from scratch. As of the middle of February 2010, Rails 3 is 
+		a beta prerelease, and the core team is collecting patches, feedback, and 
+		documentation to prepare an official release prior to the start of summer. Nonetheless,
+		the current incarnation of Rails 3 is sufficient for building applications and learning 
+		about the multitude of new capabilities.
+	</p>
+
+	<p><a name="changes"><span class="atitle">Big changes, little changes</span></a></p>
+		<p>The number of changes in Rails 3 is too significant to recount fully here. To read 
+			a complete list along with supplemental material, consult the Rails 3 Release
+			Notes (see <a href="#resources">Resources</a> for a link). Here, however, are 
+			some of the alterations most likely to affect developers:
+		</p>
+			<ul>
+				<li><b>One command to rule them all.</b> Rails 3 obsolesces the family 
+					of scripts (script/server, script/generate, and the rest) found in 
+					each application and replaces it with a single command, aptly 
+					named <code>rails</code>. For example, where you 
+					previously typed <code>./script/console</code>, you 
+					now type <code>rails console</code>. The <code>rails</code>
+					command also generates new applications, as it did before. Its 
+					operation differs according to whether it's launched amid an existing 
+					Rails application.
+				</li>
+				<li><b>A manifest solution for dependencies.</b> Reconciling and resolving 
+					gem dependencies is something of a knotty problem. Gem revisions 
+					can vary from one system to another, as can the collection of available 
+					gems. With such variety, it can be difficult to widely deploy or share a 
+					Rails application. Rails 3 introduces <code>Bundler</code>,
+					a special utility for managing dependencies (thus obsolescing
+					<code>config.gem</code>). You declare dependences in 
+					a catalog named <i>Gemfile</i> in the root of your application. <code>Bundler</code>
+					downloads and stores all the named gems. You can even "pack" the gems 
+					in your application to preclude downloads from external repositories.
+				</li>
+				<li><b>Queries without the queries.</b> Historically, Rails had made good use 
+					of domain-specific languages (DSLs) throughout&#8212;think of 
+					<code>has_one</code> or 
+					<code>validates_numericality_of</code>&#8212;with
+					one notable exception: database queries. Certainly, Rails's dynamic finders 
+					ease the burden, but code littered with option hashes replete with 
+					<code>:conditions</code>, <code>:order</code>,
+					and <code>:limit</code> are common, as are 
+					<code>find_by_sql</code> statements. Rails 3 incorporates 
+					<i>relational algebra,</i> a DSL designed to express queries. Primitives 
+					include <code>project</code> (to select columns), 
+					<code>where</code> (to express conditions), 
+					<code>join</code> (to specify relationships), 
+					<code>take</code> and <code>skip</code> 
+					(for limits and offsets, respectively), and <code>group</code>
+					(for aggregation), among others.
+				</li>
+				<li><b>Controllers sans that fussy boilerplate code.</b> The core actions of a 
+					Rails controller&#8212;<code>new</code>,
+					<code>create</code>, <code>edit</code>,
+					<code>update</code>&#8212;typically do not vary, especially 
+					if the controller is largely there for CRUD operations. In fact, the output 
+					of the controller generator, <code>./script/generate controller</code>,
+					often suffices without further modification. Given those similarities, Rails 3 
+					introduces the <code>Responder</code> to simplify the code 
+					further. For example, a few lines of code is all that's needed for a 
+					<code>create</code> action:
+
+
+<table border="0" cellspacing="0" cellpadding="0" width="50%"><tr><td class="code-outline"><pre class="displaycode">
+  class PostsController
+    respond_to :html, :xml
+
+    def create
+      @post = Post.create(params[:post])
+      respond_with(@post)
+    end
+  end
+</pre></td></tr></table><br />
+
+					<p>In this snippet, <code>respond_with(@post)</code> routes 
+						to <code>show</code> to display the new record if 
+						<code>@post</code> was saved successfully or to 
+						<code>new</code> if the object failed validations, say.
+					</p>
+				</li>
+			</ul>
+		<p>Again, this is just a small sampling. You can find examples of these new features and 
+			more in the next section, in which you build a Rails 3 application from scratch.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="app"><span class="atitle">A first Rails 3 application</span></a></p>
+		<p>To run Rails 3, your system must have either Ruby version 1.8.7 or Ruby version 1.9.2 
+			or a newer release of the programming language and its attendant libraries and 
+			interpreter. It is also beneficial to have the Git software version control system 
+			installed on your machine, as Rails 3 and many other influential Rails projects are 
+			maintained in Git. Your system should also have a database engine, such as SQLite
+			(version 3), MySQL, or PostgreSQL. A Web server is not required to develop a Rails 
+			application, but it's usually part of a production deployment.
+		</p>
+		<p>To create a Rails 3 application, you must have the Rails 3 prerelease gem and all its 
+			dependencies. At the moment, you can install the required components with just 
+			a few commands (see <a href="#list1">Listing 1</a>). (Check the documentation 
+			for Rails 3 before you continue, as the specifics may change from release to 
+			release.)
+		</p>
+
+<br /><a name="list1"><b>Listing 1. The Rails 3 prerelease gem and dependencies</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ gem install rails3b
+Due to a rubygems bug, you must uninstall all older versions of bundler for 0.9 to work
+Successfully installed mime-types-1.16
+Successfully installed mail-2.1.2
+Successfully installed text-hyphen-1.0.0
+Successfully installed text-format-1.0.0
+Successfully installed memcache-client-1.7.8
+Successfully installed rack-1.1.0
+Successfully installed rack-mount-0.4.7
+Successfully installed abstract-1.0.0
+Successfully installed erubis-2.6.5
+Successfully installed i18n-0.3.3
+Successfully installed tzinfo-0.3.16
+Successfully installed bundler-0.9.5
+Successfully installed thor-0.13.1
+Successfully installed rails3b-3.0.1
+14 gems installed
+
+$ gem install arel --pre
+Successfully installed activesupport-3.0.0.beta
+Successfully installed arel-0.2.pre
+2 gems installed
+
+$ gem install rails --pre
+Successfully installed activemodel-3.0.0.beta
+Successfully installed actionpack-3.0.0.beta
+Successfully installed activerecord-3.0.0.beta
+Successfully installed activeresource-3.0.0.beta
+Successfully installed actionmailer-3.0.0.beta
+Successfully installed railties-3.0.0.beta
+Successfully installed rails-3.0.0.beta
+7 gems installed
+</pre></td></tr></table><br />
+
+		<p>The next step is to generate the application&#8212;a small wiki, shown in 
+			<a href="#list2">Listing 2</a>. The application creates and administers articles. 
+			Each article has a title and some prose, and you create a new article simply by 
+			creating a reference to it from the body of an existing page. A reference is any
+			camel case word, such as <i>TheSolarSystem</i> or <i>TheOscars.</i>
+		</p>
+
+<br /><a name="list2"><b>Listing 2. The wiki Rails application</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ rails wiki
+</pre></td></tr></table><br />
+
+		<p>If you run <code>ls -lR</code> to see the contents of the application,
+			a few new files stand out:
+		</p>
+			<ul>
+				<li><i>Gemfile</i> is the gem manifest mentioned earlier. At a minimum,
+					the file must contain two lines: one to point to the source of the 
+					Rails 3 beta gem and one to bundle the Rails 3 beta gem itself. You 
+					probably want a third line (at least) to connect to a database:<br /><br />
+
+<table border="0" cellspacing="0" cellpadding="0" width="50%"><tr><td class="code-outline"><pre class="displaycode">
+source 'http://gemcutter.org'
+gem "rails", "3.0.0.beta"
+gem "sqlite3-ruby", :require =&gt; "sqlite3"
+</pre></td></tr></table><br />
+
+				</li>
+				<li><i>config/application.rb</i> contains many of the options previously 
+					found in config/environment.rb. The latter remains but is largely 
+					deprecated. One significant addition to config/application.rb is the 
+					<i>generators block</i>:<br /><br />
+
+<table border="0" cellspacing="0" cellpadding="0" width="50%"><tr><td class="code-outline"><pre class="displaycode">
+config.generators do |g|
+  g.orm             :active_record
+  g.template_engine :erb
+  g.test_framework  :test_unit, :fixture =&gt; true
+end
+</pre></td></tr></table><br />
+
+					<p>Your Rails 3 application can use one of a number of compatible 
+						object-relational mappers (ORM), template engines, and test frameworks.
+						The generators block specifies your preferences for the application 
+						and invokes the proper generator for your models, views, and so on.
+					</p>
+				</li>
+				<li><i>db/seeds.rb</i> is not new to Rails 3, but it's important to mention, because
+					it was added fairly recently (it was introduced in Rails version 2.3.4). If 
+					your application requires initial data to run properly, such as an administrative 
+					user, price codes, or static pages, create that data in db/seeds.rb and run 
+					the task <code>rake db:seed</code>. Prior to the seed file, 
+					no convention existed for initialization, and many developers put code in 
+					migrations, clouding the differentiation between creating the database 
+					and populating it.
+				</li>
+				<li><i>config.ru,</i> found in the root of each Rails 3 application, is a so-called 
+					<i>rackup</i> file, or a configuration for a Rack-based application. Rails 
+					3 is a Rack application and is compatible with any Web server that also 
+					supports Rack. In general, you need not touch config.ru unless you want 
+					to add other Rack components.
+				</li>
+			</ul>
+		<p>There are a few other new files; most, though, should seem familiar from Rails version 2.3.
+			The config/routes.rb file serves the same purpose as before, albeit with a much-simplified 
+			and more Ruby-like flavor. You'll see an example momentarily.
+		</p>
+		<p>After you generate the application and edit Gemfile to capture your dependencies, your 
+			next step is to collect the gems your application requires. That's the job of the 
+			new utility, <code>bundle</code> (see <a href="#list3">Listing 3</a>).
+		</p>
+
+<br /><a name="list3"><b>Listing 3. Collect the required gems</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ bundle
+installFetching source index from http://gemcutter.org
+Resolving dependencies
+Installing abstract (1.0.0) from system gems
+Installing actionmailer (3.0.0.beta) from system gems
+Installing actionpack (3.0.0.beta) from system gems
+Installing activemodel (3.0.0.beta) from system gems
+Installing activerecord (3.0.0.beta) from system gems
+Installing activeresource (3.0.0.beta) from system gems
+Installing activesupport (3.0.0.beta) from system gems
+Installing arel (0.2.1) from rubygems repository at http://gemcutter.org
+Installing builder (2.1.2) from system gems
+Installing bundler (0.9.7) from rubygems repository at http://gemcutter.org
+Installing erubis (2.6.5) from system gems
+Installing i18n (0.3.3) from system gems
+Installing mail (2.1.2) from system gems
+Installing memcache-client (1.7.8) from system gems
+Installing mime-types (1.16) from system gems
+Installing rack (1.1.0) from system gems
+Installing rack-mount (0.4.7) from system gems
+Installing rack-test (0.5.3) from system gems
+Installing rails (3.0.0.beta) from system gems
+Installing railties (3.0.0.beta) from system gems
+Installing rake (0.8.7) from system gems
+Installing sqlite3-ruby (1.2.5) from rubygems repository at 
+    http://gemcutter.org with native extensions
+
+Installing text-format (1.0.0) from system gems
+Installing text-hyphen (1.0.0) from system gems
+Installing thor (0.13.3) from rubygems repository at http://gemcutter.org
+Installing tzinfo (0.3.16) from system gems
+Your bundle is complete!
+</pre></td></tr></table><br />
+
+		<p>The <code>bundle</code> utility, short for <i>Bundler,</i> downloads 
+			and installs all the gems named in Gemfile and any of those gems' prerequisites
+			(see <a href="#list4">Listing 4</a>). The <code>bundle</code> utility 
+			can also copy all those dependencies into your application, making your code base 
+			self-sufficient. Specifically, if you run <code>bundle pack</code>, 
+			the Bundler copies the corpus of gems to vendor/cache.
+		</p>
+
+<br /><a name="list4"><b>Listing 4. Running the bundle utility</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ bundle pack
+Copying .gem files into vendor/cache
+  * bundler-0.9.7.gem
+  * thor-0.13.3.gem
+  * abstract-1.0.0.gem
+  * mime-types-1.16.gem
+  * text-hyphen-1.0.0.gem
+  * rack-mount-0.4.7.gem
+  * rake-0.8.7.gem
+  * text-format-1.0.0.gem
+  * tzinfo-0.3.16.gem
+  * rack-test-0.5.3.gem
+  * builder-2.1.2.gem
+  * erubis-2.6.5.gem
+  * memcache-client-1.7.8.gem
+  * rack-1.1.0.gem
+  * sqlite3-ruby-1.2.5.gem
+  * i18n-0.3.3.gem
+  * activesupport-3.0.0.beta.gem
+  * arel-0.2.1.gem
+  * mail-2.1.2.gem
+  * activemodel-3.0.0.beta.gem
+  * activerecord-3.0.0.beta.gem
+  * actionpack-3.0.0.beta.gem
+  * railties-3.0.0.beta.gem
+  * actionmailer-3.0.0.beta.gem
+  * activeresource-3.0.0.beta.gem
+  * rails-3.0.0.beta.gem
+
+$ ls vendor/cache
+abstract-1.0.0.gem		memcache-client-1.7.8.gem
+actionmailer-3.0.0.beta.gem	mime-types-1.16.gem
+actionpack-3.0.0.beta.gem	rack-1.1.0.gem
+activemodel-3.0.0.beta.gem	rack-mount-0.4.7.gem
+activerecord-3.0.0.beta.gem	rack-test-0.5.3.gem
+activeresource-3.0.0.beta.gem	rails-3.0.0.beta.gem
+activesupport-3.0.0.beta.gem	railties-3.0.0.beta.gem
+arel-0.2.1.gem			rake-0.8.7.gem
+builder-2.1.2.gem		sqlite3-ruby-1.2.5.gem
+bundler-0.9.7.gem		text-format-1.0.0.gem
+erubis-2.6.5.gem		text-hyphen-1.0.0.gem
+i18n-0.3.3.gem			thor-0.13.3.gem
+mail-2.1.2.gem			tzinfo-0.3.16.gem
+</pre></td></tr></table><br />
+
+		<p>Think of vendor/cache as your application's own gem repository. You can move 
+			the code base anywhere and have the gem software and versions you depend 
+			on&#8212;no remote repositories required. For example, if you run 
+			<code>bundle install</code> after <code>bundle pack</code>,
+			the gems are installed from your application repository to your system (see
+			<a href="#list5">Listing 5</a>).
+		</p>
+
+<br /><a name="list5"><b>Listing 5. Installing the gems</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+Fetching source index from http://gemcutter.org
+Resolving dependencies
+Installing abstract (1.0.0) from .gem files at
+  /Users/strike/projects/rails3/wiki/vendor/cache
+Installing actionmailer (3.0.0.beta) from .gem files at
+  /Users/strike/projects/rails3/wiki/vendor/cache
+Installing actionpack (3.0.0.beta) from .gem files at
+  /Users/strike/projects/rails3/wiki/vendor/cache
+...
+Installing thor (0.13.3) from .gem files at
+  /Users/strike/projects/rails3/wiki/vendor/cache
+Installing tzinfo (0.3.16) from .gem files at
+  /Users/strike/projects/rails3/wiki/vendor/cache
+Your bundle is complete!
+</pre></td></tr></table><br />
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="wiki"><span class="atitle">Working on the wiki</span></a></p>
+		<p>To create the application, generate a scaffold for a page, create the database, seed 
+			the database with an initial page, and set up the necessary routes (see 
+			<a href="#list6">Listing 6</a>). To keep things simple, a wiki page record is 
+			limited to a handful of fields: a title, a slug (an abbreviation of the title), a 
+			body, and timestamps to record when the page was created and when it was last 
+			modified. The title and slug are string fields; prose is a text field, and the 
+			timestamps are date and time fields. (Of course, a real wiki would have additional 
+			fields, such as the most recent author and previous revisions of the page. For 
+			brevity, this example also omits users and sessions, formatting, and any kind of 
+			authentication and authorization.) You can generate an initial model, a set of 
+			views, and a controller with the command <code>rails generate scaffold</code>.
+		</p>
+
+<br /><a name="list6"><b>Listing 6. The full wiki application</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ rails generate scaffold page title:string slug:string body:text --timestamps
+      invoke  active_record
+      create    db/migrate/20100221115613_create_pages.rb
+      create    app/models/page.rb
+      invoke    test_unit
+      create      test/unit/page_test.rb
+      create      test/fixtures/pages.yml
+       route  resources :pages
+      invoke  scaffold_controller
+      create    app/controllers/pages_controller.rb
+      invoke    erb
+      create      app/views/pages
+      create      app/views/pages/index.html.erb
+      create      app/views/pages/edit.html.erb
+      create      app/views/pages/show.html.erb
+      create      app/views/pages/new.html.erb
+      create      app/views/pages/_form.html.erb
+      create      app/views/layouts/pages.html.erb
+      invoke    test_unit
+      create      test/functional/pages_controller_test.rb
+      invoke    helper
+      create      app/helpers/pages_helper.rb
+      invoke      test_unit
+      create        test/unit/helpers/pages_helper_test.rb
+      invoke  stylesheets
+      create    public/stylesheets/scaffold.css
+</pre></td></tr></table><br />
+
+		<p>If you're wondering what happened to <code>./script/generate</code>, 
+			recall that it's now subsumed by the omnipotent <code>rails</code>
+			command.
+		</p>
+		<p>Run <code>rake db:create db:migrate</code> to create the database:</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ rake db:create db:migrate
+==  CreatePages: migrating ====================================================
+-- create_table(:pages)
+   -&gt; 0.0010s
+==  CreatePages: migrated (0.0011s) ===========================================
+</pre></td></tr></table><br />
+
+		<p>The wiki exists now, but it's empty. Add an initial page to serve as an anchor for 
+			all other pages. Edit the file db/seeds.rb, and write code to create a new page,
+			as shown in <a href="#list7">Listing 7</a>.
+		</p>
+
+<br /><a name="list7"><b>Listing 7. The wiki anchor page</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+Page.create(
+  :title    =&gt; 'The Marx Brothers Wiki',
+  :slug     =&gt; 'Home',
+  :body     =&gt; 'An encyclopedic guide to the Marx Brothers.')
+</pre></td></tr></table><br />
+
+		<p>Run <code>rake db:seed</code> to execute the code. You can verify 
+			the page with a quick glance using <code>rails console</code>, as
+			shown in <a href="#list8">Listing 8</a>.
+		</p>
+
+<br /><a name="list8"><b>Listing 8. Verify the anchor page</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+$ rake db:seed
+(in /Users/strike/projects/rails3/wiki)
+
+$ rails console
+Loading development environment (Rails 3.0.0.beta)
+irb(main):001:0&gt; Page.all
+=&gt; [#&lt;Page id: 1, title: "The Marx Brothers Wiki", slug: "Home", 
+    body: "An encyclopedic guide to the Marx Brothers.", 
+    created_at: "2010-02-21 12:24:43", updated_at: "2010-02-21 12:24:43"&gt;]
+
+</pre></td></tr></table><br />
+
+		<p>Before proceeding with the code, set up the routes. Two routes are required: a 
+			default route to find the home page and another route to find a page by its 
+			slug. <a href="#list9">Listing 9</a> shows the final config/routes.rb file.
+		</p>
+
+<br /><a name="list9"><b>Listing 9. config/routes.rb (final)</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+Wiki::Application.routes.draw do |map|
+  resources :pages
+  root :to =&gt; "pages#show"
+end
+</pre></td></tr></table><br />
+
+		<p>The <code>rails generate scaffold page</code> line in <a href="#lsit6">Listing 6</a>
+			automatically created the route in line 2, which is RESTful. You must add the 
+			route in line 3 manually. The syntax to specify a default "root" of the site route 
+			is new in Rails 3. Line 3 says, "Map the route '/' to the 'show' method of the pages 
+			controller." The code for the <code>show</code> method finds the 
+			home page in the database and displays it.
+		</p>
+		<p>After adding the new root route, delete the file public/index.html to preclude conflicts:</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+$ rm public/index.html
+</pre></td></tr></table><br />
+
+		<p>Now, turn your attention to the page controller. The code for a controller in Rails 3 
+			can be exceedingly spartan. <a href="#list10">Listing 10</a> shows the initial 
+			implementation of the controller, with a sole <code>show</code>
+			method.
+		</p>
+
+<br /><a name="list10"><b>Listing 10. A Rails 3 controller</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+class PagesController &lt; ApplicationController
+  respond_to :html
+
+  def show
+    @page = Page.where( :slug =&gt; ( params[:id] || 'Home' ) ).first
+    respond_with( @page )
+  end
+end
+</pre></td></tr></table><br />
+
+		<p>As you can see, all the boilerplate typically found in a Rails 2 controller is missing.
+			<code>respond_to</code> lists the formats the controller supports;
+			here, it responds solely to requests for HTML. <code>respond_with</code>
+			is shorthand for the logic to decide how the controller should proceed.
+		</p>
+		<p>The syntax for the query is also quite different. The lookup is an example of the Rails 3
+			relational algebra. You may be wondering why the <code>first</code>
+			suffix is required. <code>where</code> and other operands that 
+			express the query do not actually cause the query to execute. Instead, the query 
+			sits idly by until the data is actually needed. This is <i>lazy loading,</i> or deferring 
+			the query as long as possible. <code>first</code> sparks an actual 
+			inquiry from the database.
+		</p>
+		<p>If you run the application now, you should see something similar to <a href="#fig1">Figure 1</a>.</p>
+
+			
+				<br /><a name="fig1"><b>Figure 1. The Rails 3 wiki application</b></a><br />
+				<img src="images/fig1.jpg" alt="Wiki application"/>
+			<br />
+
+		<p>Now, add more code to the controller. <a href="#list11">Listing 11</a> shows the 
+			complete controller.
+		</p>
+
+<br /><a name="list11"><b>Listing 11. The complete Rails 3 controller</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+class PagesController &lt; ApplicationController
+  respond_to :html
+  before_filter :get_page, :except =&gt; [ :create ]
+
+  def create
+    respond_with( @page = Page.create( params[ :page ] ) )
+  end
+
+  def edit
+  end
+
+  def index
+    render :action =&gt; :show
+  end
+
+  def show
+    @page ||= Page.new( :slug =&gt; params[ :id ] )
+
+    if @page.new_record?
+      render :action =&gt; :new
+    else
+      respond_with( @page )
+    end
+  end
+
+  def update
+    @page.update_attributes( params[ :page ] )
+    respond_with( @page )
+  end
+
+  private
+
+    def get_page
+      @page = Page.where( :slug =&gt; ( params[:id] || 'Home' ) ).first ||
+        Page.where( :id =&gt; params[:id] ).first
+    end
+end
+</pre></td></tr></table><br />
+
+		<p>In the controller, the <code>index</code> method merely reflects the
+			<code>show</code> action with no page identifier, thus rendering 
+			the home page. <code>show</code> displays a page, given an ID or 
+			a slug (the lookups for all actions are centralized in <code>get_page</code>,
+			further reducing the amount of code); if a page does not exist, a new page is 
+			prepared for editing.
+		</p>
+		<p>The <code>Page</code> model merely validates that all its fields are 
+			present:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+class Page &gt; ActiveRecord::Base
+  validates_presence_of :body, :slug, :title
+end
+</pre></td></tr></table><br />
+
+		<p>The work to translate the camel case references to links to other pages occurs in 
+			the view for the <code>Page</code> model. A helper function in
+			app/helpers/pages_helper.rb does the heavy lifting, keeping the view minimal
+			(see <a href="#list12">Listing 12</a>).
+		</p>
+
+<br /><a name="list12"><b>Listing 12. The camel case translation helper function</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+module PagesHelper
+  def wikify( page )
+    return '' if page.body.blank?
+    page.body.gsub( /^([A-Z][[:alnum:]]*([A-Z][[:alnum:]]*)+)/ ) do |match|
+      link_to( $1, :action =&gt; :show, :id =&gt; $1 )
+    end
+  end
+end
+</pre></td></tr></table><br />
+
+		<p>The view is typical, as shown in <a href="#list13">Listing 13</a>.</p>
+
+<br /><a name="list13"><b>Listing 13. A typical view</b></a><br /><table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+&lt;p&gt;
+  &lt;b&gt;Title:&lt;/b&gt;
+  &lt;%= @page.title %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Body:&lt;/b&gt;
+  &lt;%= raw wikify( @page ) %&gt;
+&lt;/p&gt;
+
+&lt;%= link_to 'Edit', edit_page_path(@page) %&gt; |
+&lt;%= link_to 'Back', pages_path %&gt;
+</pre></td></tr></table><br />
+
+		<p>The <code>raw</code> operator is new to Rails 3. Counter to previous 
+			releases of Rails, all strings are emitted safe, stripped of HTML, by default. If you 
+			want to emit a string with HTML, you must use <code>raw</code>.
+		</p>
+
+	<br /><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/blue_rule.gif" width="100%"/></td></tr></table><table align="right" cellpadding="0" cellspacing="0" class="no-print"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /><p><a name="switching"><span class="atitle">Switching Rails</span></a></p>
+		<p>Beyond the improvements and conveniences shown here, Rails 3 offers better performance 
+			than its predecessors, especially in rendering partials. You can also create your 
+			own validator classes and take advantage of more streamlined standard validations.
+			For instance, this validation, written by Jeremy Macnally, once required four 
+			separate lines of code:
+		</p>
+
+<table border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+validates :login, :presence =&gt; true, :length =&gt; {:minimum =&gt; 4},
+  :uniqueness =&gt; true, :format =&gt; { :with =&gt; /[A-Za-z0-9]+/ }
+</pre></td></tr></table><br />
+
+		<p>The Rails Guides, the official tutorials for Rails, are currently being updated for Rails 3.
+			You can also find extensive instruction and clever solutions on the blogs of Jeremy 
+			Macnally, Yehuda Katz, Gregg Pollack, and other community leaders (see 
+			<a href="#resources">Resources</a> for links). A number of popular books are under
+			revision for the new release, too, including the seminal "pickaxe" book, <i>Agile 
+			Web Development with Rails</i> (see <a href="#resources">Resources</a> for a link).
+		</p>
+<br /><br /><p><a name="resources"><span class="atitle">Resources</span></a></p><b>Learn</b><br /><ul><li>
+		<a href="http://www.ibm.com/developerworks/web/">developerWorks Web development
+			zone</a>: The Web development zone is packed with tools and information for 
+			Web 2.0 development.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/offers/techbriefings/?S_TACT=105AGX44&amp;S_CMP=ART">IBM
+			technical events and webcasts</a>: Stay current with developerWorks' Technical
+			events and webcasts.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	<br /><br /></li></ul><br /><b>Get products and technologies</b><br /><ul><li>
+		<a href="http://www.ibm.com/developerworks/downloads/?S_TACT=105AGX01&amp;S_CMP=ART">IBM
+			product evaluation versions</a>: Download these versions today and get your hands 
+			on application development tools and middleware products from DB2&#174;, 
+			Lotus&#174;, Rational&#174;, Tivoli&#174;, and WebSphere&#174;.
+	<br /><br /></li></ul><br /><b>Discuss</b><br /><ul><li>
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			developerWorks blogs and get involved in the 
+			<a href="http://www.ibm.com/developerworks/community">developerWorks community</a>.
+	</li></ul><br /><br /><p><a name="author"><span class="atitle">About the author</span></a></p><table border="0" cellspacing="0" cellpadding="0" width="100%"><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" height="5" width="100%" alt=""/></td></tr><tr valign="top" align="left"><td><p><img alt="Martin Streicher" src="images\Bio_mstreicher.jpg" align="left"/></p></td><td><img src="../web/www.ibm.com/i/c.gif" height="5" width="4" alt=""/></td><td width="100%"><p>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<i><a href="http://www.linux-mag.com">Linux Magazine</a>.</i> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</p></td></tr></table><br /><br /><br /><p class="no-print"><span class="atitle"><a name="rate">Rate this page</a></span></p><span class="no-print"><form method="post" action="http://www-128.ibm.com/developerworks/utils/RatingsHandler"><input type="hidden" name="SITE_ID" value="1"/><input type="hidden" name="ArticleTitle" value="All aboard! An introduction to Rails 3"/><input type="hidden" name="Zone" value="SOA and Web services"/><input type="hidden" name="RedirectURL" value="http://www.ibm.com/developerworks/thankyou/feedback-thankyou.html"/><input type="hidden" name="ArticleID" value="12345"/><input type="hidden" name="publish-date" value="03012010"/><input type="hidden" name="author1-email" value="martin.streicher@gmail.com" /><input type="hidden" name="author1-email-cc" value="" /><script language="javascript" type="text/javascript">document.write('<input type="hidden" name="url" value="'+location.href+'" />');</script><img alt="" height="1" src="../web/www.ibm.com/i/v14/rules/gray_rule.gif" width="100%"/><br /><table border="0" cellpadding="0" cellspacing="0" class="v14-gray-table-border" width="100%"><tr><td width="100%"><table cellspacing="0" cellpadding="0" border="0" width="100%"><tr><td colspan="3"><p>Please take a moment to complete this form to help us better serve you.</p></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Goal">Did the information help you to achieve your goal?</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td><input type="radio" name="goal" id="goal-yes" value="Yes"/><label for="goal-yes">Yes</label></td><td><input type="radio" name="goal" id="goal-no" value="No"/><label for="goal-no">No</label></td><td><input type="radio" name="goal" id="goal-undecided" value="Don't know"/><label for="goal-undecided">Don't know</label></td></tr></table></td><td width="100%"> </td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="12" alt=""/></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Comments">Please provide us with comments to help improve this page:</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td><textarea name="Comments" id="Comments" wrap="virtual" rows="5" cols="35" class="iform"> </textarea></td></tr></table></td><td width="100%"> </td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="12" alt=""/></td></tr><tr valign="top"><td width="140"><img alt="" height="1" src="../web/www.ibm.com/i/c.gif" width="140"/><br /><p><label for="Rating">How useful is the information?</label></p></td><td width="303"><img alt="" height="6" src="../web/www.ibm.com/i/c.gif" width="303"/><br /><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td width="58" align="left"><input type="radio" name="Rating" id="Rating1" value="1"/><label for="Rating1">1</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating2" value="2"/><label for="Rating2">2</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating3" value="3"/><label for="Rating3">3</label></td><td width="58" align="left"><input type="radio" name="Rating" id="Rating4" value="4"/><label for="Rating4">4</label></td><td width="61" align="left"><input type="radio" name="Rating" id="Rating5" value="5"/><label for="Rating5">5</label></td></tr><tr><td width="60" align="left"><span class="greytext">Not</span><br /><span class="greytext">useful</span></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="60" align="left"><img alt="" width="1" height="1" src="../web/www.ibm.com/i/c.gif"/></td><td width="63" align="left"><span class="greytext">Extremely<br />useful</span></td></tr></table></td><td width="100%"> </td></tr></table></td></tr></table><table cellspacing="0" cellpadding="0" border="0" width="100%" class="v14-gray-table-border"><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="8" alt=""/></td></tr><tr><td width="8"><img src="../web/www.ibm.com/i/c.gif" width="8" height="1" alt=""/></td><td colspan="3"><input type="image" src="../web/www.ibm.com/i/v14/buttons/submit.gif" border="0" width="120" height="21" alt="Submit"/></td></tr><tr><td colspan="3"><img src="../web/www.ibm.com/i/c.gif" width="8" height="8" alt=""/></td></tr></table></form><br /></span><br /><p><!--#include virtual="/developerworks/inc/s-reserved-social-tagging.inc" --></p><!--START RESERVED FOR FUTURE USE INCLUDE FILES--><!--#include virtual="../web/www.ibm.com/developerworks/inc/s-reserved-center2.inc"--><!--END RESERVED FOR FUTURE USE INCLUDE FILES--><br /><span class="no-print"><table align="right" cellpadding="0" cellspacing="0"><tr align="right"><td><table cellspacing="0" cellpadding="0" border="0"><tr><td valign="middle"><img alt="" border="0" height="16" src="../web/www.ibm.com/i/v14/icons/u_bold.gif" width="16"/><br /></td><td align="right" valign="top"><a class="fbox" href="#main"><b>Back to top</b></a></td></tr></table></td></tr></table><br /><br /></span></td><td width="10"><img src="../web/www.ibm.com/i/c.gif" width="10" height="1" alt=""/></td></tr></table></td></tr></table><!--FOOTER_BEGIN--><!--#include virtual="/developerworks/inc/s-footer14.inc" --><!--FOOTER_END--><!--XSLT stylesheet used to transform this file:  dw-document-html-5.12.xsl--></body></html>

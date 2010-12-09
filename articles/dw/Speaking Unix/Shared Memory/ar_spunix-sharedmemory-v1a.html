@@ -1,0 +1,424 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><title>Speaking UNIX 18: Interprocess communication with shared memory</title><meta http-equiv="PICS-Label" content="(PICS-1.1 &#34;http://www.icra.org/ratingsv02.html&#34; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &#34;http://www.rsac.org/ratingsv01.html&#34; l gen true r (n 0 s 0 v 0 l 0) &#34;http://www.classify.org/safesurf/&#34; l gen true r (SS~~000 1))"/><link rel="schema.DC" href="http://purl.org/DC/elements/1.0/"/><link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico"/><meta name="Owner" content="dW Information/Raleigh/IBM"/><meta name="DC.Language" scheme="rfc1766" content="en"/><meta name="IBM.Country" content="ZZ"/><meta name="Security" content="Public"/><meta name="IBM.SpecialPurpose" content="SP001"/><meta name="IBM.PageAttributes" content="sid=1003"/><meta name="Source" content="v16 Template Generator"/><meta name="Robots" content="index,follow"/><meta name="Abstract" content="UNIX provides a number of technologies for interprocess communication, or cooperative computing between two or more applications. Shared memory is the fastest and most flexible of the techniques and is surprisingly easy to implement."/><meta name="Description" content="UNIX provides a number of technologies for interprocess communication, or cooperative computing between two or more applications. Shared memory is the fastest and most flexible of the techniques and is surprisingly easy to implement."/><meta name="Keywords" content="Martin Streicher, UNIX, speaking UNIX, shared memory, dddauca"/><meta name="DC.Date" scheme="iso8601" content="2010-05-26"/><meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316"/><meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="SWG10"/><meta scheme="IBM_WTMCategory" name="IBM.WTMCategory" content="SOFDCAIXZZ"/><meta name="DC.Rights" content="© Copyright IBM Corporation 2010"/><meta name="IBM.Effective" scheme="W3CDTF" content="2010-05-26"/><meta name="title" content="Speaking UNIX 18: Interprocess communication with shared memory"/><!-- HEADER_SCRIPTS_AND_CSS_INCLUDE --><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/all.css" media="all" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/screen-uas.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/zz/en/screen-fonts.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/handheld.css" media="handheld" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/v16/css/print.css" media="print" rel="stylesheet" title="www" type="text/css"/><!-- dW-specific CSS --><link href="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/css/dw-screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><link href="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.cluetip.css" media="screen,projection" rel="stylesheet" title="www" type="text/css"/><script src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/common/js/ibmcommon.js" type="text/javascript">//</script><!-- dW functional JS --><script language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/urltactic.js" type="text/javascript">//</script><!-- Rating_START --><script language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/artrating/artrating.js" type="text/javascript">//</script><style type="text/css">
+.metavalue {
+  display: none;
+}
+</style><!-- Rating_END --><!-- RESERVED_HEADER_INCLUDE --><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/ajax1.js" type="text/javascript">//</script><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/search_counter-maverick.js" type="text/javascript">//</script><script language="javascript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/request_referer_capture-maverick.js" type="text/javascript">//</script><script language="JavaScript" type="text/javascript"><!--
+ setDefaultQuery('');
+ //--></script><script language="JavaScript" type="text/javascript"><!--
+ function openNewWindow(url,tar,arg){window.open(url,tar,arg);}
+ //--></script></head><body id="ibm-com"><div id="ibm-top" class="ibm-landing-page"><!-- MASTHEAD_BEGIN --><div class="ibm-access"><a href="#ibm-content">Skip to main content</a></div><div id="ibm-masthead"><div id="ibm-logo"><a href="http://www.ibm.com/"><img height="50" src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/v16/t/ibm-logo.gif" width="110" alt="IBM®"/></a></div><ul id="ibm-geo"><li id="ibm-country" class="ibm-first">Country/region</li><li id="ibm-change-country">[ <a href="http://www.ibm.com/developerworks/country/">select</a> ]</li></ul><form id="ibm-search-form" action="http://www.ibm.com/developerworks/search/searchResults.jsp" method="get" name="form1"><input type="hidden" name="searchType" value="1"/><input type="hidden" name="searchSite" value="dW"/><p><span id="ibm-search-scope"><label for="sn"><img src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/c.gif" width="1" height="1" alt="Search in:"/></label><select name="searchScope" id="sn"><option value="dW" selected="selected">All of dW</option><option value="dW">-----------------</option><option value="aixunix"> AIX and UNIX</option><option value="db2"> Information Mgmt</option><option value="lotus"> Lotus</option><option value="rdd"> Rational</option><option value="tivoli"> Tivoli</option><option value="WSDD"> WebSphere</option><option value="dW">-----------------</option><option value="archZ"> Architecture</option><option value="javaZ"> Java technology</option><option value="linuxZ"> Linux</option><option value="paZ"> Multicore resources</option><option value="opensrcZ"> Open source</option><option value="webservZ"> SOA/Web services</option><option value="webarchZ"> Web development</option><option value="xmlZ"> XML</option><option value="dW">-----------------</option><option value="forums"> dW forums</option><option value="dW">-----------------</option><option value="aW">alphaWorks</option><option value="dW">-----------------</option><option value="all">All of IBM</option></select></span><label for="q"><img alt="Search for:" height="1" width="1" src="http://a248.e.akamai.net/f/248/47542/30d/www.ibm.com/i/c.gif"/></label><input type="text" name="query" maxlength="100" id="q"/><input type="submit" id="ibm-search" class="ibm-btn-search" name="Search" value="Search"/></p></form><div id="ibm-site-name"><!-- IBM site name container --></div><div id="ibm-universal-nav"><ul><li id="ibm-unav-home" class="ibm-first"><a href="http://www.ibm.com/">Home</a></li><li id="ibm-unav-solutions"><a href="http://www.ibm.com/businesssolutions/">Business solutions</a></li><li id="ibm-unav-services"><a href="http://www.ibm.com/technologyservices/">IT services</a></li><li id="ibm-unav-products"><a href="http://www.ibm.com/products/">Products</a></li><li id="ibm-unav-support"><a href="http://www.ibm.com/support/">Support &amp; downloads</a></li><li id="ibm-unav-myibm"><a href="http://www.ibm.com/account/">My IBM</a></li></ul></div></div><!-- MASTHEAD_END --><div id="ibm-pcon"><!-- CONTENT_BEGIN --><div id="ibm-content"><!-- Navigation_Trail_BEGIN --><!----><div xmlns="" id="ibm-content-head"><ul id="ibm-navigation-trail"><li class="ibm-first"><a href="http://www.ibm.com/developerworks/">developerWorks</a></li><li><a href="http://www.ibm.com/developerworks/aix/">AIX and UNIX</a></li><li><a href="http://www.ibm.com/developerworks/views/aix/library.jsp">Technical library</a></li></ul></div><!-- Navigation_Trail_END --><!-- dW_Summary Area_START --><div id="dw-summary-article"><div class="dw-content-head"><h1 xmlns="">Speaking UNIX 18: Interprocess communication with shared memory</h1><p xmlns=""/></div><div class="ibm-container-body ibm-two-column"><div class="ibm-column ibm-first"><div class="author"><a class="dwauthor" rel="#authortip1" href="#author1">Martin Streicher</a> (<a href="mailto:martin.streicher@gmail.com?subject=Speaking UNIX 18: Interprocess communication with shared memory">martin.streicher@gmail.com</a>), Software Developer, Pixel, Byte, and Comma</div><div id="authortip1" class="dwauthor-onload-state ibm-no-print"><div xmlns="" class="position"><img src="images\Bio_mstreicher.jpg" width="64" height="80" alt="Martin Streicher" /></div>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em xmlns=""><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a xmlns="" href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</div><p/><p><b>Summary:</b>  UNIX provides a number of technologies for <em xmlns="">interprocess communication,</em>
+	or cooperative computing between two or more applications. Shared memory is the fastest and 
+	most flexible of the techniques and is surprisingly easy to implement.
+</p><p class="ibm-no-print"><div id="dw-tag-this" class="ibm-no-print"><a class="ibm-external-link" onclick="jQuery.launchTagThisWindow(); return false;" href="#">Tag this!</a></div></p></div><div class="ibm-column ibm-second"><p class="leading"><b xmlns="">Date:</b>&nbsp; 26 May 2010<br /><b>Level: </b>&nbsp;Intermediate<br /><b>Comments:</b>   <span id="nCmts"><img alt="" src="http://www.ibm.com/developerworks/i/circle-preloader.gif" height="12" width="50"/><img alt="" src="http://www.ibm.com/i/gif" height="14" width="1"/></span><!-- Rating_Area_Begin --><!-- Ensure that div id is based on input id and ends with -widget --><input id="art-rating" name="ratinga" type="hidden" value="0"/><div id="art-rating-widget"></div><script language="JavaScript" type="text/javascript">
+// 
+   // widget div id and article id as args
+   window.artRating.init('art-rating-widget');
+// 
+</script><!-- Rating_Area_End --></p></div></div></div><!-- dW_Summary_Area_END --><!-- CONTENT_BODY --><div id="ibm-content-body"><!-- MAIN_COLUMN_BEGIN --><div id="ibm-content-main"><!-- Related_Searches_Area_Begin --><script type="text/javascript" language="javascript">
+	     capture_referrer();
+</script><div id="dw-related-searches-article" style="display:none"><div class="ibm-container ibm-alternate-two"><div class="ibm-container-body"><!--  START : HTML FOR ARTICLE SEARCH --><div id="article_results" style="display:block"></div><!--  END : HTML FOR ARTICLE SEARCH --></div></div></div><!-- Related_Searches_Area_End --><!-- MAIN_COLUMN_CONTAINER_BEGIN --><div class="ibm-container"><!-- MAIN_COLUMN_CONTENT_BEGIN -->
+	<p xmlns="">Based on appearance, a UNIX&#174; application has sole command of the underlying host. 
+		It has ready and free access to the processor, its memory is sacrosanct, and attached 
+		devices serve the application's every whim. But true to the maxim "Appearances can 
+		be deceiving," such sovereignty is a clever illusion. A UNIX system runs any number of 
+		applications simultaneously, sharing its finite physical resources judiciously among all.
+		Processor capacity is doled out in slices, application images are constantly shuffled 
+		in and out of real memory, and device access is driven by demand and policed by 
+		access rights. Although your shell prompt blinks attentively, a UNIX machine teems 
+		with activity.
+	</p>
+
+<div xmlns="" class="ibm-container ibm-alt-header dw-container-sidebar"><a name="fua"></a><h2>Frequently used acronyms</h2><div class="ibm-container-body">
+	
+		<ul>
+			<li><strong>API:</strong> Application programming interface</li>
+			<li><strong>IPv4:</strong> Internet Protocol version 4</li>
+			<li><strong>IPv6:</strong> Internet Protocol version 6</li>
+			<li><strong>POSIX:</strong> Portable Operating System Interface for UNIX</li>
+		</ul>
+</div></div>
+
+	<p xmlns="">Complexity notwithstanding, most applications are happily oblivious to shared tenancy. 
+		However, you can write applications to interact with each other. For example, one 
+		application could collect or generate data, while another monitors progress and 
+		analyzes the information on the fly. Chat, an instant exchange of messages, is 
+		another instance of cooperating code, where the application both transmits and 
+		receives data from a peer. Secure Shell (ssh) is another tandem, potentially 
+		coordinating between two entirely different hosts. In each instance, code connects 
+		to other, independent code to swap information, often using a protocol to negotiate
+		and control the interchange.
+	</p>
+	<p xmlns="">UNIX provides a number of technologies for such <em>interprocess communication.</em>
+		Some techniques provide for communication on the same host, while others facilitate
+		host-to-host exchanges. Speed varies among the techniques, too, so you must choose
+		the option that best suits your requirements. Coordination&#8212;enforcing timing
+		and exclusivity&#8212;is invariably required, too. For example, if one application 
+		produces data and another consumes it, the consumer must pause and wait for the 
+		producer whenever it exhausts the shared pool. Reflexively, the producer may slow 
+		or stall if the consumer cannot deplete the pool quickly enough.
+	</p>
+	<p xmlns=""><a href="#table1">Table 1</a> summarizes the forms of interprocess communication 
+		available on a typical UNIX system.
+	</p>
+
+<br /><a xmlns="" name="table1"><b>Table 1. Interprocess communication in UNIX</b></a><br />
+	<table xmlns="" border="0" cellpadding="0" cellspacing="0" class="ibm-data-table" summary="Interprocess communication in UNIX"><tr><th>Name</th><th>Description</th><th>Scope</th><th>Use</th></tr><tr><td>File</td><td>Data is written to and read from a typical UNIX file. Any number of processes 
+				can interoperate.
+			</td><td>Local</td><td>Sharing large data sets</td></tr><tr><td>Pipe</td><td>Data is read from and written to ??? using dedicated file descriptors. 
+				Communication occurs only between a parent and child process.
+			</td><td>Local</td><td>Simple data sharing, such as producer and consumer</td></tr><tr><td>Named pipe</td><td>Data is read from and written to using dedicated file descriptors. 
+				Communication can occur between any two peer processes on the 
+				same host.
+			</td><td>Local</td><td>Producer and consumer, or command-and-control, as demonstrated 
+				with the MySQL server and its command-line query utility
+			</td></tr><tr><td>Signal</td><td>An interrupt alerts the application to a specific condition.</td><td>Local</td><td>Cannot transfer data in a signal, so mostly useful for process management</td></tr><tr><td>Shared memory</td><td>Information is shared by reading and writing from a common segment of memory.</td><td>Local</td><td>Cooperative work of any kind, especially if security is required</td></tr><tr><td>Socket</td><td>After special setup, data is transferred using common input/output operations.</td><td>Local or remote</td><td>Network services such as FTP, ssh, and the Apache Web Server</td></tr></table>
+
+	<p xmlns="">As mentioned above, each technique suits a particular need. Assuming that coordination 
+		between multiple processes is roughly equally intricate, each approach has advantages
+		and disadvantages:
+	</p>
+		<ul xmlns="">
+			<li>Sharing data via a common UNIX file is simple, because it uses familiar file 
+				operations. However, sharing data via the file system is inherently slow, 
+				because disk input and output operations cannot match the expediency of 
+				memory. Further, it is difficult to coordinate reads and writes via a file only,
+				and ultimately, saving sensitive data in a file is not secure, because root and
+				other privileged users can access the information. In a sense, files are best
+				used when viewed as read-only or write-only.
+			</li>
+			<li>The pipe and named pipe are also simple mechanisms to use, using two standard
+				file descriptors on each end of the connection&#8212;one exclusive to read 
+				and another exclusive to write operations. A pipe, though, can only be used 
+				between a parent and child process, not between two arbitrary processes. 
+				The named pipe addresses the latter shortcoming and is an excellent choice 
+				for data exchange on the same system. However, neither a pipe nor a named 
+				pipe provides random access, because each operates as a first-in, first-out 
+				(FIFO) device.
+			</li>
+			<li>A signal cannot transfer data from one process to another. In general, signals should
+				only be used to communicate exceptional conditions between one process 
+				and another.
+			</li>
+			<li>Shared memory is well suited to larger collections of data and, because it uses 
+				memory, grants fast, random access. Shared memory is slightly more 
+				complicated to implement but is otherwise an excellent choice for 
+				<em>intra</em>host collaboration between multiple processes.
+			</li>
+			<li>A socket functions much like a named pipe but can span hosts. <em>Local 
+				sockets</em> (also called <em>UNIX sockets</em>) are restricted to 
+				local (same host) connectivity. <em>Inet</em> and <em>Inet6</em> 
+				sockets, which use the IPv4 and IPv6 protocols, respectively, accept 
+				remote connections (and local connections via the local machine's 
+				Internet addressing). The socket is the obvious choice for any networking 
+				application, such as distributed processing or a Web browser. Coding is 
+				a little more complicated than with named pipes, but the pattern is 
+				well established and well documented in any UNIX network programming 
+				book.
+			</li>
+		</ul>
+	<p xmlns="">Ignoring <em>inter</em>host applications, let's look at shared memory for interprocess
+		communication on the same host.
+	</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="works"><span class="atitle">How shared memory works</span></a></p>
+		<p xmlns="">As its name implies, shared memory makes a segment of memory accessible to more 
+			than one process. Special system calls, or requests to the UNIX kernel, allocate 
+			and free the memory and set permissions; common Read and Write operations 
+			put and get data from the region.
+		</p>
+		<p xmlns="">Shared memory is not drawn from a process's own memory: That memory is always 
+			private. Instead, shared memory is allocated from the system's free memory pool
+			and is annexed by each process that wants access. Annexation is called <em>mapping,</em>
+			where the shared segment of memory is assigned local addresses in each process'
+			own address space. <a href="#fig1">Figure 1</a>, <a href="#fig2">Figure 2</a>,
+			<a href="#fig3">Figure 3</a>, and <a href="#fig4">Figure 4</a> depict the process:
+		</p>
+			<ol xmlns="">
+				<li>Assume two processes, A and B, are running on the same system, as 
+					shown in <a href="#fig1">Figure 1</a>, and have been specifically 
+					coded to coordinate and share information via shared memory. A 
+					and B have disproportionate sizes in the figure to emphasize that 
+					the applications need not be identical.
+
+					
+						<br /><br /><a name="fig1"><b>Figure 1. xxx</b></a><br />
+						<img alt="xxx" src="images/fig1.png" width="326" height="251"/>
+					<br /><br />
+
+				</li>
+				<li>In <a href="#fig2">Figure 2</a>, process A requests a segment of shared 
+					memory. Process A initializes the memory segment, preparing it for 
+					use. The process also names the segment so that other processes can 
+					find it. Typically, a segment name is not dynamically assigned; instead,
+					it is well known, such as a constant in a header file, and easily referenced
+					from other code.
+
+					
+						<br /><br /><a name="fig2"><b>Figure 2. xxx</b></a><br />
+						<img alt="xxx" src="images/fig2.png" width="326" height="251"/>
+					<br /><br />
+
+				</li>
+				<li>Process A annexes, or maps, the shared memory segment into its own 
+					address space. Process B finds the segment via its named pipe and also 
+					maps the segment into its address space. This is shown in 
+					<a href="#fig3">Figure 3</a>. Both processes are enlarged by the size of 
+					the shared memory segment.
+
+					
+						<br /><br /><a name="fig3"><b>Figure 3. xxx</b></a><br />
+						<img alt="xxx" src="images/fig3.png" width="326" height="251"/>
+					<br /><br />
+
+				</li>
+				<li>Finally, in <a href="#fig4">Figure 4</a>, processes A and B can read and written
+					from the shared memory segment freely. The shared memory is treated
+					the same as local process memory. <code>read()</code> 
+					and <code>write()</code> operate as normal.
+
+					
+						<br /><br /><a name="fig4"><b>Figure 4. xxx</b></a><br />
+						<img alt="xxx" src="images/fig4.png" width="326" height="251"/>
+					<br /><br />
+
+				</li>
+			</ol>
+		<p xmlns="">Much of the work shown in these figures is captured in the UNIX shared memory 
+			API. In fact, there are two variants of the shared memory API: the POSIX API and the 
+			older but no less effective System V API. Because POSIX is the ratified standard and 
+			likely found on UNIX and Linux&#174; and derivations of those systems, let's use that 
+			version. Additionally, the POSIX API uses simple file descriptors for read and write and
+			so should seem much more familiar.
+		</p>
+		<p xmlns="">POSIX provides five entry points to create, map, synchronize, and undo shared memory 
+			segments:
+		</p>
+			<ul xmlns="">
+				<li><strong><code>shm_open()</code>.</strong> Creates a 
+					shared memory region or attaches to an existing, named region. 
+					This system call returns a file descriptor.
+				</li>
+				<li><strong><code>shm_unlink()</code>.</strong> Deletes a 
+					shared memory region given a file descriptor (returned from 
+					<code>shm_open()</code>. The region is not actually 
+					removed until all processes accessing the region exit, much like any 
+					file in UNIX. However, once <code>shm_unlink()</code> 
+					is called (typically by the originating process), no other processes can 
+					access the region.
+				</li>
+				<li><strong><code>mmap()</code>.</strong> Maps a shared 
+					memory region into the process's memory. This system call requires 
+					the file descriptor from <code>shm_open()</code> and 
+					returns a pointer to memory. (In some cases, you can also map a file 
+					descriptor to a plain file or another device into memory. A discussion 
+					of those options is beyond the scope of this introduction; consult the 
+					<code>mmap()</code> documentation for your operating
+					system for specifics.)
+				</li>
+				<li><strong><code>munmap()</code>.</strong> The inverse of 
+					<code>mmap()</code>.
+				</li>
+				<li><strong><code>msync()</code>.</strong> Used to synchronize 
+					a shared memory segment with the file system&#8212;a technique 
+					useful when mapping a file into memory.
+				</li>
+			</ul>
+		<p xmlns="">The pattern for shared memory is to create a segment with <code>shm_open()</code>,
+			size it with <code>write()</code> or <code>ftruncate()</code>,
+			map it into process memory with <code>mmap()</code>, and do the 
+			work required with one or more additional participants. To finish, the originating 
+			process calls <code>munmap()</code> and <code>shm_unlink()</code>,
+			and then exits.
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="sample"><span class="atitle">A sample application</span></a></p>
+		<p xmlns=""><a href="#list1">Listing 1</a> shows a small shared memory example. (The code is 
+			derived from John Fusco's book, <em>The Linux Programmer's Toolbox,</em> and 
+			used with the permission of the author.) The code implements a parent and child 
+			process that communicates via a shared memory segment.
+		</p>
+
+<br /><a xmlns="" name="list1"><b>Listing 1. Shared memory example</b></a><br /><table xmlns="" border="0" cellspacing="0" cellpadding="0" width="65%"><tr><td class="code-outline"><pre class="displaycode">
+	
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/file.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;sys/wait.h&gt;
+
+void error_and_die(const char *msg) {
+  perror(msg);
+  exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[]) {
+  int r;
+
+  const char *memname = "sample";
+  const size_t region_size = sysconf(_SC_PAGE_SIZE);
+
+  int fd = shm_open(memname, O_CREAT | O_TRUNC | O_RDWR, 0666);
+  if (fd == -1)
+    error_and_die("shm_open");
+
+  r = ftruncate(fd, region_size);
+  if (r != 0)
+    error_and_die("ftruncate");
+
+  void *ptr = mmap(0, region_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  if (ptr == MAP_FAILED)
+    error_and_die("mmap");
+  close(fd);
+
+  pid_t pid = fork();
+
+  if (pid == 0) {
+    u_long *d = (u_long *) ptr;
+    *d = 0xdbeebee;
+    exit(0);
+  }
+  else {
+    int status;
+    waitpid(pid, &amp;status, 0);
+    printf("child wrote %#lx\n", *(u_long *) ptr);
+  }
+
+  r = munmap(ptr, region_size);
+  if (r != 0)
+    error_and_die("munmap");
+
+  r = shm_unlink(memname);
+  if (r != 0)
+    error_and_die("shm_unlink");
+
+  return 0;
+}
+</pre></td></tr></table><br />
+
+		<p xmlns="">Here are some highlights from the code:</p>
+			<ul xmlns="">
+				<li>The call to <code>shm_open()</code> should look familiar: It
+					is much like the <code>open()</code> function, including
+					how to initialize the segment and permissions. Here, the segment is 
+					world-readable and world-writable. The next unused file descriptor is 
+					returned if the call is successful; otherwise, <code>-1</code>
+					is returned and <code>errno</code> is set accordingly.
+				</li>
+				<li><code>ftruncate()</code> sizes the file to 
+					<code>region_size</code> bytes, which was previously set 
+					to the system's standard page size. <code>sysconf()</code>
+					is provided as part of libc. (You can use the shell utility <code>getconf</code>
+					to explore your system's configuration settings, too.)
+				</li>
+				<li><code>mmap()</code> annexes the shared memory segment
+					and returns a pointer suitable for reading and writing bytes directly from 
+					the segment. <code>PROT_READ</code> and 
+					<code>PROT_WRITE</code> indicate that the pages in the 
+					segment can be read from and written to, respectively. <code>MAP_SHARED</code>
+					specifies that any changes to the memory segment should be "public" to 
+					all cooperating processes.
+				</li>
+				<li>The computation part of the code should seem familiar if you've worked at 
+					all with <code>fork()</code>: After the fork, the parent 
+					and child have copies of all open file descriptors and data values, so 
+					the pointer works for both. <code>pid</code>, however, 
+					differs. The child gets 0, the parent gets the process ID of the child, 
+					and the value of the variable determines which of the 
+					<code>if</code>/<code>then</code>/<code>else</code>
+					branches to take. The child writes some bytes to the pointer, and then 
+					exits. The parent waits for the child to exit, and then reads what was 
+					written.
+				</li>
+				<li>Before the parent can exit, however, it must free the shared memory. 
+					<code>munmap()</code> and <code>shm_unlink()</code>
+					do the trick.
+				</li>
+			</ul>
+		<p xmlns="">This example is very elementary. A real application would use semaphores or other 
+			techniques to control reading and writing to the shared segment. Such control is 
+			typically application specific, and you can find many examples in the Berkeley 
+			Software Distribution (BSD) and Linux source, if your UNIX flavor is not open 
+			source.
+		</p>
+
+	<div xmlns="" class="ibm-alternate-rule"><hr/></div><p xmlns="" class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p xmlns=""><a name="all"><span class="atitle">All for one</span></a></p>
+		<p xmlns="">Because UNIX runs many applications seemingly at the same time, it's an ideal platform 
+			for monitoring, data collection, cooperative and distributed computing, and 
+			client-server applications. Shared memory is the fastest of the interprocess 
+			communications options available and is quite flexible. You can map files into 
+			memory, as well&#8212;an ideal solution for accelerating data access.
+		</p>
+<!-- CMA ID: 12345 --> <!-- Site ID: 1 --> <!-- XSLT stylesheet used to transform this file: dw-document-html-6.0.xsl --> <br /><p xmlns=""><a name="resources"><span class="atitle">Resources</span></a></p><p xmlns=""><b>Learn</b></p><ul xmlns=""><li>
+		<a href="http://www-128.ibm.com/developerworks/views/aix/libraryview.jsp?search_by=speaking+UNIX+Part">Speaking
+			UNIX</a>: Check out other parts in this series.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/">AIX and UNIX developerWorks
+			zone</a>: The AIX and UNIX zone provides a wealth of information relating to
+			all aspects of AIX systems administration and expanding your UNIX skills.
+	<br /><br /></li><li>
+		<a href="http://www-128.ibm.com/developerworks/aix/newto/">New to AIX and UNIX</a>?
+			Visit the New to AIX and UNIX page to learn more.
+	<br /><br /></li><li>
+		<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Technology
+			bookstore</a>: Browse the technology bookstore for books on this and other
+			technical topics.
+	<br /><br /></li></ul><p xmlns=""><b>Discuss</b></p><ul xmlns=""><li>
+		<a href="http://www.ibm.com/developerworks/blogs/">developerWorks blogs</a>: Check out
+			our blogs and get involved in the <a href="http://www.ibm.com/developerworks/community">developerWorks
+			community</a>.
+	<br /><br /></li><li>
+		Participate in the AIX and UNIX forums:
+			<ul>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=747&amp;amp;cat=72">AIX
+					5L&#8212;technical forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=905&amp;amp;cat=72">AIX
+					for Developers Forum</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=907&amp;amp;cat=72">Cluster
+					Systems Management</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=935&amp;amp;cat=72">IBM
+					Support Assistant</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_forum.jsp?forum=749&amp;amp;cat=72">Performance
+					Tools&#8212;technical</a>
+				</li>
+				<li><a href="http://www-128.ibm.com/developerworks/forums/dw_auforums.jsp">More AIX and UNIX
+					forums</a>
+				</li>
+			</ul>
+	<br /></li></ul><p xmlns=""><a name="author"><span class="atitle">About the author</span></a></p><div xmlns="" class="ibm-container ibm-portrait-module ibm-alternate-two"><div class="ibm-container-body"><img src="images\Bio_mstreicher.jpg" class="dw-author-img" width="64" height="80" alt="Martin Streicher" /><p><a name="author1"></a>Martin Streicher is a freelance Ruby on Rails developer and the former Editor-in-Chief of
+		<em><a href="http://www.linux-mag.com">Linux Magazine</a>.</em> Martin holds a
+		Masters of Science degree in computer science from Purdue University and has
+		programmed UNIX-like systems since 1986. He collects art and toys. You can reach
+		Martin at <a href="mailto:martin.streicher@gmail.com">martin.streicher@gmail.com</a>.
+	</p></div></div><!-- MAIN_COLUMN_CONTENT_END --><!-- INLINE_COMMENTS_START --><p class="ibm-no-print"><span class="atitle"><a name="icomments">Comments</a></span></p><div id="dw-icomments-container" class="ibm-no-print"><div class="ibm-alternate-rule"><hr/></div><div class="ibm-alternate-rule"><hr/></div><!-- Comment_Script --><a id="comments" href="comments"/><script language="JavaScript" src="http://www.ibm.com/developerworks/js/insertcomment.js" type="text/javascript">//</script><div id="threadShow"></div><script language="JavaScript" type="text/javascript">
+// 
+jQuery('threadShow').insertComment('95%',5,'nCmts','icomments');
+// 
+</script></div><!-- INLINE_COMMENTS_END --><p class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="#ibm-pcon">Back to top</a></p><p><a href="http://www.ibm.com/developerworks/ibm/trademarks/">Trademarks</a></p></div><!-- MAIN_COLUMN_CONTAINER_END --><!-- Rating_Meta_BEGIN --><!--Rating_Meta_BEGIN--><div xmlns="" class="metavalue">static.content.url=http://www.ibm.com/developerworks/js/artrating/</div><div xmlns="" class="metavalue">SITE_ID=1</div><div xmlns="" class="metavalue">Zone=AIX and UNIX</div><div xmlns="" class="metavalue">ArticleID=12345</div><div xmlns="" class="metavalue">ArticleTitle=Speaking UNIX 18: Interprocess communication with shared memory</div><div xmlns="" class="metavalue">publish-date=05262010</div><div xmlns="" class="metavalue">author1-email=martin.streicher@gmail.com</div><div xmlns="" class="metavalue">author1-email-cc=</div><script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href+'</div>');</script><!--Rating_Meta_END--><!-- Rating_Meta_END --></div><!-- MAIN_COLUMN_END--><!-- RIGHT_COLUMN_BEGIN --><div id="ibm-content-sidebar"><!-- RIGHT_COLUMN_CONTENT_BEGIN --><div xmlns="" class="ibm-container"><h2>Table of contents</h2><div class="ibm-container-body"><img src="//www.ibm.com/i/c.gif" width="1" height="1" alt=""/><ul class="ibm-bullet-list"><li><a href="#works" class="ibm-feature-link">How shared memory works</a></li><li><a href="#sample" class="ibm-feature-link">A sample application</a></li><li><a href="#all" class="ibm-feature-link">All for one</a></li><li><a href="#resources" class="ibm-feature-link">Resources</a></li><li><a href="#author" class="ibm-feature-link">About the author</a></li><li><a href="#icomments" class="ibm-feature-link">Comments</a></li></ul></div></div><!-- Dig_Deeper --><!-- High_Visibility_Offer --><!-- Special_Offers --><!-- RIGHT_COLUMN_CONTENT_END --></div><!-- RIGHT_COLUMN_END --><!-- CONTENT_BODY_END --></div></div><!-- CONTENT_END --><!-- END_IBM-PCON --></div><!-- FOOTER_BEGIN --><div id="ibm-page-tools"><!-- IBM page tools container --></div><div id="ibm-footer"><ul><li class="ibm-first"><a href="http://www.ibm.com/ibm/">About IBM</a></li><li><a href="http://www.ibm.com/privacy/">Privacy</a></li><li><a href="http://www.ibm.com/contact/">Contact</a></li><li><a href="http://www.ibm.com/legal/">Terms of use</a></li></ul></div><!-- FOOTER_END --><!-- END_IBM-TOP --></div><!-- SCRIPTS_INCLUDE_BEGIN --><!-- JQuery start --><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.dimensions-1.2.js">//</script><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.hoverIntent.minified.js">//</script><script type="text/javascript" language="JavaScript" src="http://a248.e.akamai.net/f/248/69561/1d/www.ibm.com/developerworks/js/jquery/cluetip98/jquery.cluetip.js">//</script><script type="text/javascript" language="JavaScript">
+	jQuery.noConflict();     
+	// Put all your code in your document ready area
+	jQuery(document).ready(function(jQuery) {
+	// Do jQuery stuff using jQuery 
+	jQuery('a.dwauthor').cluetip({
+		local: true,
+		showTitle: false,
+		positionBy: 'bottomTop',
+		sticky: true,	
+		mouseOutClose: true,
+		closeText: '<img src="http://www.ibm.com/developerworks/js/jquery/cluetip98/i/x.gif" alt="Close"/>',
+		arrows: false,
+		dropShadow: true,
+		cluetipClass: 'dwbasic'
+		});   	
+	});
+ </script><!-- JQuery end --><div id="ibm-metrics"/></body></html>

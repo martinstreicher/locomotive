@@ -1,0 +1,406 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2 {
+    font-size: 125%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    padding: 5px;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  div.image {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 1em;
+    text-align: center;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+    visibility: visible;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  th, td {
+    padding: 4px 12px;
+    font-size: 80%;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<p>
+  <em>
+    Abstract: While cloud computing may currently be all the rage, there is a silicon lining to each calculating cumulus: hardware and software that require very real upkeep. Here, let's look at how to manage gobs of machines right from the command-line.
+  </em>
+</p>
+
+
+<h1>
+Managing Multitudes of Machines the Mild-Mannered Way
+  </h1>
+
+<p>
+  While cloud computing may currently be all the rage, there is a silicon lining to each calculating cumulus: A cloud is ultimately constituted from hardware and software -- components that require real and regular upkeep. Hardware failures demand repair or replacement, software requires patching, updates, and upgrades, and systems must be configured to keep ahead of demand and potential security threats. Application developers may find compute clouds soft, fluffy, and convenient, but a cloud administrator faces the grimy truth.</p>
+
+<p>
+  But you don't have to manage a cloud to face gritty issues. A LAN, a small server farm, and a compute cluster pose many of the same system administration challenges. When the number of machines climbs, workaday tools such as <i>ssh</i>, <i>scp</i>, and <i>sftp</i> become cumbersome. Here, let's look at effective techniques to manage gobs of machines from the command-line, starting with just a handful of systems and scaling upward.</p>
+
+
+<h2>
+  A Brute Force Approach</h2>
+
+<p>
+  A simple and obvious approach to running a command on a collection of machines wraps the common <i>ssh</i> utility in a script. Assuming you have distributed your public key to each remote system you want to access (to avoid typing a password each time), this script, named <i>mssh.sh</i>, runs a single command on each machine specified and prints the collected results at end.</p>
+
+<pre>
+#!/bin/bash
+# Usage: mssh.sh "machine1 [machine2...]" "command"
+
+OUTPUT_LOG=/tmp/output-$$.log
+ERROR_LOG=/tmp/error-$$.log
+MACHINES=$1; shift
+COMMAND=$1; shift
+
+for machine in $MACHINES
+do
+    ssh $machine $COMMAND >>$OUTPUT_LOG.$machine 2>>$ERROR_LOG.$machine &
+done
+
+wait
+
+cat $OUTPUT_LOG.*
+cat $ERROR_LOG.* >&2
+rm -f $OUTPUT_LOG.* $ERROR_LOG.*
+</pre>
+
+<p>
+  For example, the command <tt>mssh.sh "example.com joe@sample.com" "uptime -a"></tt> runs <tt>uptime -a</tt> on two hosts, <tt>example.com</tt> and <tt>sample.com</tt>. The list of machine names is quoted to lump the names together into one argument, and the command is quoted for exactly the same reason. Each machine name must conform to the paradigms for ssh -- either <tt><i>hostname</i></tt>, if the remote user name is the same as the local user name, or <tt><i>username@hostname</i></tt> if the remote user name differs from the local login. Running <tt>mssh.sh "example.com joe@sample.com" "uptime -a"></tt> produces something akin to this:</p>
+
+<pre>
+$ mssh.sh "example.com joe@sample.com" "uptime"
+example.com
+08:34:35 up 66 days, 17:29,  0 users,  load average: 0.40, 0.19, 0.07
+joe@sample.com
+08:34:28 up 104 days, 10:18,  0 users,  load average: 0.15, 0.10, 0.10
+</pre>
+
+<p>
+  This script is rudimentary, but can be extended to include other features, such as a tunable timeout to prevent interminable delays when a single host is down (look at the <tt>ssh -o</tt> option) and a named directory to capture output. Indeed, many packages build on the spirit of this script to simplify distributed system administration. One of those is <i>dsh</i>, the Distributed Shell.</p>
+
+
+<h2>
+  A Better Tool for the Task</h2>
+
+<p>
+  dsh is specifically designed to run shell commands on remote systems and provides a handful of conveniences to make working with groups of macines easier. dsh is available in both binary and source form. For binaries, consult your Linux or Unix distribution for the <i>libdshconfig</i> and <i>dsh</i> packages. For example, Ubuntu and Debian users can install dsh in one fell swoop with <i>apt-get</i>:</p>
+
+<pre>
+$ sudo apt-get install libdshconfig1 libdshconfig1-dev dsh
+</pre>
+
+<p>
+  If you cannot find pre-built packages for your system, dsh is readily built from source code. Find the latest version of both the library and the utility, download and unpack both tarballs, and build and install both with the typical technique of <tt>./configure; make; sudo make install</tt>.</p>
+
+<pre>
+$ # Build and install the library first
+$ wget http://www.netfort.gr.jp/~dancer/software/downloads/libdshconfig-0.20.13.tar.gz
+$ tar xzvf libdshconfig-0.20.13.tar.gz
+$ cd libshconfig-0.20.13
+$ ./configure
+$ make
+$ sudo make install
+
+$ # Then build and install the utility
+$ wget http://www.netfort.gr.jp/~dancer/software/downloads/dsh-0.25.9.tar.gz
+$ tar xzvf dsh-0.25.9.tar.gz
+$ cd dsh-0.25.9
+$ ./configure
+$ make
+$ sudo make install
+</pre>
+
+<p>
+  dsh is a fairly small application; the <i>dsh</i> and <i>dsh.conf</i> man pages provide all the details required to master the utility. For instance, to run <i>uptime</i> across a set of hosts, as in the first example, you simply type:</p>
+
+<pre>
+$ dsh --show-machine-names -m example.com -m joe@sample.com -- uptime
+example.com: 11:34:57 up 66 days, 20:29,  0 users,  load average: 0.04, 0.06, 0.01
+joe@sample.com: 11:35  up 2 days, 14:59, 8 users, load averages: 0.46 0.35 0.31
+</pre>
+
+<p>
+  A machine is specified with <tt>-m</tt> and host names follow the same rules as <i>ssh</i>. The two dashes in the command-line separate options for the <i>dsh</i> command itself from the command to run. Output appears in the order the machines are named. <tt>--show-machine-names</tt> prepends each machine name to whatever is emitted from the remote command.</p>
+
+<p>
+  If you tend to work with the same set or subset of machines, you can define one or more collections and specify a collection to operate on. You can create one <i>global</i> collection and any number of <i>groups</i>. The file <i>$HOME/.dsh/machines.list</i> is the global collection. If you specify <tt>dsh -a</tt>, the given command runs on all machines listed in <i>machines.list</i>. Hence, if <i>machines.list</i> contained...</p>
+
+<pre>
+example.com
+joe@sample.com
+</pre>
+
+<p>
+... the command <tt>dsh -a --show-machine-names -- uptime</tt> would produce the same output as the previous command.</p>
+
+<pre>
+$ dsh -a --show-machine-names -- uptime
+example.com:  11:57:03 up 66 days, 20:51,  0 users,  load average: 0.29, 0.18, 0.07
+joe@sample.com: 11:57  up 2 days, 15:21, 8 users, load averages: 0.52 0.31 0.26
+</pre>
+
+<p>
+  You can create smaller or specialized collections of machines in individual files named <i>$HOME/.dsh/group/</i>groupname, where <i>groupname</i> is a meaningful name you assign. For example, if you create a file named <i>$HOME/.dsh/group/servers</i>, the command <tt>dsh -g servers -- uptime</tt> runs <i>uptime</i> on all machines listed in the <i>servers</i> file.</p>
+
+<p>
+  Feel free to mix and match <tt>-m</tt> with <tt>-a</tt> and <tt>-g</tt> to extend the global list or a group, respectively. Additionally, you can use <tt>--file <i>filename</i></tt> to add all machines listed in <tt><i>filename</i></tt> to the list of hosts. By default, dsh runs commands in parallel. If you would like instead to run a command sequentially, one machine after another, specify <tt>--wait-shell</tt>.</p>
+
+<p>
+  While handy, dsh has one substantial detractor: It cannot copy files. If you want to deploy data, say, to more than one machine, you'll have to write a new script, adopt a distribution infrastructure such as <i>rsync</i>, or consider a more robust tool, such as <i>pssh</i>, Parallel SSH.</p>
+
+
+<h2>
+  Just Like SSH, Only in Parallel
+  </h2>
+
+<p>
+  Like <i>dsh</i>, pssh aims to streamline the administration of lots of machines. pssh has all of the capabilities of dsh, but is also able to copy files to and from a central server and kill processes across a bank of systems. pssh and its underlying library is written in Python. pssh is easy to install, assuming your system already has the Python interpreter and core libraries.</p>
+
+<pre>
+$ # For systems with apt-get (apt-get installs Python if necessary)
+$ sudo apt-get install pssh
+
+$ # For all others, install Python and then continue
+$ wget http://peak.telecommunity.com/dist/ez_setup.py
+$ sudo python ez_setup.py
+$ wget http://parallel-ssh.googlecode.com/files/pssh-2.1.1.tar.gz
+$ tar xzvf pssh-2.1.1.tar.gz
+$ cd pssh-2.1.1
+$ sudo python setup.py install
+</pre>
+
+<p>
+  The pssh package installs five utilities, <i>parallel-ssh, parallel-scp,  parallel-slurp, parallel-nuke</i>, and <i>parallel-rsync</i>. Each utility operates on multiple hosts in parallel. </p>
+
+<ul>
+	<li><i>parallel-ssh</i> runs a command on multiple hosts in parallel.</li>
+
+	<li><i>parallel-scp</i>, as its name implies, copies files to multiple remote hosts in parallel.</li>
+
+	<li><i>parallel-rsync</i>, true to its moniker, efficiently copies files to multiple hosts in parallel via the rsync protocol.</li>
+
+	<li>And <i>parallel-slurp</i> copies files from multiple remote hosts to a central host in parallel.</li>
+
+	<li><i>parallel-nuke</i> kills processes on multiple remote hosts in parallel.</li>
+  </ul>
+
+<p>
+  Unlike dsh, the hosts are always named via a manifest, a file where each line takes the form <tt><i>host[:port] [user]</i></tt>. Here's how to run <i>uptime</i> across a swath of hosts with <i>parallel-ssh</i>:</p>
+
+<pre>
+$ parallel-ssh -h servers.txt uptime
+[1] 16:15:14 [SUCCESS] example.com 22
+16:15  up 2 days, 19:39, 9 users, load averages: 0.09 0.10 0.12
+[2] 16:15:28 [SUCCESS] sample.com 22
+16:15:28 up 67 days,  1:09,  0 users,  load average: 0.09, 0.07, 0.01
+</pre>
+
+<p>
+  The file <i>servers.txt</i> has two lines.</p>
+
+<pre>
+example.com
+sample.com joe
+</pre>
+
+<p>
+  Output from each instance of the command appears in stdout by default. The output is divided into sections, one section per host. However, you can name a directory to capture the stdout of each instance. For example, if you run the previous command and add <tt>--outdir /tmp/uptime</tt>, a transcript of the command from each host is captured in a separate file in <i>/tmp/uptime</i>.</p>
+
+<pre>
+$ parallel-ssh -h servers.txt uptime
+[1] 16:15:14 [SUCCESS] example.com 22
+[2] 16:15:28 [SUCCESS] sample.com 22
+
+$ ls -1 /tmp/uptime
+example.com
+sample.com
+
+$ cat /tmp/uptime/*
+16:22  up 2 days, 19:46, 9 users, load averages: 0.47 0.28 0.19
+16:22:32 up 67 days,  1:17,  0 users,  load average: 0.06, 0.04, 0.00
+</pre>
+
+<p>
+  <i>parallel-ssh</i> can spawn a maximum of 32 processes to connect to various nodes in parallel. If a remote command does not complete after sixty seconds, the connection is terminated. If your command requires more processing time, use <tt>-t</tt> to set a longer expiry time. (<i>parallel-scp</i> and <i>parallel-rsync</i> do not have a default expiry, but one can be specified using <tt>-t</tt>.)</p>
+
+<p>
+  <i>parallel-scp</i> can be used to copy one or more files or directories to many machines in parallel. It should seem familiar if you've mastered the traditional <i>scp</i>.</p>
+
+<pre>
+$ parallel-scp -h servers.txt /etc/hosts /tmp/hosts
+[1] 16:49:38 [SUCCESS] example.com 22
+[2] 16:49:55 [SUCCESS] sample.com 22
+</pre>
+
+<p>
+  The previous command copies the local file <tt>/etc/hosts</tt> to <tt>/tmp/hosts</tt> on each of the machines listed in <tt>servers.txt</tt>. <i>parallel-rsync</i> works similarly, running <i>rsync</i> in parallel to manage files between the local host and the remote hosts listed in the manifest. <i>parallel-slurp</i> works something like <i>parallel-scp</i> in reverse, but with one twist: it collects the named file from each of the remote machines, but does not overwrite the local version of the file. Instead, <i>parallel-slurp</i> creates a subdirectory for each remote machine and copies the named file there.</p>
+
+<p>
+  As a demonstration, imagine you want to copy the <i>/etc/hosts</i> file from each remote machine to the local machine. To achieve the goal, you'd execute <tt>parallel-slurp -h servers.txt /etc/hosts</tt>.
+
+<pre>
+$ parallel-slurp -h servers.txt -L /tmp/hosts /etc/hosts hosts_file
+1] 17:03:32 [SUCCESS] example.com 22
+[2] 17:03:50 [SUCCESS] dcauto.gotdns.com 22
+
+$ ls -R /tmp/hosts
+/tmp/hosts/example.com:
+hosts_file
+
+/tmp/hosts/sample.com:
+hosts_file
+</pre>
+
+<p>
+  <i>parallel-slurp</i> copies the named remote file to the local machine and stores each copy in a specific file in an individual subdirectory named after the remote host. Here, the remote file was <tt>/etc/hosts</tt>; each local copy is named <tt>hosts_file</tt>. The <tt>-L</tt> option specifies where to create the subdirectories. Here, the target was <tt>/tmp/hosts</tt>, yielding subdirectories <i>/tmp/hosts/example.com</i> and <i>/tmp/hosts/sample.com</i>.</p>
+
+<p>
+  Finally, <i>parallel-nuke</i> is the equivalent of running <tt>ssh host killall</tt>. The argument to <i>parallel-nuke</i> is a pattern. Any process running on the remote machine whose name matches the pattern is killed. The command is handy for stopping the same daemon on a collection of servers.</p>
+
+<p>
+  To use the pssh tools, you must configure public key access to each remote server you want to administer. If a pssh utility yields <tt>[FAILURE]</tt>, verify your configuration by connecting with vanilla <i>ssh</i>. If you are prompted for a password, rectify the problem by installing your public key on the remote host and try again. (For instructions, see the <i>ssh</i> and <i>ssh-keygen</i> man pages.)</p>
+
+
+<h2>
+  Machinery En Masse
+  </h2>
+
+<p>
+  For five, ten, or tens of machines, the tools described here likely suffice, especially for infrequent and ad hoc administration tasks. However, when the number of machines climbs higher or the same chores must be repeated often, it may be prudent to consider other tools and subsystems designed to automate the maintenance of many machines. Reflexively, some software intended for large networks can be applied to a handful of machines, too. Finding the right tools and a balance between manual intervention and automation is a perennial challenge.</p>
+
+<p>
+  Here are some tools to consider.</p>
+
+<ul>
+  <li><i>rsync</i> is an excellent tool to distribute files from a central server and to keep distributed file systems in sync. A prior installment of Speaking Unix covered rsync in detail. See the references for a link.</li>
+
+  <li><i>Puppet</i> is an increasingly popular subsystem for Unix and Linux that automates configuration maintenance. According to its website, "[Puppet] provides a powerful framework to simplify the majority of technical tasks that [system administrators] need to perform. [A chore] is written as code in Puppet’s custom language, which is shareable just like any other code."  Puppet can describe dependencies between components, define the proper state of a file, query the state of the system, and more. If you ever perform a chore more than once, chances are its best to capture it as a Puppet task.</li>
+
+  <li><i>Capistrano</i> is another popular tool for remote system administration. Its home page describes the tool well: "Simply put, Capistrano is a tool for automating tasks on one or more remote servers. It executes commands in parallel on all targeted machines, and provides a mechanism for rolling back changes across multiple machines. It is ideal for anyone doing any kind of system administration, either professionally or incidentally." Like Puppet, Capistrano is scripted. Scripts are based on the Ruby programming language and the Capistrano domain-specific extensions. Here is an example.
+
+<pre>
+task :search_libs, :hosts => "www.capify.org" do
+  run "ls -x1 /usr/lib | grep -i xml"
+end
+</pre>
+
+  <p>
+    This task is named <tt>search_libs</tt>. It connects to <tt>www.capify.org</tt> and runs the command <tt>ls -x1 /usr/lib | grep -i xml</tt>. Capistrano supports groups of machines via <i>roles</i>, among hundreds of other features. Tasks are launched via the <i>cap</i> command, as in <tt>cap search_libs</tt>. Capistrano is used widely among Ruby and Rails developers to deploy code to servers, but it's an excellent choice for automating most distributed system administration tasks. Tutorials explain how to mix Capistrano with Java, Perl, Python, and other programming languages, and how to use Capistrano with application engines, such as Drupal and Expression Engine. Capistrano works best when paired with a source control system, but it's not required. You can distribute binaries with the <tt>put</tt> operation.</li>
+
+  <li>Maintenance is important, but so too is <i>monitoring</i>. Outages and errors can wreak havoc on a network, especially when many systems are running identical configurations. Nagios is an open source monitor that watches servers, services, resources, and more. It's easy to install and deploy and can be used via any Web browser.</li>
+  </ul>
+
+<p>
+  You may also want to look at compute cluster tools such as Oak Ridge National Laboratories' (ORNL) <i>Cluster Command and Control</i> (C3) and <i>pdsh</i>. C3 was developed to operate a massive compute cluster at ORNL and offers a number of command-line tools that increase system manager productivity by reducing the time and effort required to operate and manage a cluster. pdsh is similar in many ways to pssh, but can also manage system images.
+
+
+<h2>
+  So Many Machines, So Little Time
+  </h2>
+
+<p>
+  Using tools such as dsh and pssh save time and reduce errors. You can run the same command on a large number of systems and see the combined results almost instantly. Manifests lump like machines together, too, reducing the risk of omissions. Puppet and Capistrano can capture oft-repeated tasks in scripts. If you manage more then a handfu of machines, automation is key. See, even compute clouds can have a silver lining.</p>
+
+
+<h2>
+  References</h2>
+
+<ul>
+  <li><a href="http://www.netfort.gr.jp/~dancer/software/downloads">dsh</a> can run a shell command on many machines in parallel.</li>
+
+  <li><a href="http://parallel-ssh.googlecode.com">Parallel SSH</a> runs commands, copies files, and manages processes on many machines in parallel.</li>
+
+	<li><a href="http://www.ibm.com/developerworks/aix/library/au-rsyncfamily/index.html">The rsync family</a> introduces rsync and a variety of utilities based on the rsync protocols.</li>
+
+	<li><a href="http://www.ibm.com/developerworks/aix/library/au-spunix_rsync/index.html">Speaking UNIX: Advanced applications of rsync</a> describes how to use rsync to manage collections of files on a network.</li>
+
+	<li>Learn more about <a href="http://projects.puppetlabs.com/>Puppet</a>, one of the most popular distributed system administration tools.</li>
+
+  <li>Visit the <a href="http://www.capify.org/index.php/Capistrano">Capistrano home page</a> to learn more about scripting administration with Ruby and the Capistrano domain-specific language.</li>
+
+  <li><a href="http://www.nagios.org/">Nagios</a> is an open source monitoring platform. It can be combined with automated maintenance tools to improve the overall stability of any size network.</li>
+
+  <li><a href="http://www.csm.ornl.gov/torc/C3/">The Cluster Command and Control</a> (C3) tools manage hundreds of compute nodes.</li>
+
+  <li><a href="http://sourceforge.net/projects/pdsh/">pdsh</a> is another compute cluster management tool. pdsh  can run a command on multiple machines in parallel.</li>
+  </ul>
+
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2 {
+    font-size: 125%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    padding: 5px;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  div.image {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 1em;
+    text-align: center;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+    visibility: visible;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  table {
+    width: 100%;
+    padding: 0 2em;
+  }
+
+  th, td {
+    padding: 4px 12px;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>
+  Creating Great Graphical Applications with Shell Scripts
+  </h1>
+
+<p class="close">
+  The command-line isn't suitable for every user. Indeed, some users may only feel comfortable when armed with a mouse. To accommodate those users or build custom desktop applications using only the shell, add graphical user interfaces to your scripts. Here's how.
+</p>
+
+<p>
+  If you walk into any crowded machine room, chances are you'll catch chit-chat about "shebangs", slashes, dot-dots, root, pipes, ports, and dash-dash this and that. If you speak Unix, you'll no doubt grok the local lingo -- acronyms, command names, shortcuts, options, file names, and colloquialisms about Unix -- and feel right at home. Like practitioners of other art, Unix users have an extensive vernacular for describing the specifics of their work.</p>
+
+<p>
+  But not everyone speaks Unix and, in fact, some may find the command-line daunting or perplexing. Further, you simply may not want to entrust the entirety of the command-line to an occasional or inexperienced user.  To assist those unaccustomed to the command-line or to build custom solutions around the shell, you can build graphical user interfaces for your scripts. With such tools -- <i>dialog</i> and <i>Zenity</i> are two worthy of mention -- you can use dialogs, file browsers, and other common "windowing" controls and techniques to interact with your user. Indeed, dialogs provide for more natural conversations: you present information, ask for a response, and react accordingly.</p>
+
+<p>
+  Let's look at dialog and Zenity in this installment of Speaking Unix, and see how you can turn any script into a convincing GUI application. Dialog is used with traditional, text-based interfaces, and Zenity proffers the style of the modern, windowed desktop.</p>
+
+
+<h2>
+  Add Dialogs to Any Shell Script
+  </h2>
+
+<p>
+  A command-line utility typically offers sufficient options to completely control each invocation. Some switches may enable or disable a feature, while other switches may process arguments, such a list of names. On the command-line, you present (nearly) all the information up front and let the job go. Graphical applications are very different. Choices are made through menus, check boxes, and file browsers. A graphical application takes in a little information, processes it, and then usually asks for more information. It is said that GUI applications are event-driven.</p>
+
+<p>
+  The dialog utility spans the two worlds. You invoke the dialog utility whenever you need input from the user and then return to your script to continue, processing whatever data was provided. In other words, if you write a script to use dialog, you'll likely ignore command-line arguments and instead use dialog to prompt for information when necessary.</p>
+
+<p>
+  If your system lacks the dialog utility, you can easily install it with your distribution's own package manager or you can build it directly from source. For example, if your system uses Aptitude, you can install dialog with the command <tt>sudo apt-get install dialog</tt>. Otherwise, to build from source, download the code from maintainer Thomas Dickey's website at http://invisible-island.net/dialog/dialog.html and run the typical trio of commands, <tt>./configure && make && make install</tt>.
+
+<pre>
+$ wget http://invisible-island.net/datafiles/release/dialog.tar.gz
+$ tar xzf dialog.tar.gz
+$ cd dialog-1.1-20100428
+$ ./configure
+$ make
+$ sudo make install
+</pre>
+
+<p>
+  After the install, you should have a new utility named dialog in your path. Type <tt>man dialog</tt> to see the bundled documentation.</p>
+
+<p>
+  Using dialog is very simple -- it's just another Unix command. You display a dialog of your choice using the command's options, then capture the result and perform some logic based on that value. Some variations of  dialog place the result of the command directly in the special shell status variable, <tt>$?</tt>, which you should save or interrogate immediately after the dialog command exits (because a subsequent command will immediately change its value). Other, typically more complicated variations of the dialog command both set the shell status variable and generate other results. To make things simple, dialog provides the <tt>--stdout</tt> option to always emit its result to standard output, making it easy to capture data with command evaluation (a combination of a command in backquotes and an assignment statement).<p>
+
+<p>
+  For example, the command <tt>dialog --yesno</tt> is one of the simplest variants. It presents a question, prompts for either a yes or no response, and returns either 0 or 1 in <tt>$?</tt> if the "Yes" or "No" button was pressed, respectively. You can test the value of <tt>$?</tt> and execute some conditional code. Here is a working snippet you can add to a shell script.</p>
+
+<pre>
+dialog --yesno "Do you want to continue?" 0 0
+rc=$?
+if [ "${rc}" == "0" ]; then
+  echo Yes
+else
+  echo No
+fi
+</pre>
+
+<p>
+  The <tt>--yesno</tt> option requires at least three arguments: text for the question and the height and height of the dialog itself, measured in rows and columns. If you don't require specific dimentions, you can always use 0 for either height or width to size the dialog automatically. (There are also options to place the window relative to the top-left corner of the screen.) Figure 1 shows <tt>--yesno</tt> in operation.</p>
+
+<div class="image">
+<img src="images/figure1.png" />
+</div>
+
+<p>
+ The dialog option <tt>--calendar</tt> presents a calendar to allow the user to choose a specific date. If the user chooses a date and chooses "OK", the command returns 0. If, however, the user chooses "Cancel", the command returns 1. Moreover, if the user chooses "OK", the command emits the date selected to standard output. Here is an example using command evaluation to yield a date.</p>
+
+<pre>
+RESULT=`dialog --stdout --title "CALENDAR" --calendar "Please choose a date..." 0 0 9 1 2010`
+retval=$?
+</pre>
+
+<p>
+  The <tt>--title</tt> option uses the next argument to add a title to the dialog box and can be used with any dialog command. Much like <tt>--yesno</tt>, you provide some text to prompt the user. Next, the options <tt>0 0</tt> again specify automatic height and width, and the options <tt>9 1 2010</tt> dictate the initial <i>day, month, and year</i>, respectively, shown in the calendar. The Tab and arrow keys alter the calendar and choose a date. After the dialog is dismissed, if <tt>retval</tt> is 0, the value of <tt>RESULT</tt> is the date selected. Figure 2 shows the calendar dialog.</p>
+
+<div class="image">
+<img src="images/figure2.png" />
+</div>
+
+<p>
+  The dialog command offers most of the controls typically found in a graphical application.</p>
+
+<ul>
+  <li>
+    <tt>--infobox</tt> simply presents information. It does not expect any input. The information box remains onscreen only briefly. To prolong display, place a <tt>sleep</tt> between it and the next command.</li>
+
+  <li>
+    <tt>--input</tt> collects a single, typed response. You might use this to collect your user's name or zip code.</li>
+
+  <li>
+    <tt>--textbox</tt> displays the contents of a text file. If the file exceeds the vertical height of the dialog, a the control allows for simple scrolling up and down.</li>
+
+  <li>
+    <tt>--menu</tt> and <tt>--radiolist</tt> present a list of choices and allows the user to select one. The two kinds of dialog are functionally equivalent but have slightly different visual styles to better simulate  what a graphical user interface might present. Specifically, the <tt>--radiolist</tt> renders <tt>(&nbsp;)</tt> to mimic radio buttons.</li>
+
+  <li>
+    <tt>--checklist</tt> displays a list of items that can be enabled or disabled individually. </li>
+  </ul>
+
+<p>
+  The output of each dialog variant differs, but is either a single value or a list of quoted values separated by white space. For instance, <tt>--checklist</tt>, which is great for choosing one or more options, emits a list of quoted values, where each value is associated with an enabled option. An example demonstrates the operation.</p>
+
+<pre>
+RESULT=`dialog --stdout --checklist "Enable the account options you want:" 10 40 3 \
+  1 "Home directory" on \
+  2 "Signature file" off \
+  3 "Simple password" off`
+</pre>
+
+<p>
+  The backslash (<tt>\</tt>) at the end of lines 1, 2, and 3 are continuations; everything from <tt>RESULT</tt> to <tt>off`</tt> is one command. If the user enabled "Home directory" and "Simple password", <tt>$RESULT</tt> would be <tt>"1" "3"</tt>. The arguments to <tt>--checklist</tt> are the  height and width, the number of list elements at any time (you can scroll to see additional items if some are occluded), and the checklist options, where each option is a value, a description and whether the option is initially enabled or disabled.</p>
+
+<p>
+  You can type <tt>dialog --help</tt> at any time to see the list of general and dialog-specific options. There are tons of uses for dialog.</p>
+
+
+<h2>
+  Got Pixels? Use Zenity.
+  </h2>
+
+<p>
+  Zenity is to the Unix desktop what dialog is to simple terminal screens. You can use Zenity to open GTK+ dialog boxes from any shell script. In fact, Zenity shares many of the same features as dialog; the only difference is that Zenity works in an X Window System environment. Zenity comes bundled with GNOME. If you don't run GNOME, you can install Zenity separately (however, expect a large number of GTK+ libraries to be installed, too). You can also download the source of Zenity from the GNOME project pages at http://ftp.gnome.org/pub/gnome/sources/zenity/2.30/zenity-2.30.0.tar.bz2.</p>
+
+<p>
+  Here's a quick example. The command <tt>zenity --question --text "Do you want to continue?"</tt> produces something like Figure 3. (The machine used for demonstration is running Ubuntu 10.) If you press "OK", the command returns 0. Otherwise, it returns 1. </p>
+
+<div class="image">
+<img src="images/figure3.png" />
+</div>
+
+<p>
+  Like dialog, Zenity has a good number of options -- perhaps even more than dialog -- but the options are well-named and thus self-explanatory. You'll likely find Zenity more advantageous than dialog, especially since most computer users have an X desktop of some sort.</p>
+
+<p>
+  Zenity offers many of the same controls as dialog. Here is a snippet to collect a name.</p>
+
+<pre>
+ENTRY=`zenity --entry --text "Please enter your name" --entry-text "Your name" --title "Enter your name"
+if [ $? == 0 ]; then
+  zenity --info --text "Hello $ENTRY\!"
+fi
+</pre>
+
+<p>
+  Again, if the exit code of zenity is 0, then <tt>ENTRY</tt> has the person's name. Here is the calendar example from above rewritten to use Zenity.
+  </p>
+
+<pre>
+DATE=`zenity --calendar --day "9" --month "1" --year "2010" --format "%Y-%m-%d"
+if [ $? == 0 ]; then
+  echo $DATE
+fi
+</pre>
+
+<p>
+  Although Zenity is a little more verbose -- there are separate options for day, month, and year -- the additional switches free you from remembering the precise usage sequence of arguments. Zenity's calendar also allows you to specify the format for output, using standard <tt>strftime()</tt> codes. The result of this command would be something like "2010-1-9" for January 9, 2010.</p>
+
+<p>
+  Zenity also provides a progress meter to show the state of an operation. Zenity reads data from standard input line by line. If a line is prefixed with the octothorpe or "pound sign" (<tt>#</tt>), the text is updated with the text on that line. If a line contains only a number, the percentage is updated with that number. Here is an example from the Zenity documentation.</p>
+
+<pre>
+#!/bin/sh
+(
+  echo "10" ; sleep 1
+  echo "# Updating mail logs" ; sleep 1
+  echo "20" ; sleep 1
+  echo "# Resetting cron jobs" ; sleep 1
+  echo "50" ; sleep 1
+  echo "This line will just be ignored" ; sleep 1
+  echo "75" ; sleep 1
+  echo "# Rebooting system" ; sleep 1
+  echo "100" ; sleep 1
+) |
+zenity --progress \
+  --title="Update System Logs" \
+  --text="Scanning mail logs..." \
+  --percentage=0
+
+if [ "$?" = -1 ] ; then
+  zenity --error \
+    --text="Update canceled."
+fi
+</pre>
+
+<p>
+  The subshell (wrapped in parentheses) performs a series of tasks, albeit sleep delays in this contrived example, and emits output to a Zenity progress meter via a pipe. Before each step, the subshell emits a number to advance the progress meter, which starts at 0 per <tt>--percentage 0</tt>, and then emits a string prefaced with <tt>#</tt> to change the status message. Thus, the progress meter steps along to mark the work of the script. If Zenity exits with code -1, the "Cancel" button was pressed.</p>
+
+<p>
+  Again, to use dialog or Zenity, replace code where you previously referenced a command-line argument with a dialog box. With a little creativity, you can turn your shell scripts into first-class desktop citizens.</p>
+
+
+<h2>
+  Additional Advanced Tools
+  </h2>
+
+<p>
+  At some point, you may find your requirements exceed the capabilities of both shell scripting and dialog and Zenity. In those instances, you may turn to C/C++ and build native applications for the desktop, but you can also turn to advanced scripting languages and language bindings for any number of robust graphical user interface frameworks.</p>
+
+<p>
+  One combination is the <i>Ruby</i> scripting language and the Ruby bindings for the <i>wxWidgets</i> framework. Ruby is object-oriented, expressive, concise, and runs on almost every operating system. wxWidgets is also available on every major platform, including Mac OS X, Windows, Linux, and Unix. Since both are portable, you can write an application once in Ruby and run it everywhere. Another simpler option is <i>Shoes</i>. While not as rich as wxWidgets, Shoes is fairly quick to learn and use. This code realizes a calculator in 70 lines of code.</p>
+
+<pre>
+class Calc
+  def initialize
+    @number = 0
+    @previous = nil
+    @op = nil
+  end
+
+  def to_s
+    @number.to_s
+  end
+
+  (0..9).each do |n|
+    define_method "press_#{n}" do
+      @number = @number.to_i * 10 + n
+    end
+  end
+
+  def press_clear
+    @number = 0
+  end
+
+  {'add' =&gt; '+', 'sub' =&gt; '-', 'times' =&gt; '*', 'div' =&gt; '/'}.each do |meth, op|
+    define_method "press_#{meth}" do
+      if @op
+        press_equals
+      end
+      @op = op
+      @previous, @number = @number, nil
+    end
+  end
+
+  def press_equals
+    @number = @previous.send(@op, @number.to_i)
+    @op = nil
+  end
+end
+
+number_field = nil
+number = Calc.new
+Shoes.app :height =&gt; 250, :width =&gt; 200, :resizable =&gt; false do
+  background "#EEC".."#996", :curve =&gt; 5, :margin =&gt; 2
+
+  stack :margin =&gt; 2 do
+
+    stack :margin =&gt; 8 do
+      number_field = para strong(number)
+    end
+
+    flow :width =&gt; 218, :margin =&gt; 4 do
+      %w(7 8 9 / 4 5 6 * 1 2 3 - 0 Clr = +).each do |btn|
+        button btn, :width =&gt; 46, :height =&gt; 46 do
+          method = case btn
+            when /[0-9]/; 'press_'+btn
+            when 'Clr'; 'press_clear'
+            when '='; 'press_equals'
+            when '+'; 'press_add'
+            when '-'; 'press_sub'
+            when '*'; 'press_times'
+            when '/'; 'press_div'
+          end
+
+          number.send(method)
+          number_field.replace strong(number)
+        end
+      end
+    end
+  end
+end
+</pre>
+
+<p>
+  An introduction to Ruby and shoes is beyond the scope of this article, but let's hit some of the most important constructs.</p>
+
+<ul>
+ 	<li>
+ 	  The bulk of the Ruby class Calc uses Ruby's metaprogramming features to define functions at runtime for all the digit keys and for the math operation keys.</li>
+
+	<li>
+	  The code beginning <tt>Shoes.app...</tt> creates the graphical user interface for the calculator, rendering the layout and the buttons for the calculator. Shoes provides two containers to assemble layouts: the <i>stack</i> and the <i>flow</i>. A stack a vertical stack of elements, with each element placed directly beneath the element preceding it. A flow packs elements in as tightly as it can until it reaches the limits of its bounding box and then wraps the remaining elements. (You can think of a stack as an HTML div and a flow as an HTML p.) You create a stack or flow using a Ruby block.</li>
+
+  <li>
+    The innermost <tt>flow</tt> block loops, creating all the buttons in the application and effectively binding each button to its method. (The <tt>case</tt> statement returns a method name; the line <tt>number.send(method)</tt> calls that method on the instantiated calculator.)</li>
+
+   <li>
+    The line <tt>number_field.replace strong(number)</tt> updates the calculator display with the result of the most recent calculation. Emitting <tt>number</tt> causes the class to call its own <tt>to_s</tt> ("to string") method.</li>
+  </ul>
+
+<p>
+  Other scripting languages have similar libraries and there are many more choices for Ruby itself, including Ruby Cocoa to develop Cocoa applications on Mac OS X with Ruby. Pick your favorite open source scripting language, find a lightweight GUI toolkit, and start coding.</p>
+
+
+<h2>
+  We Don't Need No Stinkin' Compiler!
+  </h2>
+
+<p>
+  If you've already mastered shell scripting, combine your work with dialog or Zenity to add interactivity. And once you need more programming power than what the shell provides, consider a language such as Ruby or Python and any one of several windowing toolkits. You don't need a compiler to write great desktop applications. </p>
+
+<h2>
+  Resources
+  </h2>
+
+<ul>
+  <li>
+    Download the source code for dialog from its <a href="http://invisible-island.net/dialog/dialog.html">project page</a>.</li>
+
+  <li>
+    Get the source code for Zenity from the <a href="http://ftp.gnome.org/pub/gnome/sources/zenity/2.30/zenity-2.30.0.tar.bz2">GNOME project pages</a>.</li>
+
+  <li>
+    Read more about <a href="http://www.wxwidgets.org/">wxWidgets</a>, the cross-platform graphical user interface framework.</li>
+
+  <li>
+    Learn how to script applications with <a href="http://github.com/shoes/shoes">Shoes</a>, a GUI library for <a href="http://www.ruby-lang.org/en/">Ruby</a>.
+    </li>
+</ul>
+</body>
+</html>
