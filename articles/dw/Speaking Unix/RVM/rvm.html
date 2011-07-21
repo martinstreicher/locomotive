@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=macintosh" />
+  <title> </title>
+  <style>
+  body {
+    font-family: Georgia, serif;
+    font-size: 80%;
+    margin: 25px;
+  }
+
+  a {
+    text-decoration: none;
+    border-bottom: 1px dotted blue;
+  }
+
+  h1,h2,h3,h4, p.close, p.subhead {
+    font-family: Tahoma, Arial, Verdana, sans-serif;
+  }
+
+  h2 {
+    font-size: 125%;
+    margin-top: 2em;
+    font-weight: bolder;
+  }
+
+  h4 {
+    font-size: 85%;
+  }
+
+  img {
+    border: 5px black solid;
+  }
+
+  li {
+    margin-bottom: 1em;
+  }
+
+  div.image {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 1em;
+    text-align: center;
+  }
+
+  p.image {
+    text-align: center;
+  }
+
+  p.opening {
+    font-style: italic;
+  }
+
+  tt, pre {
+    font-family: Courier, sans-serif;
+    visibility: visible;
+  }
+
+  tt {
+    font-weight: bolder;
+  }
+
+  p.close {
+    border-top: 1px solid black;
+    padding: 5px 0px;
+    margin-top: 2em;
+    font-size: smaller;
+  }
+
+  pre {
+    background: black;
+    color: white;
+    padding: 5px 10px;
+  }
+
+  pre.list {
+    background: white;
+    color: black;
+    border: 1px solid black;
+    padding: 5px 10px;
+  }
+
+  table {
+    width: 100%;
+    padding: 0 2em;
+  }
+
+  th, td {
+    padding: 4px 12px;
+  }
+
+  th {
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
+</head>
+<body>
+
+<p class="opening">
+  Need to recreate another <em>Ruby</em> coder's development environment? Long to experiment with the latest version of <em>JRuby</em>? Want to isolate your work to a specific set of gems? You can do all that and more with the handy and clever <em>Ruby Version Manager</em>.
+</p>
+
+
+<h1>
+  Managing Rubies and Gems with RVM</h1>
+
+<p>
+  While Internet Relay Chat (IRC), forums, and revision control tools such as Git and Github make distributed development a snap, reproducing another developer's environment is often an obstacle to productivity. Dependencies
+
+<p>
+  RVM provides several indispensable features:</p>
+
+<ul>
+  <li>
+    You can create, manage, and deploy any number of Ruby environments, where each environment combines a Ruby interpreter and a set of gems called a <em>gemset</em>.</li>
+
+  <li>
+    Each environment is self-contained and siloed (typically) within your home directory. Indeed, the entire RVM system lives in your home directory, ensuring that another user cannot clobber or pollute what you've assembled and vice versa. (You can also install RVM centrally, but it's an uncommon practice.)</li>
+
+  <li>
+    You can maintain any number of collections of gems. You can create one set for your Ruby on Rails Web application and another set of gems for to power a daemon. You can switch back and forth between gemsets and altering the contents of a gemset is as easy as running the Ruby <em>gem</em> command.</li>
+
+  <li>
+    Switching between environments is a snap. You type one command: <tt>rvm <em>interpreter</em>@<em>gemset</em></tt>. Further, you can add a special "dot" file to any project to automatically switch to a specific environment when you enter the project's directory.</li>
+
+  <li>
+    You can run your application's test suite against one, some, or all of your enviroments. Run MRI locally but use Ruby Enterprise Edition (REE) on your server? Use RVM to test your code against both before you push revisions live.</li>
+  </ul>
+
+<p>
+  The Ruby community is fast-moving and the interpreters and libraries of code found in gems change farily often, for the better. RVM lets you try combinations of code quickly and easily so you can keep your application stable and modern.  For example, one milieu, say "1.8.7p302@acme", as denoted in RVM, could contain the Ruby MRI patch level 302 for version 1.8.7 of the language and a collection of gems for the Acme website. If a new MRI is released, such as the recent distribution of p330, you can build it in RVM, create environment "1.8.7p330@acme", run tests, and settle on the new MRI if all is well. Another environment, "jruby@daemon", might provide JRuby for version 1.9.2 of the language and a batch of gems to operate a daemon. The name of a gemset is arbitrary. The names of the indvidual interpreters are provided by RVM.</p>
+
+
+<h2>
+  Getting Started</h2>
+
+<p>
+  RVM is simple to install -- it's juyst one command and a small change to your shell startup script.</p>
+
+<p>
+  Of course, RVM does have some prerequisites. Before you continue, check your system and be sure you have the <em>bash, git, tar, curl, gunzip</em>, and <em>bunzip2</em> utilities installed locally. Further, your system must have the Readline, IConv, Zlib, OpenSSL, and Autoconf packages to build the Ruby interpreters. You must have the Bash shell to install RVM, but you can use RVM with Z Shell version 4.3.5 or later after RVM is installed. Git is required to automatically update RVM, as will be explained shortly. If your system lacks all the packages listed, you can quickly install them using a package manager such as APT (for various Linux distributions) or port (for Mac OS X). You must also have the GNU C Compiler (<em>gcc</em>) and other tools required to build applications.</p>
+
+<p>
+  Once your system is ready, go to a shell prompt and type (or copy and paste) the command...</p>
+
+<pre>
+bash < <(curl http://rvm.beginrescueend.com/releases/rvm-install-head)
+</pre>
+
+<p>
+  (<em>There is a space</em> between the two less than or <tt>&lt;</tt> symbols. The special Bash syntax <tt>&lt(...)</tt> runs the commands in parentheses and saves the output in a temporary file. The first <tt>&lt;</tt> is the typical input redirection. Hence, the command runs <em>bash</em> and provides input from a temporary file created by <em>curl</em>. Think of the sequence above as running a shell script, albeit one stored on a remote server.</tt>)
+
+<p>
+  The command uses Git to clone and create a local instance of RVM in your home directory. Look in <em>$HOME/.rvm</em>. The <em>bin</em> subdirectory contains the <em>rvm</em> utility itself, while <em>rubies</em> is the eventual home for Ruby interpreters. You'll find that RVM organizes software you amass in a predictable hierarchy based on interpreter type, version, and gemset, for example.
+  </p>
+
+<p>
+  After the install script finishes, you must edit your shell's dot files to load the RVM shell functions whenever a new shell starts. In general, this line...</p>
+
+<pre>
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+</pre>
+
+<p>
+  ... must be the last line in the
+  </p>
+
+
+<h2>
+  Pick a Ruby</h2>
+
+<p>
+  Now that RVM is installed, it's time to download, build, and install one or more Ruby interpreters. There are some twenty or more variations, if you count language versions, patches, and underlying implementation. You can list all known variations with the command <tt>rvm list known</tt>.
+
+<pre>
+$ <b>rvm list known</b>
+# MRI Rubies
+[ruby-]1.8.6[-p399]
+[ruby-]1.8.6-head
+[ruby-]1.8.7[-p330]
+[ruby-]1.8.7-head
+[ruby-]1.9.1-p243
+[ruby-]1.9.1[-p378]
+[ruby-]1.9.1-p429
+[ruby-]1.9.1-head
+[ruby-]1.9.2-preview1
+[ruby-]1.9.2-preview3
+[ruby-]1.9.2-rc1
+[ruby-]1.9.2-rc2
+[ruby-]1.9.2[-p136]
+[ruby-]1.9.2-head
+ruby-head
+
+# GoRuby
+goruby
+
+# JRuby
+jruby-1.2.0
+jruby-1.3.1
+jruby-1.4.0
+jruby[-1.5.6]
+jruby-head
+
+# Rubinius
+rbx-1.0.1
+rbx-1.1.0
+rbx-1.1.1
+rbx-1.2.0
+rbx[-head]
+
+# Ruby Enterprise Edition
+ree-1.8.6
+ree[-1.8.7]
+ree-1.8.6-head
+ree-1.8.7-head
+
+# MagLev
+maglev[-24924]
+maglev-head
+
+# Mac OS X Snow Leopard Only
+macruby[-0.8] # the default macruby
+macruby-nightly
+macruby-head      # Build from the macruby git repository
+
+# IronRuby -- Not implemented yet.
+ironruby-0.9.3
+ironruby-1.0-rc2
+ironruby-head
+</pre>
+
+<p>
+  The patch level 330 MRI for Ruby 1.8.7 provides a good foundation for both Ruby and Rails development. Let's install it first. Type <tt>rvm install</tt> and the name of the engine, <tt>ruby-1.8.7-p300</tt>. You can also type <tt>rvm install 1.8.7</tt>. Portions of the engine names that appear in brackets (<tt>[]</tt>) are optional, so <tt>rvm install 1.8.7</tt> is the same as <tt>rvm install ruby-1.8.7-p330</tt>. In general, if you simply name a version, RVM installs the latest and greatest code. When you install an engine, RVM downloads and builds the code for you.</p>
+
+<pre>
+$ <b>rvm install ruby-1.8.7-p330</b>
+/home/strike/.rvm/rubies/ruby-1.8.7-p330, this may take a while depending on your cpu(s)...
+
+ruby-1.8.7-p330 - #fetching
+ruby-1.8.7-p330 - #downloading ruby-1.8.7-p330, this may take a while depending on your connection...
+ruby-1.8.7-p330 - #extracting ruby-1.8.7-p330 to /home/strike/.rvm/src/ruby-1.8.7-p330
+ruby-1.8.7-p330 - #extracted to /home/strike/.rvm/src/ruby-1.8.7-p330
+ruby-1.8.7-p330 - #configuring
+ruby-1.8.7-p330 - #compiling
+ruby-1.8.7-p330 - #installing
+ruby-1.8.7-p330 - #rubygems installing to ruby-1.8.7-p330
+Retrieving rubygems-1.4.2
+Extracting rubygems-1.4.2 ...
+ruby-1.8.7-p330 - adjusting #shebangs for (gem).
+ruby-1.8.7-p330 - #importing default gemsets (/home/strike/.rvm/gemsets/)
+Install of ruby-1.8.7-p330 - #complete
+</pre>
+
+
+
+
+<h2>
+  Some Additional Tips</h2>
+
+<p>
+  Ideally, your system has all the utilities and packages listed as prerequisites before you try to build a Ruby engine. However, if you cannot install or build any of those packages, say, because you do not have sufficient privileges to customize your machine, RVM provides an alternative. You can install each of the five libraries -- Readline, IConv, Zlib, OpenSSL, and Autoconf -- in your own .rvm directory as a private copy and use RVM as usual. </p>
+
+<p>
+  When you install a new Ruby interpreter, its collection of gemsets is empty. For example, MRI 1.8.7 p330 was recently added to the list of known Rubies. After installing that release with <tt>rvm install 1.8.7-p300</tt>,
+
+
+<h2>
+  Resources
+  </h2>
+
+<ul>
+  <li>
+    You can download the Ruby Version Manager and read extensive documentation from its <a href="http://rvm.beginrescueend.com/">project page</a>.</li>
+
+  <li>
+    Many developers and open source projects keep code under version control with <a href="http://git-scm.com/">Git</a> and <a href="http://www.github.com/">Github</a>.</li>
+  </ul>
+</body>
+</html>

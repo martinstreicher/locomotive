@@ -101,6 +101,7 @@
 <body>
 
 <p>
+  <em>Break out the Jolt Cola, elbow grease, and your text editor. It's time to turn your Unix shell into a hot rod. It's time for an extreme shell makeover.</em>
 </p>
 
 <h1>
@@ -108,7 +109,7 @@
   </h1>
 
 <p>
-  No matter what car you drive, you have to appreciate the hot rod. There's nothing quite like a 1969 Dodge Charger with five-spoke mag wheels, wide tires, a midnight black finish, lots of chrome, and a snarling big block. It's a masterpiece -- the car Rodin's Thinker would drive. A classic.</p>
+  No matter what car you drive, you have to appreciate the hot rod. There's nothing quite like a 1969 Dodge Charger with five-spoke mag wheels, wide tires, a midnight black finish, lots of chrome, and a snarling big block. It's a masterpiece -- the car Rodin's The Thinker would drive. A classic.</p>
 
 <p>
   The Unix shell is a classic, too, sans the big fenders. But with a little elbow grease, wrench-time, and after-market mods, it can look and perform like a hot rod, too. You might call this "Top Gear-head", "Geek Eye for the Straight Guy", or "Extreme Shell Makeover". I call it "Pimp My Shell".</p>
@@ -139,7 +140,7 @@
   </h2>
 
 <p>
-	Much like other operations in the shell, an environment variable controls what's drawn each time the shell presents a prompt. The variable, <tt>PS1</tt>, or "prompt string level 1", is interpreted when rendered much like the command-line itself. <tt>PS1</tt> can contain other shell and environment variables, in-place command evaluation (via backquotes), and specialized literals. Here's an initial example:</p>
+  Much like other operations in the shell, an environment variable controls what's drawn each time the shell presents a prompt. The variable, <tt>PS1</tt>, or "prompt string level 1", is interpreted when rendered much like the command-line itself. <tt>PS1</tt> can contain other shell and environment variables, in-place command evaluation (via backquotes), and specialized literals. Here's an initial example:</p>
 
 <pre>
 $ <b>export PS1="\u@\h \w &gt;"</b>
@@ -151,10 +152,10 @@ strike@nostromo ~ &gt;
 </pre>
 
 <p>
-	Initially, the prompt was the simple <tt>$</tt>. Setting the environment variable <tt>PS1</tt> (hence, <tt>export</tt> instead of <tt>set</tt>) to <tt>\u@\h \w ></tt> renders your user name (the meaning of <tt>\u</tt>), the literal <tt>@</tt>, your hostame (<tt>\h</tt>), your present working directory (<tt>\w</tt>), and the literal string <tt> > </tt>.</p>
+  Initially, the prompt was the simple <tt>$</tt>. Setting the environment variable <tt>PS1</tt> (hence, <tt>export</tt> instead of <tt>set</tt>) to <tt>\u@\h \w ></tt> renders your user name (the meaning of <tt>\u</tt>), the literal <tt>@</tt>, your hostame (<tt>\h</tt>), your present working directory (<tt>\w</tt>), and the literal string <tt> > </tt>.</p>
 
 <p>
-	Other special literals include <tt>\t</tt> for the time (in 24-hour format), <tt>\d</tt> for the date (in weekday, month, date format), and <tt>\!</tt> for the shell history number. If you keep your shell window open for extended periods, you can quickly repeat a previous command with <tt>!<em>nnn</em></tt>, where <tt><em>nnn</em></tt> is the number shown in the prompt for the command.</p>
+  Other special literals include <tt>\t</tt> for the time (in 24-hour format), <tt>\d</tt> for the date (in weekday, month, date format), and <tt>\!</tt> for the shell history number. If you keep your shell window open for extended periods, you can quickly repeat a previous command with <tt>!<em>nnn</em></tt>, where <tt><em>nnn</em></tt> is the number shown in the prompt for the command.</p>
 
 <pre>
 strike@nostromo ~ &gt; <b>export PS1="\! $ "</b>
@@ -165,11 +166,11 @@ find . -name ...
 1000 $
 </pre>
 
-	<p>
-	  Have you ever wondered how the shell prompt changes to the octothorpe (<tt>#</tt>) whenever you are or behave like the superuser, root? By default, the standard prompt is actually the special operator <tt>\$ </tt>. If your effective UID is 0, this emits <tt>#</tt>; otherwise, it emits a <tt>$</tt>.</p>
+  <p>
+    Have you ever wondered how the shell prompt changes to the octothorpe (<tt>#</tt>) whenever you are or behave like the superuser, root? By default, the standard prompt is actually the special operator <tt>\$ </tt>. If your effective UID is 0, this emits <tt>#</tt>; otherwise, it emits a <tt>$</tt>.</p>
 
-	</p>
-	  Abbreviations also exist to change colors. Another sample demonstrates:</p>
+  </p>
+    Abbreviations also exist to change colors. Another sample demonstrates:</p>
 
 <pre>
 strike@nostromo ~ &gt; <b>export PS1='$ '</b>
@@ -180,7 +181,7 @@ $ <b>export PS1="$blue\u@\h$none\w>"</b>
 </pre>
 
 <p>
-	The (rather unwieldy) abbreviation <tt>\e[0;34m</tt> enables blue. Its complement, <tt>\e[m</tt>, resets the rendering color to the default for your shell window. Both codes are enclosed in single quotes to prevent the shell from interpolating characters that have special meaning. This example also shows you can use variables in a prompt, too. Here, the variables <tt>blue</tt> and <tt>none</tt> are expanded <em>when the command-line is interpreted</em> and the prompt is set to the string that results from the expansion. If you want to expand a variable dynamically each time the prompt is rendered, you must escape its interpretation when set. Let's look at just that:</p>
+  The (rather unwieldy) abbreviation <tt>\e[0;34m</tt> enables blue. Its complement, <tt>\e[m</tt>, resets the rendering color to the default for your shell window. Both codes are enclosed in single quotes to prevent the shell from interpolating characters that have special meaning. This example also shows you can use variables in a prompt, too. Here, the variables <tt>blue</tt> and <tt>none</tt> are expanded <em>when the command-line is interpreted</em> and the prompt is set to the string that results from the expansion. If you want to expand a variable dynamically each time the prompt is rendered, you must escape its interpretation when set. Let's look at just that:</p>
 
 <pre>
 <span style="color: blue;">strike@nostromo </span>~ &gt;<b>export PS1="\$somevar $ "</b>
@@ -189,10 +190,10 @@ hello $
 </pre>
 
 <p>
-	The phrase <tt>\$somevar</tt> escapes the dollar sign, avoiding interpretation of the variable in the command where the prompt is set. Instead, the interpretation occurs whenever the prompt is drawn. If <tt>somevar</tt> changes -- because of other commands , the prompt displays its new value.</p>
+  The phrase <tt>\$somevar</tt> escapes the dollar sign, avoiding interpretation of the variable in the command where the prompt is set. Instead, the interpretation occurs whenever the prompt is drawn. If <tt>somevar</tt> changes -- because of other commands , the prompt displays its new value.</p>
 
 <p>
-	You can also call any command or function in the prompt, as mentioned above. Simply use the backquotes (<tt>``</tt>). For example, if you use the Ruby Version Manager (RVM) to switch between Ruby language versions and interpreters, you may want to know which Ruby binary is active. There are two approaches.</p>
+  You can also call any command or function in the prompt, as mentioned above. Simply use the backquotes (<tt>``</tt>). For example, if you use the Ruby Version Manager (RVM) to switch between Ruby language versions and interpreters, you may want to know which Ruby binary is active. There are two approaches.</p>
 
 <pre>
 hello $ <b>export PS1="(`which ruby`) \w $ "</b>
@@ -200,7 +201,7 @@ hello $ <b>export PS1="(`which ruby`) \w $ "</b>
 </pre>
 
 <p>
-	This first technique applies <em>which</em> to find the first Ruby executable in the current <tt>PATH</tt>. This next technique achieves the same goal, but demonstrates how complex an in-place command evaluation can be. If you set the prompt to the string <tt>"(`rvm info | grep 'ruby:' | grep bin | cut -f2 -d: | tr \\" ' '`)"</tt>, you get the same result, albeit through a more circuitous route.</p>
+  This first technique applies <em>which</em> to find the first Ruby executable in the current <tt>PATH</tt>. This next technique achieves the same goal, but demonstrates how complex an in-place command evaluation can be. If you set the prompt to the string <tt>"(`rvm info | grep 'ruby:' | grep bin | cut -f2 -d: | tr \\" ' '`)"</tt>, you get the same result, albeit through a more circuitous route.</p>
 
 <p>
   By the way, you may have wondered why <tt>PS1</tt> is "prompt string level 1".  Are there other prompt levels? The answer is yes. Environment variables exist for <tt>PS2</tt>, <tt>PS3</tt>, and <tt>PS4</tt>, and these prompts appear any time you open a new block. Here is one occurrence:</p>
@@ -289,7 +290,7 @@ $ zsh
   You'll likely notice that many of the themes print status information in the prompt <em>and to the far-right of the prompt</em>. For example, the Clean theme prints the current time at far-right. Screen emulators typically don't include a status line at bottom (unlike their hardware progenitors), but can use the real estate found to the right of the prompt for dynamic feedback. Recall the funny <tt>\e[</tt> codes to set colors in the prompt? There is an extensive set of such "escapes" to move the cursor around a screen. Further, rather than use archane symbols and numbers, modern Unix systems use <em>tput</em> to look up and emit escapes by name or purpose. Z Shell uses all this trickery to provide an <tt>RPS1</tt> and <tt>RPS2</tt> for right-side prompts on the initial and subsequent lines, respectively.</p>
 
 <p>
-  Beyond thematic treatments of colors and prompts, OMZ! includes plug-ins that group like functions and features together. If you use Git for source control, for instance, you can enable the Git OMZ! plug-in to amend your prompt with Git status. Again, open the <em>~/.zshrc</em> file and edit the plug-ins line to include <tt>git></tt>. Now, when you switch to a Git repo, the prompt reflects state. For instance, Figure 2 shows the Clean theme and a repo with modifications that are not yet staged.</p>
+  Beyond thematic treatments of colors and prompts, OMZ! includes plug-ins that group like functions and features together. If you use Git for source control, for instance, you can enable the Git OMZ! plug-in to amend your prompt with Git status. Again, open the <em>~/.zshrc</em> file and edit the plug-ins line to include <tt>git></tt>. Now, when you switch to a Git repo, the prompt reflects state. For instance, Figure 2 shows the Clean theme and a repository with modifications that are not yet staged.</p>
 
 <div class="image">
 <p class="image">
@@ -297,10 +298,61 @@ $ zsh
   </p></div>
 
 <p>
-  Smartly, the prompt shows the current branch ("rubricmods") and a red X, indicating the repo is dirty. Once the changes are committed, the X is elided. The Git plugin also adds helpful aliases for common Git command combinations and context-sensitive completions for Git options. If you type <tt>git branch</tt> followed by the Tab key, the Git plug-in lists the available branches. Other plug-ins exist for OS X, Ruby on Rails development, MySQL, and more.</p>
+  Smartly, the prompt shows the current branch ("rubricmods") and a red X, indicating the current repository is dirty, or that local files have been modified but not committed. Once the revisions are committed, the X is elided. The Git plugin also adds helpful aliases for common Git command combinations and context-sensitive completions for Git options. Try one: if you type <tt>git branch</tt> followed by the Tab key, the Git plug-in lists the available branches. Other plug-ins exist for OS X, Ruby on Rails development, MySQL, and more. Some of the plug-ins are slight, perhaps nothing more than a function or two or some aliases; other plug-ins are more extensive.</p>
 
 <p>
-  Bash It! has similar features for Bash users.</p>
+  Dirpersist in a good showcase of the intent of OMZ! plug-ins. Dirpersist saves and restores your directory stack across shell invocations, thus preserving important state so you can resume work where you left off. To use it, add the plug-in to your <em>~/.zshrc</em>. The source of the plugin is brief:</p>
+
+<pre>
+#!/bin/zsh
+#
+# Make the dirstack more persistant
+#
+# Add dirpersist to $plugins in ~/.zshrc to load
+#
+
+# $zdirstore is the file used to persist the stack
+zdirstore=~/.zdirstore
+
+dirpersistinstall () {
+  if grep 'dirpersiststore' ~/.zlogout &gt; /dev/null; then
+  else
+    if read -q \?"Would you like to set up your .zlogout file for use with dirspersist? (y/n) "; then
+      echo "# Store dirs stack\n\
+        # See ~/.oh-my-zsh/plugins/dirspersist.plugin.zsh\ndirpersiststore" &gt;&gt; ~/.zlogout
+    else
+      echo "If you don't want this message to appear, remove dirspersist from \$plugins"
+    fi
+  fi
+}
+
+dirpersiststore () {
+  dirs -p | perl -e 'foreach (reverse &lt;STDIN&gt;) {\
+    chomp;s/([& ])/\\$1/g ;print "if [ -d $_ ]; then pushd -q $_; fi\n"}' &gt; $zdirstore
+}
+
+dirpersistrestore () {
+  if [ -f $zdirstore ]; then
+    source $zdirstore
+  fi
+}
+
+DIRSTACKSIZE=10
+setopt autopushd pushdminus pushdsilent pushdtohome pushdignoredups
+
+dirpersistinstall
+dirpersistrestore
+
+# Make popd changes permanent without having to wait for logout
+alias popd="popd;dirpersiststore"
+</pre>
+
+<p>
+  The plug-in is composed of three functions, a handful of shell options, and an alias for <em>popd</em> that persists the directory stack with each pop operation. The plug-in also initializes its environment, creating a place to store the directory stack and by modifying the Z Shell logout file, <em>~/.zlogout</em> to persist the directory stack any time you log out. As you can see, a new plug-in is easy to create and you can build one around any set of shell commands.
+  </p>
+
+<p>
+  If you like OMZ! but use the Bash shell, try Bash It! It was inspired by OMZ! and has similar features and operation. Bash It also offers plug-ins for Subversion and <em>nginx</em>.</p>
 
 
 <h2>
@@ -308,6 +360,27 @@ $ zsh
   </h2>
 
 <p>
-  Pop open the hood of OMZ! or Bash It! to see what makes shell customizations tick. You can also find wisdom and novelty by searching the Web for "dot files"; many Unix gearheads post configurations online for others to cull from. Showing off your dot files may not land you a starring role in the next Fast and the Furious, but it'll likely boost your geek cred.</p>
+  Pop open the hood of OMZ! or Bash It! to see what makes shell customizations tick. You can also find wisdom and novelty by searching the Web for the phrase "dot files" -- many Unix gearheads post personal shell configurations online for others to cull from. Here's a tip, too: Keep your dot files in some form of version control. Given a repository, you're likely to feel more comfortable experimenting with change and with other shells. You can revert to a prior version if you make a mistake or keep variations for particular shells or scenarios. The shell is flexible and dynamic and one size need not fit all. Once you have a set of cool "dot files", share with others. Showing off your dot files may not land you a starring role in the next "The Fast and the Furious", but it'll likely boost your geek cred.</p>
+
+<h2>
+  Resources
+  </h2>
+
+<ul>
+  <li>
+    You can find the source of the Z Shell and extensive documentation and tutorials at <a href="http://www.zsh.org/">its project page.</a>. The source of the Bash shell can be downloaded from the <a href="http://www.gnu.org/software/bash/">GNU Software Foundation</a>.
+
+  <li>
+    Read more about the Bash shell and terminal cursor and rendering options in the <a href="http://tldp.org/HOWTO/Bash-Prompt-HOWTO/x405.html">Bash documentation</a>.</li>
+
+  <li>
+    <a href="https://github.com/robbyrussell/oh-my-zsh">Oh My Z Shell!</a> is an open source project to add extensions and helpful shortcuts to the Z Shell.</li>
+
+  <li>
+    Similarly, <a href="https://github.com/revans/bash-it">Bash It!</a> is a community project to provide a framework of extensions and convenience for the Bash shell. </li>
+
+  <li>
+    Many developers and open source projects keep code under version control with <a href="http://git-scm.com/">Git</a> and <a href="http://www.github.com/">Github</a>.</li>
+  </ul>
 </body>
 </html>
